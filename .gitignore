@@ -22,6 +22,8 @@ build/
 *.woff2
 fontdb/data/fonts/**
 !fontdb/data/fonts/.gitkeep
+fontdb/data/synthetic/**
+!fontdb/data/synthetic/.gitkeep
 spike/**/fonts/
 spike*/**/fonts/
 spike4/fonts/

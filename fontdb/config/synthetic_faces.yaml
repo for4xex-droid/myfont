@@ -1,0 +1,31 @@
+# T7+: 一時フォント化した自作面（face_kind=synthetic）
+# 計測 profile は ft_1024_nohint_gray_v1（union→OTF 済み。掟4: 接合前 poly とは分離）
+# OTF バイナリは data/synthetic/（gitignore、掟10）
+
+protocol:
+  profile: ft_1024_nohint_gray_v1
+  face_kind: synthetic
+  path_prefix: data/synthetic
+  # 掟7: 代表字は YAML 正本（コードにハードコードしない）
+  glyphs: ["十", "三", "二", "永"]
+
+faces:
+  - family_id: mymincho_t7_classic
+    face_id: mymincho_t7_classic_regular
+    display_name: MyMincho T7 classic
+    params_name: classic
+    style_name: Regular
+    weight_class: 400
+    license: proprietary-self
+    vendor: myfont
+    notes: "engine.bridge 一時OTF。params=classic"
+
+  - family_id: mymincho_t7_product_r1
+    face_id: mymincho_t7_product_r1_regular
+    display_name: MyMincho T7 product_r1
+    params_name: product_r1
+    style_name: Regular
+    weight_class: 400
+    license: proprietary-self
+    vendor: myfont
+    notes: "engine.bridge 一時OTF。params=product_r1（h=45/v=110）"

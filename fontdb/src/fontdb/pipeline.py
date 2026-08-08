@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
+import sqlite3
+from collections.abc import Sequence
 from typing import Any
 
 import yaml
@@ -42,7 +44,7 @@ def codepoint(ch: str) -> str:
     return f"U+{ord(ch):04X}"
 
 
-def _probe_for_char(
+def probe_for_char(
     canvases: dict[str, Any],
     *,
     target: str,
@@ -53,7 +55,11 @@ def _probe_for_char(
 ) -> dict[str, Any]:
     """target で測り、fail/low_confidence なら fallback_char を試す（掟6/7）。"""
     if target not in canvases:
-        return {"status": "fail", "reason": f"missing canvas for {target!r}", "value": None}
+        return {
+            "status": "fail",
+            "reason": f"missing canvas for {target!r}",
+            "value": None,
+        }
     res = measure_fn(canvases[target], threshold=threshold, **kwargs)
     res["measured_char"] = target
     if res.get("status") in ("ok",) or not fallback or fallback not in canvases:
@@ -66,10 +72,200 @@ def _probe_for_char(
         fb["primary_reason"] = res.get("reason")
         if fb.get("status") == "ok":
             return fb
-        # どちらもダメなら primary を返す
         res["fallback_attempted"] = fallback
         res["fallback_status"] = fb.get("status")
     return res
+
+
+def resolve_probe_protocol(
+    defs: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """probe_defs.yaml から juu/san の代表字と kwargs を解決（掟7）。"""
+    defs = defs if defs is not None else load_probe_defs()
+    juu_probe = (defs.get("probes") or {}).get("juu_contrast") or {}
+    juu_target = juu_probe.get("target_char")
+    if not juu_target:
+        raise ValueError("probe_defs juu_contrast.target_char 未定義（掟7）")
+
+    j_kw = juu_kwargs(defs)
+    san_probe = (defs.get("probes") or {}).get("san_uroko") or {}
+    san_target = san_probe.get("target_char")
+    san_fallback = san_probe.get("fallback_char")
+    if not san_target or not san_fallback:
+        raise ValueError(
+            "probe_defs san_uroko.target_char/fallback_char 未定義（掟7）"
+        )
+    s_kw_full = san_kwargs(defs)
+    s_kw = {
+        k: v
+        for k, v in s_kw_full.items()
+        if k not in ("fallback_char", "target_char")
+    }
+    return {
+        "juu_target": str(juu_target),
+        "san_target": str(san_target),
+        "san_fallback": str(san_fallback),
+        "j_kw": j_kw,
+        "s_kw": s_kw,
+    }
+
+
+def ensure_glyphs_for_probes(
+    glyphs: Sequence[str],
+    *,
+    juu_target: str,
+    san_target: str,
+    san_fallback: str,
+) -> list[str]:
+    out = list(glyphs)
+    for ch in (juu_target, san_target, san_fallback):
+        if ch not in out:
+            out.append(ch)
+    return out
+
+
+def measure_face_metrics(
+    conn: sqlite3.Connection,
+    face_ft,
+    *,
+    face_id: str,
+    log_label: str,
+    glyphs: Sequence[str],
+    profile_id: str,
+    em_px: int,
+    threshold: int,
+    hinting: bool,
+    juu_target: str,
+    san_target: str,
+    san_fallback: str,
+    j_kw: dict[str, Any],
+    s_kw: dict[str, Any],
+    save_rasters: bool = True,
+    raster_prefix: str | None = None,
+) -> dict[str, Any]:
+    """1 face の glyph_metric + probe_metric を書き込み、report 断片を返す。"""
+    raster_chars = {juu_target, san_target}
+    prefix = raster_prefix or log_label
+    face_report: dict[str, Any] = {"glyphs": {}, "probes": {}}
+    canvases: dict[str, Any] = {}
+
+    for ch in glyphs:
+        gray, meta = render_glyph_gray(face_ft, ch, hinting=hinting)
+        gid = meta.get("glyph_index", face_ft.get_char_index(ord(ch)))
+        canvas = place_on_em_canvas(gray, meta, em_px=em_px)
+        canvases[ch] = canvas
+        m = ink_metrics(canvas, threshold=threshold, em_px=em_px)
+        if gid == 0:
+            m = {"status": "missing", "reason": "cmap missing (gid=0)"}
+        status = m["status"]
+        bbox = m.get("ink_bbox")
+        # 掟2: カラムは EM 正規化のみ
+        if bbox:
+            bbox_em = [v / em_px for v in bbox]
+        else:
+            bbox_em = [None, None, None, None]
+        advance_em = (
+            float(meta["advance_x"]) / em_px
+            if meta.get("advance_x") is not None
+            else None
+        )
+        conn.execute(
+            """INSERT OR REPLACE INTO glyph_metric VALUES
+            (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (
+                face_id,
+                codepoint(ch),
+                ch,
+                profile_id,
+                EXTRACTOR_VERSION,
+                status,
+                bbox_em[0],
+                bbox_em[1],
+                bbox_em[2],
+                bbox_em[3],
+                m.get("face_ratio"),
+                m.get("black_density"),
+                m.get("centroid_x_em"),
+                m.get("centroid_y_em"),
+                advance_em,
+            ),
+        )
+        face_report["glyphs"][ch] = {
+            "status": status,
+            "face_ratio": m.get("face_ratio"),
+            "black_density": m.get("black_density"),
+        }
+        if save_rasters and ch in raster_chars:
+            RENDERS_DIR.mkdir(parents=True, exist_ok=True)
+            Image.fromarray(canvas, mode="L").save(
+                RENDERS_DIR / f"{prefix}_{ch}.png"
+            )
+
+    if juu_target not in canvases:
+        raise ValueError(f"missing canvas for juu target {juu_target!r}")
+    juu = measure_juu_contrast(
+        canvases[juu_target],
+        threshold=threshold,
+        em_px=em_px,
+        **j_kw,
+    )
+    juu_for_db = dict(juu)
+    if juu.get("vert_thickness_px") is not None:
+        juu_for_db["vert_thickness_em"] = juu["vert_thickness_px"] / em_px
+        juu_for_db["horiz_thickness_em"] = juu["horiz_thickness_px"] / em_px
+        # カラム value_secondary も EM（掟2）。px は detail_json に残す
+        juu_for_db["value_secondary"] = juu_for_db["horiz_thickness_em"]
+
+    san = probe_for_char(
+        canvases,
+        target=san_target,
+        fallback=san_fallback,
+        measure_fn=measure_san_uroko,
+        kwargs=s_kw,
+        threshold=threshold,
+    )
+
+    for probe_id, res in (("juu_contrast", juu_for_db), ("san_uroko", san)):
+        row = dict(res)
+        if probe_id == "san_uroko" and row.get("value_secondary") is not None:
+            row["uroko_protrusion_px"] = row["value_secondary"]
+            row["value_secondary"] = float(row["value_secondary"]) / em_px
+        conn.execute(
+            """INSERT OR REPLACE INTO probe_metric VALUES
+            (?,?,?,?,?,?,?,?,?)""",
+            (
+                face_id,
+                probe_id,
+                profile_id,
+                EXTRACTOR_VERSION,
+                row["status"],
+                row.get("value"),
+                row.get("value_secondary"),
+                json.dumps(
+                    {k: v for k, v in row.items() if k not in ("status",)},
+                    ensure_ascii=False,
+                    default=str,
+                ),
+                row.get("reason"),
+            ),
+        )
+        face_report["probes"][probe_id] = {
+            "status": row["status"],
+            "value": row.get("value"),
+            "reason": row.get("reason"),
+            "measured_char": row.get("measured_char"),
+        }
+        logger.info(
+            "%s %s: %s value=%s",
+            log_label,
+            probe_id,
+            row["status"],
+            row.get("value"),
+        )
+
+    face_report["_juu"] = juu
+    face_report["_san"] = san
+    return face_report
 
 
 def run_measure(
@@ -85,24 +281,21 @@ def run_measure(
     hinting = str(profile.get("hinting", "off")) == "on"
 
     defs = load_probe_defs()
-    glyphs = glyphs or corpus_glyphs(defs)
-    # probe 対象字が欠けていれば追加
-    for ch in ("十", "三", "二"):
-        if ch not in glyphs:
-            glyphs.append(ch)
-
-    j_kw = juu_kwargs(defs)
-    s_kw_full = san_kwargs(defs)
-    san_fallback = s_kw_full.pop("fallback_char", "二")
-    san_target = s_kw_full.pop("target_char", "三")
-    # measure_san_uroko に渡さないキーを除去
-    s_kw = {k: v for k, v in s_kw_full.items() if k not in ("fallback_char", "target_char")}
+    proto = resolve_probe_protocol(defs)
+    glyphs = ensure_glyphs_for_probes(
+        glyphs or corpus_glyphs(defs),
+        juu_target=proto["juu_target"],
+        san_target=proto["san_target"],
+        san_fallback=proto["san_fallback"],
+    )
 
     with open(CORPUS_YAML, encoding="utf-8") as f:
         corpus = yaml.safe_load(f)
     families = [x for x in corpus["families"] if x.get("acquired")]
     if not families:
-        raise SystemExit("acquired fonts がありません。scripts/01_fetch.py を先に実行してください")
+        raise SystemExit(
+            "acquired fonts がありません。scripts/01_fetch.py を先に実行してください"
+        )
 
     conn = connect(DB_PATH)
     init_db(conn, reset=reset_db)
@@ -129,7 +322,13 @@ def run_measure(
 
         conn.execute(
             "INSERT OR REPLACE INTO family VALUES (?,?,?,?,?)",
-            (fid, fam["display_name"], fam["license"], fam.get("vendor"), fam.get("notes")),
+            (
+                fid,
+                fam["display_name"],
+                fam["license"],
+                fam.get("vendor"),
+                fam.get("notes"),
+            ),
         )
         face_id = f"{fid}_regular"
         conn.execute(
@@ -141,7 +340,9 @@ def run_measure(
                 style_name or "Regular",
                 400,
                 1 if fam.get("is_variable") else 0,
-                json.dumps(fam.get("instance_coords")) if fam.get("instance_coords") else None,
+                json.dumps(fam.get("instance_coords"))
+                if fam.get("instance_coords")
+                else None,
                 fam["path_rel"],
                 fam["sha256_measured"],
                 fam.get("source_url"),
@@ -149,118 +350,27 @@ def run_measure(
             ),
         )
 
-        face_report: dict[str, Any] = {"path": fam["path_rel"], "glyphs": {}, "probes": {}}
-        canvases: dict[str, Any] = {}
-        for ch in glyphs:
-            gray, meta = render_glyph_gray(face_ft, ch, hinting=hinting)
-            gid = meta.get("glyph_index", face_ft.get_char_index(ord(ch)))
-            canvas = place_on_em_canvas(gray, meta, em_px=em_px)
-            canvases[ch] = canvas
-            m = ink_metrics(canvas, threshold=threshold, em_px=em_px)
-            if gid == 0:
-                m = {"status": "missing", "reason": "cmap missing (gid=0)"}
-            status = m["status"]
-            bbox = m.get("ink_bbox")
-            # 掟2: カラムは EM 正規化のみ
-            if bbox:
-                bbox_em = [v / em_px for v in bbox]
-            else:
-                bbox_em = [None, None, None, None]
-            advance_em = (
-                float(meta["advance_x"]) / em_px if meta.get("advance_x") is not None else None
-            )
-            conn.execute(
-                """INSERT OR REPLACE INTO glyph_metric VALUES
-                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (
-                    face_id,
-                    codepoint(ch),
-                    ch,
-                    profile_id,
-                    EXTRACTOR_VERSION,
-                    status,
-                    bbox_em[0],
-                    bbox_em[1],
-                    bbox_em[2],
-                    bbox_em[3],
-                    m.get("face_ratio"),
-                    m.get("black_density"),
-                    m.get("centroid_x_em"),
-                    m.get("centroid_y_em"),
-                    advance_em,
-                ),
-            )
-            face_report["glyphs"][ch] = {
-                "status": status,
-                "face_ratio": m.get("face_ratio"),
-                "black_density": m.get("black_density"),
-            }
-            if save_rasters and ch in ("十", "三"):
-                Image.fromarray(canvas, mode="L").save(RENDERS_DIR / f"{fid}_{ch}.png")
-
-        juu = measure_juu_contrast(
-            canvases["十"],
-            threshold=threshold,
+        face_report = measure_face_metrics(
+            conn,
+            face_ft,
+            face_id=face_id,
+            log_label=fid,
+            glyphs=glyphs,
+            profile_id=profile_id,
             em_px=em_px,
-            **j_kw,
-        )
-        # value_secondary 等の px は detail_json のみ（掟2）
-        juu_for_db = dict(juu)
-        if juu.get("vert_thickness_px") is not None:
-            juu_for_db["vert_thickness_em"] = juu["vert_thickness_px"] / em_px
-            juu_for_db["horiz_thickness_em"] = juu["horiz_thickness_px"] / em_px
-            # カラム value_secondary も EM（掟2）。px は detail_json に残す
-            juu_for_db["value_secondary"] = juu_for_db["horiz_thickness_em"]
-
-        san = _probe_for_char(
-            canvases,
-            target=san_target,
-            fallback=san_fallback,
-            measure_fn=measure_san_uroko,
-            kwargs=s_kw,
             threshold=threshold,
+            hinting=hinting,
+            juu_target=proto["juu_target"],
+            san_target=proto["san_target"],
+            san_fallback=proto["san_fallback"],
+            j_kw=proto["j_kw"],
+            s_kw=proto["s_kw"],
+            save_rasters=save_rasters,
+            raster_prefix=fid,
         )
-
-        for probe_id, res in (("juu_contrast", juu_for_db), ("san_uroko", san)):
-            row = dict(res)
-            # san の value_secondary は突起 px → EM（掟2）
-            if probe_id == "san_uroko" and row.get("value_secondary") is not None:
-                row["uroko_protrusion_px"] = row["value_secondary"]
-                row["value_secondary"] = float(row["value_secondary"]) / em_px
-            conn.execute(
-                """INSERT OR REPLACE INTO probe_metric VALUES
-                (?,?,?,?,?,?,?,?,?)""",
-                (
-                    face_id,
-                    probe_id,
-                    profile_id,
-                    EXTRACTOR_VERSION,
-                    row["status"],
-                    row.get("value"),
-                    row.get("value_secondary"),
-                    json.dumps(
-                        {k: v for k, v in row.items() if k not in ("status",)},
-                        ensure_ascii=False,
-                        default=str,
-                    ),
-                    row.get("reason"),
-                ),
-            )
-            res = row  # for face_report below
-            face_report["probes"][probe_id] = {
-                "status": res["status"],
-                "value": res.get("value"),
-                "reason": res.get("reason"),
-                "measured_char": res.get("measured_char"),
-            }
-            logger.info(
-                "%s %s: %s value=%s",
-                fid,
-                probe_id,
-                res["status"],
-                res.get("value"),
-            )
-
+        juu = face_report.pop("_juu")
+        san = face_report.pop("_san")
+        face_report["path"] = fam["path_rel"]
         report["faces"][fid] = face_report
         report["probe_summary"].append(
             {

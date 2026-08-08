@@ -17,6 +17,7 @@ from typing import Any
 
 from pathops import PathVerb
 
+from engine.curve_refit import RefitConfig, load_refit_config, refit_contours
 from engine.extra_skeletons import all_characters, all_labels
 from engine.geometry import UPM, y_for_font
 from engine.join_solver import SolveResult, solve_glyph, split_contours
@@ -24,10 +25,11 @@ from engine.params import PARAM_SETS, MinchoParams
 
 logger = logging.getLogger(__name__)
 
-# コア試験字（spike3 と同セット）
+# コア試験字（T7/T7+: 十・二・三・永。三は san_uroko 用）
 CORE_GLYPHS: dict[str, dict[str, Any]] = {
     "juu": {"name": "uni5341", "unicode": 0x5341, "char": "十"},
     "ni": {"name": "uni4E8C", "unicode": 0x4E8C, "char": "二"},
+    "san": {"name": "uni4E09", "unicode": 0x4E09, "char": "三"},
     "ei": {"name": "uni6C38", "unicode": 0x6C38, "char": "永"},
 }
 
@@ -39,6 +41,7 @@ class BridgeGlyphResult:
     contours_after_cleanup: int
     font_contours: list[list[tuple[float, float]]]
     winding: dict[str, Any] = field(default_factory=dict)
+    refit: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -133,6 +136,7 @@ def solve_to_font_contours(
     params: MinchoParams,
     *,
     k: float = 0.15,
+    refit_cfg: RefitConfig | None = None,
 ) -> BridgeGlyphResult:
     chars = all_characters()
     if glyph_id not in chars:
@@ -140,7 +144,15 @@ def solve_to_font_contours(
     labels = all_labels()
     result: SolveResult = solve_glyph(chars[glyph_id], params, k=k)
     internal = extract_contours_xy(result.path)
-    font = to_font_contours(internal)
+    cfg = refit_cfg if refit_cfg is not None else load_refit_config()
+    refit_out = refit_contours(internal, cfg)
+    # extract 後の輪郭数と比較（pathops 件数と抽出フィルタがずれる余地があるため）
+    if len(refit_out.contours) != len(internal):
+        raise ValueError(
+            f"curve_refit changed contour count for {glyph_id}: "
+            f"{len(internal)} -> {len(refit_out.contours)}"
+        )
+    font = to_font_contours(refit_out.contours)
     font, winding = ensure_positive_fill(font)
     meta = CORE_GLYPHS.get(glyph_id, {})
     return BridgeGlyphResult(
@@ -149,6 +161,7 @@ def solve_to_font_contours(
         contours_after_cleanup=result.after_cleanup,
         font_contours=font,
         winding=winding,
+        refit=refit_out.meta,
     )
 
 
@@ -249,7 +262,8 @@ def check_fill_juu(otf_path: Path, *, em_px: int = 256) -> dict[str, Any]:
 
     face = freetype.Face(str(otf_path))
     face.set_char_size(em_px * 64)
-    face.load_char("十", freetype.FT_LOAD_RENDER | freetype.FT_LOAD_NO_HINTING)
+    juu_ch = str(CORE_GLYPHS["juu"]["char"])
+    face.load_char(juu_ch, freetype.FT_LOAD_RENDER | freetype.FT_LOAD_NO_HINTING)
     bitmap = face.glyph.bitmap
     if bitmap.width == 0 or bitmap.rows == 0:
         return {"ok": False, "reason": "empty raster", "ink_ratio": 0.0}
@@ -305,16 +319,18 @@ def measure_juu_from_otf(otf_path: Path, *, em_px: int = 1024, threshold: int = 
     imported = _try_import_fontdb_measure()
     if imported is not None:
         measure_juu_contrast, load_face, place_on_em_canvas, render_glyph_gray = imported
+        juu_ch = str(CORE_GLYPHS["juu"]["char"])
         face = load_face(str(otf_path), em_px=em_px)
-        gray, meta = render_glyph_gray(face, "十", hinting=False)
+        gray, meta = render_glyph_gray(face, juu_ch, hinting=False)
         canvas = place_on_em_canvas(gray, meta, em_px=em_px)
         out = measure_juu_contrast(canvas, threshold=threshold, em_px=em_px)
         out["profile"] = "ft_1024_nohint_gray_v1"
         return out
 
+    juu_ch = str(CORE_GLYPHS["juu"]["char"])
     face = freetype.Face(str(otf_path))
     face.set_pixel_sizes(em_px, em_px)
-    face.load_char("十", freetype.FT_LOAD_RENDER | freetype.FT_LOAD_NO_HINTING)
+    face.load_char(juu_ch, freetype.FT_LOAD_RENDER | freetype.FT_LOAD_NO_HINTING)
     bitmap = face.glyph.bitmap
     if bitmap.width == 0 or bitmap.rows == 0:
         return {"status": "fail", "reason": "empty"}
@@ -387,6 +403,7 @@ def write_bridge_report(result: BridgeBuildResult, path: Path) -> Path:
                 "contours_after_cleanup": g.contours_after_cleanup,
                 "n_font_contours": len(g.font_contours),
                 "winding": g.winding,
+                "refit": g.refit,
             }
             for g in result.glyphs
         ],

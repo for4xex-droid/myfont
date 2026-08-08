@@ -1,5 +1,7 @@
 data/fonts/**
 !data/fonts/.gitkeep
+data/synthetic/**
+!data/synthetic/.gitkeep
 data/renders/**
 !data/renders/.gitkeep
 data/db/*.sqlite

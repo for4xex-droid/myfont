@@ -129,6 +129,7 @@ alias（`uXXXX`→`uXXXX-j`）解決後の名前で記録する。表面名だ�
 | 計測プロトコル定義 | `fontdb/config/*.yaml` | コードにハードコード禁止（掟7） |
 | DB | `fontdb/data/db/fontdb.sqlite` | |
 | 外部フォント | `fontdb/data/fonts/` | gitignore（掟10） |
+| 自作一時OTF（T7+） | `fontdb/data/synthetic/` | gitignore（掟10）。DB の `face_kind=synthetic` |
 | エンジン | `engine/` | prototypeから移行。skia-pathopsはここだけ |
 | 骨格JSON | `engine/skeletons/` | フォント空間・Y上（掟1） |
 | UFO正本 | `fonts_out/*.ufo` | git管理。OTFは`fonts_out/build/`（gitignore） |
