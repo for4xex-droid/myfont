@@ -58,10 +58,12 @@ python scripts/06_ingest_prototype.py
 
 実測例（ft_1024_nohint_gray_v1）: classic 十 contrast≈2.22 / product_r1≈2.43（アンカー 2.44 に近い）。
 
-## 接合回帰
+## 接合回帰（掟14）
+
+正本: リポジトリ根の `tests/regression_join20.yaml`（20字）。
 
 ```bash
 pytest tests/test_regression_join.py -v
 ```
 
-回帰8字×3 params（classic/modern/product_r1）グリーン（`upm_area_ratio=0.0035`）。
+20字×3 params（classic/modern/product_r1）グリーン（`upm_area_ratio=0.0035`）。

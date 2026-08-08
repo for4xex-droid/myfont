@@ -1,0 +1,41 @@
+# P2 DoD 回帰20字（GOLDENRULES 掟14 / PLAN §3.3）
+# 正本: このファイル。engine テストはここを読み込む。
+#
+# 期待 contour 数:
+#   - 単一外輪郭: 1（十/木/本/一/人/大/土/王/山/工/上/下）
+#   - 非接触複数画: 二=2, 三=3, 川=3, 永=2（点独立）
+#   - 囲み+穴: 口=2, 日=3, 田=5, 中=3
+
+version: 1
+params: classic
+solver:
+  k: 0.15
+  area_ratio: 0.005
+  upm_area_ratio: 0.0035
+  proximity: 8.0
+  cleanup_mode: proximate
+  detect_scale: 1.0
+
+glyphs:
+  # --- コア8字 ---
+  - {id: juu,   char: 十, expected_contours: 1, self_intersect: false, notes: "十字交差"}
+  - {id: ni,    char: 二, expected_contours: 2, self_intersect: false, notes: "非接触2横"}
+  - {id: ei,    char: 永, expected_contours: 2, self_intersect: false, notes: "点+本体"}
+  - {id: ki,    char: 木, expected_contours: 1, self_intersect: false, notes: "横×縦×はらい"}
+  - {id: hon,   char: 本, expected_contours: 1, self_intersect: false, notes: "短横400-600・無うろこ"}
+  - {id: nichi, char: 日, expected_contours: 3, self_intersect: false, notes: "外1+穴2"}
+  - {id: ta,    char: 田, expected_contours: 5, self_intersect: false, notes: "外1+穴4"}
+  - {id: kuchi, char: 口, expected_contours: 2, self_intersect: false, notes: "外1+穴1"}
+  # --- join20 拡張12字 ---
+  - {id: ichi,  char: 一, expected_contours: 1, self_intersect: false, notes: "単横"}
+  - {id: san,   char: 三, expected_contours: 3, self_intersect: false, notes: "非接触3横"}
+  - {id: jin,   char: 人, expected_contours: 1, self_intersect: false, notes: "左右はらい接合"}
+  - {id: dai,   char: 大, expected_contours: 1, self_intersect: false, notes: "横+はらい"}
+  - {id: do,    char: 土, expected_contours: 1, self_intersect: false, notes: "上下横+縦"}
+  - {id: ou,    char: 王, expected_contours: 1, self_intersect: false, notes: "三横+縦"}
+  - {id: yama,  char: 山, expected_contours: 1, self_intersect: false, notes: "三縦+上横接続"}
+  - {id: kawa,  char: 川, expected_contours: 3, self_intersect: false, notes: "非接触3縦"}
+  - {id: kou,   char: 工, expected_contours: 1, self_intersect: false, notes: "上下横+縦"}
+  - {id: ue,    char: 上, expected_contours: 1, self_intersect: false, notes: "縦+下横+挑"}
+  - {id: shita, char: 下, expected_contours: 1, self_intersect: false, notes: "上横+縦+挑"}
+  - {id: naka,  char: 中, expected_contours: 3, self_intersect: false, notes: "口+中央縦=外1+穴2"}
