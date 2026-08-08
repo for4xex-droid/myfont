@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="620">
+<rect width="100%" height="100%" fill="#f7f3ea"/>
+<text x="40" y="28" font-size="16" font-family="Hiragino Mincho ProN,serif">永 — KAGE flattened vs prototype skeleton</text>
+<text x="40" y="48" font-size="12" font-family="sans-serif">Left: GlyphWiki u6c38→u6c38-j | Right: prototype/skeletons.char_ei()</text>
+<rect x="40" y="70" width="500.0" height="500.0" fill="#fff" stroke="#ccc"/>
+<rect x="580.0" y="70" width="500.0" height="500.0" fill="#fff" stroke="#ccc"/>
+<text x="40" y="64" font-size="12">KAGE</text>
+<text x="580.0" y="64" font-size="12">prototype</text>
+<path d="M 205.0,102.5 L 216.8,105.9 L 228.2,109.6 L 239.2,113.5 L 249.8,117.6 L 260.0,121.9 L 269.8,126.5 L 279.2,131.3 L 288.2,136.3 L 296.8,141.5 L 305.0,146.9 L 312.8,152.6 L 320.2,158.5 L 327.2,164.6 L 333.8,170.9 L 340.0,177.5" fill="none" stroke="#0b5fff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 125.0,220.0 L 290.0,220.0" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 290.0,220.0 L 290.0,527.5" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 80.0,302.5 L 217.5,302.5" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 217.5,302.5 L 213.7,319.6 L 209.1,336.1 L 203.7,352.2 L 197.4,367.7 L 190.3,382.8 L 182.3,397.3 L 173.5,411.3 L 163.8,424.8 L 153.3,437.8 L 141.9,450.3 L 129.7,462.2 L 116.7,473.7 L 102.8,484.6 L 88.1,495.1 L 72.5,505.0" fill="none" stroke="#0b5fff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 467.5,230.0 L 461.0,235.7 L 454.2,241.6 L 447.1,247.6 L 439.7,253.7 L 431.9,260.0 L 423.9,266.4 L 415.5,272.9 L 406.9,279.6 L 397.9,286.4 L 388.6,293.3 L 379.0,300.4 L 369.1,307.6 L 358.9,314.9 L 348.3,322.4 L 337.5,330.0" fill="none" stroke="#0b5fff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 300.0,237.5 L 306.1,259.8 L 313.2,281.2 L 321.2,301.8 L 330.1,321.6 L 340.0,340.6 L 350.8,358.7 L 362.5,376.0 L 375.2,392.5 L 388.8,408.2 L 403.3,423.1 L 418.8,437.1 L 435.2,450.3 L 452.5,462.7 L 470.8,474.3 L 490.0,485.0" fill="none" stroke="#0b5fff" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 840.0,152.5 L 877.5,192.5" fill="none" stroke="#b00020" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 710.0,220.0 L 960.0,220.0" fill="none" stroke="#b00020" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 815.0,220.0 L 815.0,460.0" fill="none" stroke="#b00020" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 815.0,297.5 L 900.0,285.0" fill="none" stroke="#b00020" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 807.5,225.0 L 760.0,310.0 L 705.0,395.0 L 650.0,480.0" fill="none" stroke="#b00020" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 830.0,175.0 L 807.5,195.0 L 780.0,215.0 L 750.0,235.0" fill="none" stroke="#b00020" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 820.0,330.0 L 860.0,370.0 L 930.0,430.0 L 1010.0,480.0" fill="none" stroke="#b00020" stroke-width="2.5" stroke-linecap="round"/>
+<text x="40" y="608.0" font-size="11">写像可能性: 点列＋type/tag は対応可能。座標系は KAGE200(Y↓)→UPM1000(Y↑) 変換が必須。</text>
+</svg>

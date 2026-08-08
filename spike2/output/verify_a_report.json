@@ -1,0 +1,18 @@
+{
+  "source": "PyPI kanji-lists (MIT)",
+  "JOYO_count": 2136,
+  "JOYO_expected": 2136,
+  "JOYO_ok": true,
+  "KYOIKU_count": 1026,
+  "KYOIKU_expected": 1026,
+  "KYOIKU_ok": true,
+  "KYOIKU_subset_of_JOYO": true,
+  "outputs": [
+    "/Users/motista/Desktop/antigravity/myfont/spike2/output/glyphset_joyo2136.txt",
+    "/Users/motista/Desktop/antigravity/myfont/spike2/output/glyphset_kyoiku1026.txt",
+    "/Users/motista/Desktop/antigravity/myfont/spike2/output/glyphset_joyo2136_uninames.txt"
+  ],
+  "sample_head": "一丁七万丈三上下不与且世丘丙両並中串丸丹",
+  "sample_tail": "魔魚鮮鯨鳥鳴鶏鶴鹿麓麗麦麺麻黄黒黙鼓鼻齢",
+  "verdict": "前提成立"
+}

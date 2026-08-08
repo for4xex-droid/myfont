@@ -1,0 +1,17 @@
+=== A: union → Y-flip → UFO → fontmake ===
+  juu(十): contours 6→2, roles=['fill', 'fill'], areas_after=[87952.1, 419.4]
+  ni(二): contours 6→4, roles=['fill', 'fill', 'fill', 'fill'], areas_after=[32617.7, 27059.0, 448.8, 419.4]
+  ei(永): contours 13→4, roles=['fill', 'fill', 'fill', 'fill'], areas_after=[135054.6, 4974.8, 462.6, 419.4]
+A verdict: 条件付き
+=== B: freetype vs poly_pillow ruler ===
+B ft: {'vert_thickness_px': 102.0, 'horiz_thickness_px': 46.0, 'contrast_v_over_h': 2.217391304347826, 'status': 'ok'}
+B poly: {'vert_thickness_px': 104.0, 'horiz_thickness_px': 47.0, 'contrast_v_over_h': 2.2127659574468086, 'status': 'ok'}
+B diff: {'vert_px_delta_ft_minus_poly': -2.0, 'horiz_px_delta_ft_minus_poly': -1.0, 'contrast_delta_ft_minus_poly': 0.0046253469010175685, 'vert_rel_pct': -1.9230769230769231, 'horiz_rel_pct': -2.127659574468085, 'contrast_rel_pct': 0.2090301003344478}
+B verdict: 成立
+=== C: proof smoke ===
+=== pip install diffenator2 ===
+C hb proof: True /Users/motista/Desktop/antigravity/myfont/spike3/output/C_proof_juuni_ei.png
+C hb-view: True /Users/motista/Desktop/antigravity/myfont/spike3/output/C_proof_hbview_juuni_ei.png
+C diffenator2: 不成立（proof失敗/HTML無し）
+wrote /Users/motista/Desktop/antigravity/myfont/spike3/output/verify_e2e_report.json
+OVERALL: {"A": "条件付き", "B": "成立", "C": "成立"}

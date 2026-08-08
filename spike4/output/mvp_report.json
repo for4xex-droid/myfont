@@ -1,0 +1,907 @@
+{
+  "profile": "ft_1024_nohint_gray_v1",
+  "extractor": "spike4_v1",
+  "glyphs": [
+    "三",
+    "十",
+    "口",
+    "田",
+    "国",
+    "日",
+    "東",
+    "鬱",
+    "永",
+    "あ",
+    "の",
+    "ん"
+  ],
+  "faces": {
+    "source_han_serif_jp": {
+      "path": "fonts/source_han_serif_jp-Regular.otf",
+      "glyphs": {
+        "三": {
+          "status": "ok",
+          "face_ratio": 0.7249345779418945,
+          "black_density": 0.11519978320039886,
+          "centroid": [
+            0.5542257435921959,
+            0.5277227368560792
+          ]
+        },
+        "十": {
+          "status": "ok",
+          "face_ratio": 0.831939697265625,
+          "black_density": 0.10928042808407615,
+          "centroid": [
+            0.5181802622245125,
+            0.4686408203719147
+          ]
+        },
+        "口": {
+          "status": "ok",
+          "face_ratio": 0.5740041732788086,
+          "black_density": 0.23277957490359485,
+          "centroid": [
+            0.5081213947755109,
+            0.5217109875175758
+          ]
+        },
+        "田": {
+          "status": "ok",
+          "face_ratio": 0.6557941436767578,
+          "black_density": 0.3042928815531157,
+          "centroid": [
+            0.5074629999548979,
+            0.5128549810077923
+          ]
+        },
+        "国": {
+          "status": "ok",
+          "face_ratio": 0.7589340209960938,
+          "black_density": 0.32281352098517213,
+          "centroid": [
+            0.5158700539130773,
+            0.5043327070641702
+          ]
+        },
+        "日": {
+          "status": "ok",
+          "face_ratio": 0.5492839813232422,
+          "black_density": 0.27737053923321864,
+          "centroid": [
+            0.5070774312662748,
+            0.5172135492465855
+          ]
+        },
+        "東": {
+          "status": "ok",
+          "face_ratio": 0.8498191833496094,
+          "black_density": 0.26797441364605545,
+          "centroid": [
+            0.5183743650004502,
+            0.5109381854160734
+          ]
+        },
+        "鬱": {
+          "status": "ok",
+          "face_ratio": 0.8507480621337891,
+          "black_density": 0.3969883664359683,
+          "centroid": [
+            0.48303474040235866,
+            0.4662619706896296
+          ]
+        },
+        "永": {
+          "status": "ok",
+          "face_ratio": 0.8506050109863281,
+          "black_density": 0.1928953587973863,
+          "centroid": [
+            0.5144689931189261,
+            0.5368723805910995
+          ]
+        },
+        "あ": {
+          "status": "ok",
+          "face_ratio": 0.6355905532836914,
+          "black_density": 0.2708844425438695,
+          "centroid": [
+            0.5001420798771706,
+            0.5290558974454399
+          ]
+        },
+        "の": {
+          "status": "ok",
+          "face_ratio": 0.5524101257324219,
+          "black_density": 0.2505593497731526,
+          "centroid": [
+            0.5073875319745409,
+            0.5247830683501568
+          ]
+        },
+        "ん": {
+          "status": "ok",
+          "face_ratio": 0.6646814346313477,
+          "black_density": 0.1674450370102544,
+          "centroid": [
+            0.477722452475922,
+            0.607206235299347
+          ]
+        }
+      },
+      "probes": {
+        "juu_contrast": {
+          "status": "ok",
+          "value": 2.413793103448276,
+          "value_secondary": 29.0,
+          "vert_thickness_px": 70.0,
+          "horiz_thickness_px": 29.0,
+          "contrast_v_over_h": 2.413793103448276,
+          "vert_cands": [
+            70,
+            70,
+            70,
+            70
+          ],
+          "horiz_cands": [
+            29,
+            29,
+            29,
+            29
+          ]
+        },
+        "san_uroko": {
+          "status": "ok",
+          "reason": "clear uroko protrusion",
+          "value": 0.8620689655172413,
+          "value_secondary": 25.0,
+          "body_thickness_px": 29.0,
+          "uroko_protrusion_px": 25.0,
+          "uroko_height_boost_px": 25.0,
+          "uroko_relative_to_stroke": 0.8620689655172413,
+          "peak_y_rel": 82,
+          "band_lo_hi": [
+            68,
+            97
+          ],
+          "roi_y_abs": [
+            140,
+            203
+          ],
+          "used_fallback_band": false,
+          "right_top_rel": 0,
+          "body_top_rel": 25.0
+        }
+      }
+    },
+    "ipaex_mincho": {
+      "path": "fonts/ipaex_mincho-Regular.ttf",
+      "glyphs": {
+        "三": {
+          "status": "ok",
+          "face_ratio": 0.6110315322875977,
+          "black_density": 0.11390279267004104,
+          "centroid": [
+            0.5613781286825662,
+            0.5299824318040122
+          ]
+        },
+        "十": {
+          "status": "ok",
+          "face_ratio": 0.7638826370239258,
+          "black_density": 0.10749585824524431,
+          "centroid": [
+            0.5201386938100299,
+            0.4814949555329083
+          ]
+        },
+        "口": {
+          "status": "ok",
+          "face_ratio": 0.5276565551757812,
+          "black_density": 0.23486683246338255,
+          "centroid": [
+            0.5005134526333408,
+            0.5286591924403997
+          ]
+        },
+        "田": {
+          "status": "ok",
+          "face_ratio": 0.6021966934204102,
+          "black_density": 0.28934561619386523,
+          "centroid": [
+            0.4943718321462095,
+            0.5144772436195657
+          ]
+        },
+        "国": {
+          "status": "ok",
+          "face_ratio": 0.7110557556152344,
+          "black_density": 0.30448661205263977,
+          "centroid": [
+            0.5112702497863661,
+            0.5148305363984094
+          ]
+        },
+        "日": {
+          "status": "ok",
+          "face_ratio": 0.5050811767578125,
+          "black_density": 0.269259236881061,
+          "centroid": [
+            0.49624139443844495,
+            0.5090171717877829
+          ]
+        },
+        "東": {
+          "status": "ok",
+          "face_ratio": 0.8247556686401367,
+          "black_density": 0.24915733812508745,
+          "centroid": [
+            0.5160098538018735,
+            0.5044242302144438
+          ]
+        },
+        "鬱": {
+          "status": "ok",
+          "face_ratio": 0.8362293243408203,
+          "black_density": 0.3790249187432286,
+          "centroid": [
+            0.4837421478437135,
+            0.4755643257641463
+          ]
+        },
+        "永": {
+          "status": "ok",
+          "face_ratio": 0.8001623153686523,
+          "black_density": 0.1993180228144133,
+          "centroid": [
+            0.49692574406408085,
+            0.543904821425368
+          ]
+        },
+        "あ": {
+          "status": "ok",
+          "face_ratio": 0.6238632202148438,
+          "black_density": 0.2577594746303702,
+          "centroid": [
+            0.48953689075491646,
+            0.5366246671470424
+          ]
+        },
+        "の": {
+          "status": "ok",
+          "face_ratio": 0.53558349609375,
+          "black_density": 0.24703525641025642,
+          "centroid": [
+            0.5017204069921973,
+            0.5087260418919163
+          ]
+        },
+        "ん": {
+          "status": "ok",
+          "face_ratio": 0.6171512603759766,
+          "black_density": 0.16380943550754873,
+          "centroid": [
+            0.46771420220317717,
+            0.6073995074571251
+          ]
+        }
+      },
+      "probes": {
+        "juu_contrast": {
+          "status": "ok",
+          "value": 2.5,
+          "value_secondary": 26.0,
+          "vert_thickness_px": 65.0,
+          "horiz_thickness_px": 26.0,
+          "contrast_v_over_h": 2.5,
+          "vert_cands": [
+            65,
+            65,
+            65,
+            65
+          ],
+          "horiz_cands": [
+            26,
+            26,
+            26,
+            26
+          ]
+        },
+        "san_uroko": {
+          "status": "ok",
+          "reason": "clear uroko protrusion",
+          "value": 0.8518518518518519,
+          "value_secondary": 23.0,
+          "body_thickness_px": 27.0,
+          "uroko_protrusion_px": 23.0,
+          "uroko_height_boost_px": 23.0,
+          "uroko_relative_to_stroke": 0.8518518518518519,
+          "peak_y_rel": 75,
+          "band_lo_hi": [
+            69,
+            96
+          ],
+          "roi_y_abs": [
+            183,
+            241
+          ],
+          "used_fallback_band": false,
+          "right_top_rel": 0,
+          "body_top_rel": 23.0
+        }
+      }
+    },
+    "shippori_mincho": {
+      "path": "fonts/shippori_mincho-Regular.ttf",
+      "glyphs": {
+        "三": {
+          "status": "ok",
+          "face_ratio": 0.7149639129638672,
+          "black_density": 0.11981288365653187,
+          "centroid": [
+            0.5425490008822907,
+            0.5215271131315198
+          ]
+        },
+        "十": {
+          "status": "ok",
+          "face_ratio": 0.8095951080322266,
+          "black_density": 0.11380433066877758,
+          "centroid": [
+            0.5136011985242364,
+            0.4755948731413866
+          ]
+        },
+        "口": {
+          "status": "ok",
+          "face_ratio": 0.5511665344238281,
+          "black_density": 0.23323009308924803,
+          "centroid": [
+            0.5016532728656161,
+            0.535840683434507
+          ]
+        },
+        "田": {
+          "status": "ok",
+          "face_ratio": 0.6403923034667969,
+          "black_density": 0.30416827997021595,
+          "centroid": [
+            0.5055898472116143,
+            0.5125332142844029
+          ]
+        },
+        "国": {
+          "status": "ok",
+          "face_ratio": 0.7387542724609375,
+          "black_density": 0.3236742228648146,
+          "centroid": [
+            0.5135751188524753,
+            0.5039621256820058
+          ]
+        },
+        "日": {
+          "status": "ok",
+          "face_ratio": 0.5376148223876953,
+          "black_density": 0.2794351906054317,
+          "centroid": [
+            0.5067065875732418,
+            0.5184142592929104
+          ]
+        },
+        "東": {
+          "status": "ok",
+          "face_ratio": 0.821044921875,
+          "black_density": 0.27457464503419565,
+          "centroid": [
+            0.5178587510615448,
+            0.5088833853111291
+          ]
+        },
+        "鬱": {
+          "status": "ok",
+          "face_ratio": 0.8200035095214844,
+          "black_density": 0.4055994398931889,
+          "centroid": [
+            0.486922285529851,
+            0.46479998027324093
+          ]
+        },
+        "永": {
+          "status": "ok",
+          "face_ratio": 0.8168163299560547,
+          "black_density": 0.20015318262591447,
+          "centroid": [
+            0.5097337356173074,
+            0.5296339066966108
+          ]
+        },
+        "あ": {
+          "status": "ok",
+          "face_ratio": 0.6293563842773438,
+          "black_density": 0.25363979100750383,
+          "centroid": [
+            0.48978371308637625,
+            0.5302784899729066
+          ]
+        },
+        "の": {
+          "status": "ok",
+          "face_ratio": 0.5449504852294922,
+          "black_density": 0.23397419070319309,
+          "centroid": [
+            0.49707240881735326,
+            0.5301912209559978
+          ]
+        },
+        "ん": {
+          "status": "ok",
+          "face_ratio": 0.6248073577880859,
+          "black_density": 0.1659889675467597,
+          "centroid": [
+            0.47782205719995124,
+            0.5761174204762802
+          ]
+        }
+      },
+      "probes": {
+        "juu_contrast": {
+          "status": "ok",
+          "value": 2.4642857142857144,
+          "value_secondary": 28.0,
+          "vert_thickness_px": 69.0,
+          "horiz_thickness_px": 28.0,
+          "contrast_v_over_h": 2.4642857142857144,
+          "vert_cands": [
+            69,
+            69,
+            69,
+            69
+          ],
+          "horiz_cands": [
+            28,
+            28,
+            28,
+            28
+          ]
+        },
+        "san_uroko": {
+          "status": "ok",
+          "reason": "clear uroko protrusion",
+          "value": 0.8620689655172413,
+          "value_secondary": 25.0,
+          "body_thickness_px": 29.0,
+          "uroko_protrusion_px": 25.0,
+          "uroko_height_boost_px": 25.0,
+          "uroko_relative_to_stroke": 0.8620689655172413,
+          "peak_y_rel": 77,
+          "band_lo_hi": [
+            68,
+            98
+          ],
+          "roi_y_abs": [
+            140,
+            204
+          ],
+          "used_fallback_band": false,
+          "right_top_rel": 0,
+          "body_top_rel": 25.0
+        }
+      }
+    },
+    "zen_old_mincho": {
+      "path": "fonts/zen_old_mincho-Regular.ttf",
+      "glyphs": {
+        "三": {
+          "status": "ok",
+          "face_ratio": 0.6799888610839844,
+          "black_density": 0.12321253260778099,
+          "centroid": [
+            0.5436800211539446,
+            0.5310339964201564
+          ]
+        },
+        "十": {
+          "status": "ok",
+          "face_ratio": 0.8186359405517578,
+          "black_density": 0.11571617959883598,
+          "centroid": [
+            0.5163779277113892,
+            0.47257599630591157
+          ]
+        },
+        "口": {
+          "status": "ok",
+          "face_ratio": 0.5127716064453125,
+          "black_density": 0.2703187769677131,
+          "centroid": [
+            0.5042752669295469,
+            0.5191761681258386
+          ]
+        },
+        "田": {
+          "status": "ok",
+          "face_ratio": 0.6024370193481445,
+          "black_density": 0.32646932646932647,
+          "centroid": [
+            0.49834162279646366,
+            0.5153033605216966
+          ]
+        },
+        "国": {
+          "status": "ok",
+          "face_ratio": 0.7222604751586914,
+          "black_density": 0.33817348764433647,
+          "centroid": [
+            0.5080302832674122,
+            0.5194868209322802
+          ]
+        },
+        "日": {
+          "status": "ok",
+          "face_ratio": 0.4802570343017578,
+          "black_density": 0.3145242322066142,
+          "centroid": [
+            0.5022564272227571,
+            0.5232331426285592
+          ]
+        },
+        "東": {
+          "status": "ok",
+          "face_ratio": 0.8186359405517578,
+          "black_density": 0.2806307534232213,
+          "centroid": [
+            0.5154945249194147,
+            0.5037229078842769
+          ]
+        },
+        "鬱": {
+          "status": "ok",
+          "face_ratio": 0.8805513381958008,
+          "black_density": 0.35318983023312484,
+          "centroid": [
+            0.48881264285388476,
+            0.4952996328489861
+          ]
+        },
+        "永": {
+          "status": "ok",
+          "face_ratio": 0.824824333190918,
+          "black_density": 0.2040395841788156,
+          "centroid": [
+            0.5052989494703835,
+            0.542467829528197
+          ]
+        },
+        "あ": {
+          "status": "ok",
+          "face_ratio": 0.6297531127929688,
+          "black_density": 0.2765043674206171,
+          "centroid": [
+            0.5005750116895689,
+            0.5271412844850839
+          ]
+        },
+        "の": {
+          "status": "ok",
+          "face_ratio": 0.5466518402099609,
+          "black_density": 0.2611399741105292,
+          "centroid": [
+            0.4968452595561906,
+            0.5097725013277706
+          ]
+        },
+        "ん": {
+          "status": "ok",
+          "face_ratio": 0.6108226776123047,
+          "black_density": 0.17402817200473383,
+          "centroid": [
+            0.4638192898183494,
+            0.6010460163287026
+          ]
+        }
+      },
+      "probes": {
+        "juu_contrast": {
+          "status": "ok",
+          "value": 2.4,
+          "value_secondary": 30.0,
+          "vert_thickness_px": 72.0,
+          "horiz_thickness_px": 30.0,
+          "contrast_v_over_h": 2.4,
+          "vert_cands": [
+            72,
+            72,
+            72,
+            72
+          ],
+          "horiz_cands": [
+            30,
+            30,
+            30,
+            30
+          ]
+        },
+        "san_uroko": {
+          "status": "ok",
+          "reason": "clear uroko protrusion",
+          "value": 0.8387096774193549,
+          "value_secondary": 26.0,
+          "body_thickness_px": 31.0,
+          "uroko_protrusion_px": 26.0,
+          "uroko_height_boost_px": 26.0,
+          "uroko_relative_to_stroke": 0.8387096774193549,
+          "peak_y_rel": 73,
+          "band_lo_hi": [
+            58,
+            89
+          ],
+          "roi_y_abs": [
+            154,
+            220
+          ],
+          "used_fallback_band": false,
+          "right_top_rel": 0,
+          "body_top_rel": 26.0
+        }
+      }
+    },
+    "biz_ud_mincho": {
+      "path": "fonts/biz_ud_mincho-Regular.ttf",
+      "glyphs": {
+        "三": {
+          "status": "ok",
+          "face_ratio": 0.6658029556274414,
+          "black_density": 0.19171089100401778,
+          "centroid": [
+            0.528258833176432,
+            0.5437417725984743
+          ]
+        },
+        "十": {
+          "status": "ok",
+          "face_ratio": 0.8045063018798828,
+          "black_density": 0.13460038454881898,
+          "centroid": [
+            0.512064129418875,
+            0.47618701878407177
+          ]
+        },
+        "口": {
+          "status": "ok",
+          "face_ratio": 0.5496768951416016,
+          "black_density": 0.2942738966442161,
+          "centroid": [
+            0.499813960678132,
+            0.5265111042767211
+          ]
+        },
+        "田": {
+          "status": "ok",
+          "face_ratio": 0.6407012939453125,
+          "black_density": 0.36255477625092286,
+          "centroid": [
+            0.4960152635195609,
+            0.5145996159903807
+          ]
+        },
+        "国": {
+          "status": "ok",
+          "face_ratio": 0.7527923583984375,
+          "black_density": 0.38834878889226715,
+          "centroid": [
+            0.506551232738169,
+            0.5150426311055075
+          ]
+        },
+        "日": {
+          "status": "ok",
+          "face_ratio": 0.5320529937744141,
+          "black_density": 0.34516524525988623,
+          "centroid": [
+            0.497602609984447,
+            0.5062171999307384
+          ]
+        },
+        "東": {
+          "status": "ok",
+          "face_ratio": 0.8796958923339844,
+          "black_density": 0.31424132832047597,
+          "centroid": [
+            0.5070479772102962,
+            0.4865676087898677
+          ]
+        },
+        "鬱": {
+          "status": "ok",
+          "face_ratio": 0.8926067352294922,
+          "black_density": 0.4211093137998603,
+          "centroid": [
+            0.4839645401847104,
+            0.4721501864443896
+          ]
+        },
+        "永": {
+          "status": "ok",
+          "face_ratio": 0.8615951538085938,
+          "black_density": 0.2285886957522735,
+          "centroid": [
+            0.49063292436222267,
+            0.5302481814917465
+          ]
+        },
+        "あ": {
+          "status": "ok",
+          "face_ratio": 0.6840953826904297,
+          "black_density": 0.29112286463895076,
+          "centroid": [
+            0.4838016980019633,
+            0.5376132331771057
+          ]
+        },
+        "の": {
+          "status": "ok",
+          "face_ratio": 0.6079616546630859,
+          "black_density": 0.27482925329493296,
+          "centroid": [
+            0.497634783706807,
+            0.5022881902478996
+          ]
+        },
+        "ん": {
+          "status": "ok",
+          "face_ratio": 0.662989616394043,
+          "black_density": 0.18625133955221196,
+          "centroid": [
+            0.47797322519809854,
+            0.5961755262958465
+          ]
+        }
+      },
+      "probes": {
+        "juu_contrast": {
+          "status": "ok",
+          "value": 1.3461538461538463,
+          "value_secondary": 52.0,
+          "vert_thickness_px": 70.0,
+          "horiz_thickness_px": 52.0,
+          "contrast_v_over_h": 1.3461538461538463,
+          "vert_cands": [
+            70,
+            70,
+            70,
+            70
+          ],
+          "horiz_cands": [
+            52,
+            52,
+            52,
+            52
+          ]
+        },
+        "san_uroko": {
+          "status": "ok",
+          "reason": "clear uroko protrusion",
+          "value": 0.4117647058823529,
+          "value_secondary": 21.0,
+          "body_thickness_px": 51.0,
+          "uroko_protrusion_px": 21.0,
+          "uroko_height_boost_px": 21.0,
+          "uroko_relative_to_stroke": 0.4117647058823529,
+          "peak_y_rel": 79,
+          "band_lo_hi": [
+            62,
+            113
+          ],
+          "roi_y_abs": [
+            146,
+            255
+          ],
+          "used_fallback_band": false,
+          "right_top_rel": 21,
+          "body_top_rel": 42.0
+        }
+      }
+    }
+  },
+  "probe_summary": [
+    {
+      "family_id": "source_han_serif_jp",
+      "label": "SourceHanSerifJP",
+      "display_name": "源ノ明朝 (Source Han Serif JP)",
+      "contrast": 2.413793103448276,
+      "uroko_rel": 0.8620689655172413,
+      "uroko_px": 25.0,
+      "juu_status": "ok",
+      "san_status": "ok",
+      "san_reason": "clear uroko protrusion"
+    },
+    {
+      "family_id": "ipaex_mincho",
+      "label": "IPAexMincho",
+      "display_name": "IPAex明朝",
+      "contrast": 2.5,
+      "uroko_rel": 0.8518518518518519,
+      "uroko_px": 23.0,
+      "juu_status": "ok",
+      "san_status": "ok",
+      "san_reason": "clear uroko protrusion"
+    },
+    {
+      "family_id": "shippori_mincho",
+      "label": "ShipporiMincho",
+      "display_name": "しっぽり明朝",
+      "contrast": 2.4642857142857144,
+      "uroko_rel": 0.8620689655172413,
+      "uroko_px": 25.0,
+      "juu_status": "ok",
+      "san_status": "ok",
+      "san_reason": "clear uroko protrusion"
+    },
+    {
+      "family_id": "zen_old_mincho",
+      "label": "ZenOldMincho",
+      "display_name": "Zen Old Mincho",
+      "contrast": 2.4,
+      "uroko_rel": 0.8387096774193549,
+      "uroko_px": 26.0,
+      "juu_status": "ok",
+      "san_status": "ok",
+      "san_reason": "clear uroko protrusion"
+    },
+    {
+      "family_id": "biz_ud_mincho",
+      "label": "BIZ UDMincho",
+      "display_name": "BIZ UD明朝",
+      "contrast": 1.3461538461538463,
+      "uroko_rel": 0.4117647058823529,
+      "uroko_px": 21.0,
+      "juu_status": "ok",
+      "san_status": "ok",
+      "san_reason": "clear uroko protrusion"
+    }
+  ],
+  "san_uroko_stability": {
+    "ok_count": 5,
+    "total": 5,
+    "ok_ratio": 1.0,
+    "per_family": {
+      "source_han_serif_jp": {
+        "status": "ok",
+        "uroko_rel": 0.8620689655172413,
+        "uroko_px": 25.0,
+        "reason": "clear uroko protrusion"
+      },
+      "ipaex_mincho": {
+        "status": "ok",
+        "uroko_rel": 0.8518518518518519,
+        "uroko_px": 23.0,
+        "reason": "clear uroko protrusion"
+      },
+      "shippori_mincho": {
+        "status": "ok",
+        "uroko_rel": 0.8620689655172413,
+        "uroko_px": 25.0,
+        "reason": "clear uroko protrusion"
+      },
+      "zen_old_mincho": {
+        "status": "ok",
+        "uroko_rel": 0.8387096774193549,
+        "uroko_px": 26.0,
+        "reason": "clear uroko protrusion"
+      },
+      "biz_ud_mincho": {
+        "status": "ok",
+        "uroko_rel": 0.4117647058823529,
+        "uroko_px": 21.0,
+        "reason": "clear uroko protrusion"
+      }
+    },
+    "verdict": "書体別チューニングなしで 5/5 書体が ok"
+  },
+  "scatter_png": "/Users/motista/Desktop/antigravity/myfont/spike4/output/scatter_contrast_uroko.png",
+  "scatter_separation": {
+    "contrast_span": 1.1538461538461537,
+    "uroko_span": 0.4503042596348884,
+    "meaningful": true,
+    "note": "contrast_span>=0.15 or uroko_span>=0.15 なら書体間差ありと判定"
+  }
+}

@@ -1,0 +1,137 @@
+[
+  {
+    "kage_type": 2,
+    "type_name": "curve",
+    "start_tag": 7,
+    "end_tag": 8,
+    "points": [
+      {
+        "x": 66.0,
+        "y": 13.0
+      },
+      {
+        "x": 102.0,
+        "y": 23.0
+      },
+      {
+        "x": 120.0,
+        "y": 43.0
+      }
+    ],
+    "source": "u6c38-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 0,
+    "end_tag": 2,
+    "points": [
+      {
+        "x": 34.0,
+        "y": 60.0
+      },
+      {
+        "x": 100.0,
+        "y": 60.0
+      }
+    ],
+    "source": "u6c38-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 22,
+    "end_tag": 4,
+    "points": [
+      {
+        "x": 100.0,
+        "y": 60.0
+      },
+      {
+        "x": 100.0,
+        "y": 183.0
+      }
+    ],
+    "source": "u6c38-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 0,
+    "end_tag": 2,
+    "points": [
+      {
+        "x": 16.0,
+        "y": 93.0
+      },
+      {
+        "x": 71.0,
+        "y": 93.0
+      }
+    ],
+    "source": "u6c38-j"
+  },
+  {
+    "kage_type": 2,
+    "type_name": "curve",
+    "start_tag": 22,
+    "end_tag": 7,
+    "points": [
+      {
+        "x": 71.0,
+        "y": 93.0
+      },
+      {
+        "x": 61.0,
+        "y": 145.0
+      },
+      {
+        "x": 13.0,
+        "y": 174.0
+      }
+    ],
+    "source": "u6c38-j"
+  },
+  {
+    "kage_type": 2,
+    "type_name": "curve",
+    "start_tag": 0,
+    "end_tag": 7,
+    "points": [
+      {
+        "x": 171.0,
+        "y": 64.0
+      },
+      {
+        "x": 152.0,
+        "y": 81.0
+      },
+      {
+        "x": 119.0,
+        "y": 104.0
+      }
+    ],
+    "source": "u6c38-j"
+  },
+  {
+    "kage_type": 2,
+    "type_name": "curve",
+    "start_tag": 7,
+    "end_tag": 0,
+    "points": [
+      {
+        "x": 104.0,
+        "y": 67.0
+      },
+      {
+        "x": 121.0,
+        "y": 135.0
+      },
+      {
+        "x": 180.0,
+        "y": 166.0
+      }
+    ],
+    "source": "u6c38-j"
+  }
+]

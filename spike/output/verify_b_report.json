@@ -1,0 +1,137 @@
+{
+  "font_path": "/Users/motista/Desktop/antigravity/myfont/spike/fonts/NotoSerifJP-Regular-wght400.ttf",
+  "source": "google/fonts NotoSerifJP variable → fontTools instancer wght=400",
+  "reference_only": false,
+  "units_per_EM": 1000,
+  "family": "Noto Serif JP",
+  "style": "ExtraLight",
+  "protocol": {
+    "em_px": 1024,
+    "load_flags": "FT_LOAD_NO_HINTING | FT_LOAD_RENDER",
+    "threshold": 128,
+    "plan_refs": [
+      "§2.3 ft_1024_nohint_gray_v1",
+      "§2.4 Phase α juu_contrast / san_uroko"
+    ]
+  },
+  "glyphs": {
+    "juu": {
+      "meta": {
+        "width": 936,
+        "rows": 933,
+        "pitch": 936,
+        "pixel_mode": 2,
+        "left": 45,
+        "top": 855,
+        "advance_x": 1024.0,
+        "units_per_EM": 1000
+      },
+      "png": "/Users/motista/Desktop/antigravity/myfont/spike/output/raster_juu_1024.png",
+      "bin_png": "/Users/motista/Desktop/antigravity/myfont/spike/output/raster_juu_1024_bin.png",
+      "probe": {
+        "status": "ok",
+        "bbox": [
+          45,
+          47,
+          980,
+          978
+        ],
+        "scan_center": [
+          512,
+          512
+        ],
+        "vert_thickness_px": 70.0,
+        "horiz_thickness_px": 29.0,
+        "vert_thickness_em": 0.068359375,
+        "horiz_thickness_em": 0.0283203125,
+        "contrast_v_over_h": 2.413793103448276,
+        "vert_cands": [
+          70,
+          70,
+          70,
+          70
+        ],
+        "horiz_cands": [
+          29,
+          29,
+          29,
+          29
+        ],
+        "face_w": 936,
+        "face_h": 932
+      }
+    },
+    "san": {
+      "meta": {
+        "width": 951,
+        "rows": 801,
+        "pitch": 951,
+        "pixel_mode": 2,
+        "left": 41,
+        "top": 805,
+        "advance_x": 1024.0,
+        "units_per_EM": 1000
+      },
+      "png": "/Users/motista/Desktop/antigravity/myfont/spike/output/raster_san_1024.png",
+      "bin_png": "/Users/motista/Desktop/antigravity/myfont/spike/output/raster_san_1024_bin.png",
+      "probe": {
+        "status": "ok",
+        "body_thickness_px": 29.0,
+        "uroko_protrusion_px": 69.0,
+        "uroko_height_boost_px": 69.0,
+        "uroko_protrusion_em": 0.0673828125,
+        "uroko_relative_to_stroke": 2.3793103448275863,
+        "roi": [
+          42,
+          96,
+          990,
+          320
+        ],
+        "note": "簡易検出。様式的ゼロと検出不能の区別は閾値設計が必要（PLAN §2.4）"
+      }
+    },
+    "ni": {
+      "meta": {
+        "width": 927,
+        "rows": 673,
+        "pitch": 927,
+        "pixel_mode": 2,
+        "left": 51,
+        "top": 741,
+        "advance_x": 1024.0,
+        "units_per_EM": 1000
+      },
+      "png": "/Users/motista/Desktop/antigravity/myfont/spike/output/raster_ni_1024.png",
+      "bin_png": "/Users/motista/Desktop/antigravity/myfont/spike/output/raster_ni_1024_bin.png",
+      "probe": {
+        "status": "ok",
+        "body_thickness_px": 29.0,
+        "uroko_protrusion_px": 72.0,
+        "uroko_height_boost_px": 72.0,
+        "uroko_protrusion_em": 0.0703125,
+        "uroko_relative_to_stroke": 2.4827586206896552,
+        "roi": [
+          51,
+          161,
+          977,
+          348
+        ],
+        "note": "簡易検出。様式的ゼロと検出不能の区別は閾値設計が必要（PLAN §2.4）"
+      }
+    }
+  },
+  "pitfalls": [
+    "TTC は Face(path, index=N) でフェイス選択。ヒラギノは複数スタイルが入る",
+    "set_pixel_sizes(EM, EM) で 1024px/EM。set_char_size は pt/dpi 換算で誤りやすい",
+    "bitmap.pitch は行ストライド（>= width）。必ず pitch で行送りすること",
+    "bitmap_top は baseline からの上方向、画像行は下向き。配置時に y0=baseline-top",
+    "FT_LOAD_NO_HINTING 無しだとヒントで太さが変わり T3 の黄金画像が不安定",
+    "可変フォントはデフォルトインスタンス（wght 軸の初期値）でラスタ化される点に注意"
+  ],
+  "verdict": {
+    "overall": "成立",
+    "juu_contrast_ok": true,
+    "san_uroko_tried": true,
+    "plan": "§2.3/§2.4 計測プロトコルは実装可能"
+  }
+}

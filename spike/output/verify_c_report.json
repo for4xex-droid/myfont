@@ -1,0 +1,42 @@
+{
+  "fontmake": {
+    "install": {
+      "ok": true,
+      "returncode": 0,
+      "stderr_tail": "",
+      "error": null
+    },
+    "help": {
+      "ok": true,
+      "stdout_head": " when exactly\n                        in the middle of two off-curve points (TrueType only;\n                        default: False).\n\nHandling of OpenType Layout:\n  --interpolate-binary-layout [MASTER_DIR]\n                        Interpolate layout tables from compiled master\n                        binaries. Requires Glyphs or DesignSpace source.\n  --feature-writer CLASS\n                        string specifying a feature writer class to load,\n                        either built-in or from an "
+    }
+  },
+  "fontbakery": {
+    "install": {
+      "ok": true,
+      "returncode": 0,
+      "stderr_tail": "",
+      "error": null
+    },
+    "download": {
+      "skipped": true,
+      "reason": "install succeeded"
+    }
+  },
+  "uharfbuzz": {
+    "run_ok": true,
+    "shape": {
+      "ok": true,
+      "upem": 1000,
+      "gid": 1208,
+      "ax": 1000
+    },
+    "note": "font.size 属性は uharfbuzz 0.56 に無し。除去後は成功"
+  },
+  "verdict": {
+    "fontmake": "成立",
+    "fontbakery": "成立",
+    "uharfbuzz_proof": "成立",
+    "overall": "成立"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "seed": 20260809,
+  "n": 100,
+  "sample_chars": "固肺倫塊隣雅黒学握管納抽臣売精弁疑円惧館渡江言撮叔故教瞳根陵紛継架斑可傾問且既受蹴房必植様完院旅懇具投城楼足千街青旗描蜜暁盗帥譲仙旬掌旋択眺盾信雲桃患璃嵐債錠舎膨訴損速梅軸摯戯科泡向散沿例勲運穴樹掛景",
+  "success_count": 100,
+  "success_rate": 1.0,
+  "elapsed_sec": 0.3503024592064321,
+  "per_char_ms": 3.503024592064321,
+  "n_flat_strokes_total": 1221,
+  "fallback_events_total": 135,
+  "fallback_rate_overall": 0.11056511056511056,
+  "fallback_rate_hard": 0.04504504504504504,
+  "fallback_hard_events": 55,
+  "fallback_soft_events": 80,
+  "fallback_by_kind": {
+    "vertical_sweep_as_left_hara": 25,
+    "short_curve_as_ten": 80,
+    "bend_split": 20,
+    "complex_curve_as_cubic": 8,
+    "special_skip": 2
+  },
+  "fallback_rate_by_kage_type": {
+    "type0": {
+      "strokes": 2,
+      "fallback_events": 2,
+      "rate": 1.0
+    },
+    "type1": {
+      "strokes": 773,
+      "fallback_events": 0,
+      "rate": 0.0
+    },
+    "type2": {
+      "strokes": 393,
+      "fallback_events": 80,
+      "rate": 0.2035623409669211
+    },
+    "type3": {
+      "strokes": 20,
+      "fallback_events": 20,
+      "rate": 1.0
+    },
+    "type6": {
+      "strokes": 8,
+      "fallback_events": 8,
+      "rate": 1.0
+    },
+    "type7": {
+      "strokes": 25,
+      "fallback_events": 25,
+      "rate": 1.0
+    }
+  },
+  "errors": [],
+  "extrapolation_2136": {
+    "joyo_total": 2136,
+    "est_seconds": 7.48246052864939,
+    "est_minutes": 0.12470767547748983,
+    "assumptions": "同一成功率・同一平均処理時間の線形外挿（I/O・品質ゲート除く）"
+  },
+  "note": "hard= type3/4/6/7/0 等の構造フォールバック。soft= short_curve→ten（ヒューリスティック、品質上は正常寄り）。type2 の通常 quad→cubic は警告に含めない。"
+}

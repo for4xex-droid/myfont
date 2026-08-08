@@ -1,0 +1,34 @@
+Collecting fonttools
+  Downloading fonttools-4.63.0-cp314-cp314-macosx_10_15_universal2.whl.metadata (118 kB)
+Collecting skia-pathops
+  Downloading skia_pathops-0.9.2-cp310-abi3-macosx_10_9_universal2.whl.metadata (2.5 kB)
+Collecting freetype-py
+  Downloading freetype_py-2.5.1-py3-none-macosx_10_9_universal2.whl.metadata (6.3 kB)
+Collecting pillow
+  Downloading pillow-12.3.0-cp314-cp314-macosx_11_0_arm64.whl.metadata (9.1 kB)
+Collecting numpy
+  Downloading numpy-2.5.1-cp314-cp314-macosx_14_0_arm64.whl.metadata (6.6 kB)
+Collecting uharfbuzz
+  Downloading uharfbuzz-0.56.0-cp310-abi3-macosx_10_9_universal2.whl.metadata (3.6 kB)
+Downloading fonttools-4.63.0-cp314-cp314-macosx_10_15_universal2.whl (2.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.9/2.9 MB 10.4 MB/s  0:00:00
+
+Downloading skia_pathops-0.9.2-cp310-abi3-macosx_10_9_universal2.whl (2.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.9/2.9 MB 10.5 MB/s  0:00:00
+
+Downloading freetype_py-2.5.1-py3-none-macosx_10_9_universal2.whl (1.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 11.0 MB/s  0:00:00
+
+Downloading pillow-12.3.0-cp314-cp314-macosx_11_0_arm64.whl (4.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.8/4.8 MB 10.3 MB/s  0:00:00
+
+Downloading numpy-2.5.1-cp314-cp314-macosx_14_0_arm64.whl (5.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.3/5.3 MB 9.7 MB/s  0:00:00
+
+Downloading uharfbuzz-0.56.0-cp310-abi3-macosx_10_9_universal2.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 9.3 MB/s  0:00:00
+
+Installing collected packages: uharfbuzz, skia-pathops, pillow, numpy, freetype-py, fonttools
+
+
+Successfully installed fonttools-4.63.0 freetype-py-2.5.1 numpy-2.5.1 pillow-12.3.0 skia-pathops-0.9.2 uharfbuzz-0.56.0

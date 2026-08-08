@@ -1,0 +1,36 @@
+[project]
+name = "fontdb"
+version = "0.1.0"
+description = "Font measurement database for myfont project"
+requires-python = ">=3.11"
+dependencies = [
+    "fonttools",
+    "freetype-py",
+    "numpy",
+    "pillow",
+    "pyyaml",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+# P2以降。fontdb MVPでは不要
+engine = ["skia-pathops"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+ignore = [
+    "EXE001",  # scripts は python scripts/x.py で起動（実行ビット不要）
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["T201", "LOG015"]  # CLI の print / root logger 設定は許容

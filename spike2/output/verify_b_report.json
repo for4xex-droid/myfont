@@ -1,0 +1,972 @@
+{
+  "dump_path": "/Users/motista/Desktop/antigravity/myfont/spike2/data/dump_newest_only.txt",
+  "dump_size_bytes": 346494731,
+  "index_entries": 2443897,
+  "load_seconds": 2.183,
+  "joyo_total": 2136,
+  "joyo_covered": 2136,
+  "joyo_coverage_ratio": 1.0,
+  "joyo_missing_count": 0,
+  "joyo_missing_sample": [],
+  "joyo_surface_alias_or_redirect": 2026,
+  "joyo_surface_has_ref99": 2135,
+  "joyo_surface_ref99_ratio": 0.9995,
+  "joyo_post_alias_still_has_ref99": 1854,
+  "joyo_post_alias_still_has_ref99_ratio": 0.868,
+  "joyo_post_alias_pure_primitive_strokes": 282,
+  "joyo_flatten_fail_or_empty": 0,
+  "joyo_flatten_seconds": 0.084,
+  "joyo_max_recursion_depth_max": 5,
+  "joyo_max_recursion_depth_mean": 2.213,
+  "joyo_max_recursion_depth_p95": 3,
+  "sample_chars": [
+    "一",
+    "二",
+    "三",
+    "十",
+    "木",
+    "人",
+    "本",
+    "大",
+    "山",
+    "口",
+    "国",
+    "囲",
+    "園",
+    "図",
+    "回",
+    "海",
+    "詩",
+    "村",
+    "時",
+    "話",
+    "永",
+    "職",
+    "議",
+    "論",
+    "鬱",
+    "漢",
+    "雨",
+    "電",
+    "食",
+    "鳥"
+  ],
+  "sample_count": 30,
+  "sample_need_component_resolve": 30,
+  "sample_need_component_resolve_ratio": 1.0,
+  "sample_max_recursion_depth_values": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    3,
+    2,
+    2,
+    2,
+    1,
+    2,
+    2,
+    1,
+    2,
+    2,
+    1,
+    2,
+    3,
+    3,
+    3,
+    2,
+    3,
+    3,
+    1,
+    2
+  ],
+  "sample_max_recursion_depth_max": 3,
+  "sample_max_recursion_depth_mean": 1.733,
+  "parser_loc": {
+    "file_total_lines": 341,
+    "file_nonempty_lines": 293,
+    "file_code_lines": 279,
+    "dump_parse_funcs_loc": 24,
+    "stroke_parse_funcs_loc": 77,
+    "flatten_funcs_loc": 95,
+    "func_loc": {
+      "parse_dump_line": 12,
+      "iter_dump": 6,
+      "load_dump_index": 6,
+      "parse_kage_data": 50,
+      "is_alias": 9,
+      "resolve_alias_chain": 18,
+      "flatten_glyph": 58,
+      "_compose_box": 15,
+      "_map_point": 5,
+      "_coords_to_points": 17,
+      "_strip_version": 5,
+      "_to_int": 5,
+      "_to_float": 5,
+      "sample_curve_points": 15,
+      "_quad": 10
+    }
+  },
+  "dozens_of_lines_claim": {
+    "plan_claim": "GlyphWiki ダンプのパース（name|related|data の | 区切り）は数十行で書ける",
+    "dump_parse_funcs_loc": 24,
+    "stroke_parse_funcs_loc": 77,
+    "full_parser_file_code_lines": 279,
+    "verdict_on_dump_line_parse": "前提成立",
+    "note": "「数十行」は dump 行分解に妥当。部品展開・座標写像を含めると百行超になり得る"
+  },
+  "svg_outputs": [
+    "/Users/motista/Desktop/antigravity/myfont/spike2/output/kage_skeleton_u6c38_永.svg",
+    "/Users/motista/Desktop/antigravity/myfont/spike2/output/kage_skeleton_u56fd_国.svg"
+  ],
+  "sample_rows": [
+    {
+      "char": "一",
+      "name": "u4e00",
+      "alias_chain": [
+        "u4e00",
+        "u4e00-j"
+      ],
+      "final_name": "u4e00-j",
+      "surface": {
+        "name": "u4e00",
+        "related": "u4e00",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u4e00-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u4e00-j"
+      },
+      "flattened_stroke_count": 1,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "二",
+      "name": "u4e8c",
+      "alias_chain": [
+        "u4e8c",
+        "u4e8c-j"
+      ],
+      "final_name": "u4e8c-j",
+      "surface": {
+        "name": "u4e8c",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u4e8c-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u4e8c-j"
+      },
+      "flattened_stroke_count": 2,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "三",
+      "name": "u4e09",
+      "alias_chain": [
+        "u4e09",
+        "u4e09-j"
+      ],
+      "final_name": "u4e09-j",
+      "surface": {
+        "name": "u4e09",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u4e09-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u4e09-j"
+      },
+      "flattened_stroke_count": 3,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "十",
+      "name": "u5341",
+      "alias_chain": [
+        "u5341",
+        "u5341-j"
+      ],
+      "final_name": "u5341-j",
+      "surface": {
+        "name": "u5341",
+        "related": "u5341",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u5341-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u5341-j"
+      },
+      "flattened_stroke_count": 2,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "木",
+      "name": "u6728",
+      "alias_chain": [
+        "u6728",
+        "u6728-j"
+      ],
+      "final_name": "u6728-j",
+      "surface": {
+        "name": "u6728",
+        "related": "u6728",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u6728-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u6728-j"
+      },
+      "flattened_stroke_count": 4,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "人",
+      "name": "u4eba",
+      "alias_chain": [
+        "u4eba",
+        "u4eba-j"
+      ],
+      "final_name": "u4eba-j",
+      "surface": {
+        "name": "u4eba",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u4eba-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u4eba-j"
+      },
+      "flattened_stroke_count": 2,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "本",
+      "name": "u672c",
+      "alias_chain": [
+        "u672c",
+        "u672c-j"
+      ],
+      "final_name": "u672c-j",
+      "surface": {
+        "name": "u672c",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u672c-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u672c-j"
+      },
+      "flattened_stroke_count": 5,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "大",
+      "name": "u5927",
+      "alias_chain": [
+        "u5927",
+        "u5927-j"
+      ],
+      "final_name": "u5927-j",
+      "surface": {
+        "name": "u5927",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u5927-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u5927-j"
+      },
+      "flattened_stroke_count": 3,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "山",
+      "name": "u5c71",
+      "alias_chain": [
+        "u5c71",
+        "u5c71-j"
+      ],
+      "final_name": "u5c71-j",
+      "surface": {
+        "name": "u5c71",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u5c71-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u5c71-j"
+      },
+      "flattened_stroke_count": 4,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "口",
+      "name": "u53e3",
+      "alias_chain": [
+        "u53e3",
+        "u53e3-j"
+      ],
+      "final_name": "u53e3-j",
+      "surface": {
+        "name": "u53e3",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u53e3-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u53e3-j"
+      },
+      "flattened_stroke_count": 4,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "国",
+      "name": "u56fd",
+      "alias_chain": [
+        "u56fd",
+        "u56fd-j"
+      ],
+      "final_name": "u56fd-j",
+      "surface": {
+        "name": "u56fd",
+        "related": "u56fd",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u56fd-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u56fd-j"
+      },
+      "flattened_stroke_count": 9,
+      "max_recursion_depth": 3,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "囲",
+      "name": "u56f2",
+      "alias_chain": [
+        "u56f2",
+        "u56f2-j"
+      ],
+      "final_name": "u56f2-j",
+      "surface": {
+        "name": "u56f2",
+        "related": "u56f2",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u56f2-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u56f2-j"
+      },
+      "flattened_stroke_count": 8,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "園",
+      "name": "u5712",
+      "alias_chain": [
+        "u5712",
+        "u5712-j"
+      ],
+      "final_name": "u5712-j",
+      "surface": {
+        "name": "u5712",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u5712-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u5712-j"
+      },
+      "flattened_stroke_count": 16,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "図",
+      "name": "u56f3",
+      "alias_chain": [
+        "u56f3",
+        "u56f3-j"
+      ],
+      "final_name": "u56f3-j",
+      "surface": {
+        "name": "u56f3",
+        "related": "u56f3",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u56f3-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u56f3-j"
+      },
+      "flattened_stroke_count": 8,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "回",
+      "name": "u56de",
+      "alias_chain": [
+        "u56de",
+        "u56de-j"
+      ],
+      "final_name": "u56de-j",
+      "surface": {
+        "name": "u56de",
+        "related": "u56de",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u56de-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u56de-j"
+      },
+      "flattened_stroke_count": 8,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "海",
+      "name": "u6d77",
+      "alias_chain": [
+        "u6d77",
+        "u6d77-j"
+      ],
+      "final_name": "u6d77-j",
+      "surface": {
+        "name": "u6d77",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u6d77-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u6d77-j"
+      },
+      "flattened_stroke_count": 12,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "詩",
+      "name": "u8a69",
+      "alias_chain": [
+        "u8a69",
+        "u8a69-j"
+      ],
+      "final_name": "u8a69-j",
+      "surface": {
+        "name": "u8a69",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u8a69-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u8a69-j"
+      },
+      "flattened_stroke_count": 14,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "村",
+      "name": "u6751",
+      "alias_chain": [
+        "u6751"
+      ],
+      "final_name": "u6751",
+      "surface": {
+        "name": "u6751",
+        "related": "u6751",
+        "n_strokes_surface": 2,
+        "type_counts": {
+          "ref": 2
+        },
+        "has_ref99": true,
+        "is_alias": false,
+        "ref_names": [
+          "u6728-01",
+          "u5bf8-02"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u6728-01$99:0:0:-10:0:200:200:u5bf8-02"
+      },
+      "flattened_stroke_count": 7,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "時",
+      "name": "u6642",
+      "alias_chain": [
+        "u6642",
+        "u6642-j"
+      ],
+      "final_name": "u6642-j",
+      "surface": {
+        "name": "u6642",
+        "related": "u6642",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u6642-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u6642-j"
+      },
+      "flattened_stroke_count": 12,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "話",
+      "name": "u8a71",
+      "alias_chain": [
+        "u8a71",
+        "u8a71-j"
+      ],
+      "final_name": "u8a71-j",
+      "surface": {
+        "name": "u8a71",
+        "related": "u8a71",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u8a71-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u8a71-j"
+      },
+      "flattened_stroke_count": 15,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "永",
+      "name": "u6c38",
+      "alias_chain": [
+        "u6c38",
+        "u6c38-j"
+      ],
+      "final_name": "u6c38-j",
+      "surface": {
+        "name": "u6c38",
+        "related": "u6c38",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u6c38-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u6c38-j"
+      },
+      "flattened_stroke_count": 7,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "職",
+      "name": "u8077",
+      "alias_chain": [
+        "u8077",
+        "u8077-j"
+      ],
+      "final_name": "u8077-j",
+      "surface": {
+        "name": "u8077",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u8077-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u8077-j"
+      },
+      "flattened_stroke_count": 19,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "議",
+      "name": "u8b70",
+      "alias_chain": [
+        "u8b70",
+        "u8b70-j"
+      ],
+      "final_name": "u8b70-j",
+      "surface": {
+        "name": "u8b70",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u8b70-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u8b70-j"
+      },
+      "flattened_stroke_count": 21,
+      "max_recursion_depth": 3,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "論",
+      "name": "u8ad6",
+      "alias_chain": [
+        "u8ad6",
+        "u8ad6-j"
+      ],
+      "final_name": "u8ad6-j",
+      "surface": {
+        "name": "u8ad6",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u8ad6-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u8ad6-j"
+      },
+      "flattened_stroke_count": 17,
+      "max_recursion_depth": 3,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "鬱",
+      "name": "u9b31",
+      "alias_chain": [
+        "u9b31",
+        "u9b31-j"
+      ],
+      "final_name": "u9b31-j",
+      "surface": {
+        "name": "u9b31",
+        "related": "u9b31",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u9b31-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u9b31-j"
+      },
+      "flattened_stroke_count": 32,
+      "max_recursion_depth": 3,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "漢",
+      "name": "u6f22",
+      "alias_chain": [
+        "u6f22",
+        "u6f22-j"
+      ],
+      "final_name": "u6f22-j",
+      "surface": {
+        "name": "u6f22",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u6f22-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u6f22-j"
+      },
+      "flattened_stroke_count": 15,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "雨",
+      "name": "u96e8",
+      "alias_chain": [
+        "u96e8",
+        "u96e8-j"
+      ],
+      "final_name": "u96e8-j",
+      "surface": {
+        "name": "u96e8",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u96e8-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u96e8-j"
+      },
+      "flattened_stroke_count": 9,
+      "max_recursion_depth": 3,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "電",
+      "name": "u96fb",
+      "alias_chain": [
+        "u96fb",
+        "u96fb-j"
+      ],
+      "final_name": "u96fb-j",
+      "surface": {
+        "name": "u96fb",
+        "related": "u3013",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u96fb-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u96fb-j"
+      },
+      "flattened_stroke_count": 15,
+      "max_recursion_depth": 3,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "食",
+      "name": "u98df",
+      "alias_chain": [
+        "u98df",
+        "u98df-j"
+      ],
+      "final_name": "u98df-j",
+      "surface": {
+        "name": "u98df",
+        "related": "u98df",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u98df-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u98df-j"
+      },
+      "flattened_stroke_count": 11,
+      "max_recursion_depth": 1,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    },
+    {
+      "char": "鳥",
+      "name": "u9ce5",
+      "alias_chain": [
+        "u9ce5",
+        "u9ce5-j"
+      ],
+      "final_name": "u9ce5-j",
+      "surface": {
+        "name": "u9ce5",
+        "related": "u9ce5",
+        "n_strokes_surface": 1,
+        "type_counts": {
+          "ref": 1
+        },
+        "has_ref99": true,
+        "is_alias": true,
+        "ref_names": [
+          "u9ce5-j"
+        ],
+        "raw_preview": "99:0:0:0:0:200:200:u9ce5-j"
+      },
+      "flattened_stroke_count": 13,
+      "max_recursion_depth": 2,
+      "missing_refs": [],
+      "needs_component_resolve": true
+    }
+  ],
+  "type_tag_pair_counts": {
+    "t1_s0_e0": 74,
+    "t1_s2_e2": 54,
+    "t2_s7_e8": 36,
+    "t2_s0_e7": 24,
+    "t1_s12_e13": 19,
+    "t1_s22_e23": 19,
+    "t2_s7_e0": 10,
+    "t2_s32_e7": 6,
+    "t1_s0_e32": 6,
+    "t1_s32_e32": 6,
+    "t1_s32_e0": 6,
+    "t1_s0_e13": 3,
+    "t1_s0_e23": 3,
+    "t1_s2_e0": 3,
+    "t1_s0_e4": 3,
+    "t1_s0_e2": 3,
+    "t1_s22_e4": 3,
+    "t2_s22_e7": 3,
+    "t7_s0_e7": 2,
+    "t0_s0_e0": 2,
+    "t2_s12_e7": 2,
+    "t6_s0_e5": 2,
+    "t1_s12_e0": 2,
+    "t6_s22_e4": 1,
+    "t1_s32_e4": 1,
+    "t3_s0_e5": 1,
+    "t7_s32_e7": 1,
+    "t3_s32_e5": 1,
+    "t1_s12_e32": 1,
+    "t2_s22_e4": 1
+  }
+}

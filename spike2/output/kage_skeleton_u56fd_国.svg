@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
+<title>国 (u56fd) flattened KAGE skeleton</title>
+<rect x="0" y="0" width="640" height="640" fill="#f7f3ea"/>
+<rect x="20" y="20" width="600.0" height="600.0" fill="none" stroke="#ccc" stroke-width="1"/>
+<text x="20" y="14" font-family="Hiragino Mincho ProN,serif" font-size="14">国 (u56fd) flattened KAGE skeleton</text>
+<path d="M 110.00,104.00 L 110.00,536.00" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="0" data-type="1" data-start="12" data-end="13"/>
+<circle cx="110.00" cy="104.00" r="3" fill="#222"/>
+<circle cx="110.00" cy="536.00" r="3" fill="#888"/>
+<path d="M 110.00,104.00 L 530.00,104.00" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="1" data-type="1" data-start="2" data-end="2"/>
+<circle cx="110.00" cy="104.00" r="3" fill="#222"/>
+<circle cx="530.00" cy="104.00" r="3" fill="#888"/>
+<path d="M 530.00,104.00 L 530.00,536.00" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="2" data-type="1" data-start="22" data-end="23"/>
+<circle cx="530.00" cy="104.00" r="3" fill="#222"/>
+<circle cx="530.00" cy="536.00" r="3" fill="#888"/>
+<path d="M 110.00,536.00 L 530.00,536.00" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="3" data-type="1" data-start="2" data-end="2"/>
+<circle cx="110.00" cy="536.00" r="3" fill="#222"/>
+<circle cx="530.00" cy="536.00" r="3" fill="#888"/>
+<path d="M 171.80,177.20 L 468.20,177.20" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="4" data-type="1" data-start="0" data-end="0"/>
+<circle cx="171.80" cy="177.20" r="3" fill="#222"/>
+<circle cx="468.20" cy="177.20" r="3" fill="#888"/>
+<path d="M 189.35,322.10 L 450.65,322.10" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="5" data-type="1" data-start="0" data-end="0"/>
+<circle cx="189.35" cy="322.10" r="3" fill="#222"/>
+<circle cx="450.65" cy="322.10" r="3" fill="#888"/>
+<path d="M 320.00,177.20 L 320.00,469.10" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="6" data-type="1" data-start="32" data-end="32"/>
+<circle cx="320.00" cy="177.20" r="3" fill="#222"/>
+<circle cx="320.00" cy="469.10" r="3" fill="#888"/>
+<path d="M 152.30,469.10 L 487.70,469.10" fill="none" stroke="#1a1a1a" stroke-width="2.2" stroke-linecap="round" data-i="7" data-type="1" data-start="0" data-end="0"/>
+<circle cx="152.30" cy="469.10" r="3" fill="#222"/>
+<circle cx="487.70" cy="469.10" r="3" fill="#888"/>
+<path d="M 366.80,351.50 L 372.45,355.50 L 377.96,359.68 L 383.34,364.02 L 388.57,368.52 L 393.67,373.20 L 398.62,378.04 L 403.44,383.06 L 408.12,388.24 L 412.66,393.58 L 417.07,399.10 L 421.33,404.78 L 425.46,410.64 L 429.44,416.66 L 433.29,422.84 L 437.00,429.20" fill="none" stroke="#0b5fff" stroke-width="2.2" stroke-linecap="round" data-i="8" data-type="2" data-start="7" data-end="8"/>
+<circle cx="366.80" cy="351.50" r="3" fill="#222"/>
+<circle cx="437.00" cy="429.20" r="3" fill="#888"/>
+<text x="20" y="634.0" font-size="11" font-family="sans-serif">1=straight 2=curve 3=bend 4=otsu 6=complex 7=vsweep | KAGE Y-down 200sq</text>
+</svg>

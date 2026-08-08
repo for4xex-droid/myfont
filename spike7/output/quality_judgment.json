@@ -1,0 +1,15 @@
+{
+  "verdict": "P4a→P3接続は成立（接合前）。字として認識可。製品品質はP2依存。",
+  "chars": [
+    {"char": "永", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "mapping_ten_heuristic"},
+    {"char": "国", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "params_corner_ten"},
+    {"char": "十", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": null},
+    {"char": "木", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "params"},
+    {"char": "東", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "mapping_corner"},
+    {"char": "語", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "params"},
+    {"char": "人", "recognizable": true, "primary_issue": "join_unimplemented_minor", "secondary": null},
+    {"char": "山", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "tag_sparsity"},
+    {"char": "口", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "mapping_corner_uroko"},
+    {"char": "海", "recognizable": true, "primary_issue": "join_unimplemented", "secondary": "complex_curve_approx"}
+  ]
+}

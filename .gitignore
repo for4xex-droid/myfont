@@ -1,0 +1,49 @@
+# Python
+.venv/
+**/.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Font binaries (GOLDENRULES 掟10: git に入れない)
+*.otf
+*.ttf
+*.ttc
+*.woff
+*.woff2
+fontdb/data/fonts/**
+!fontdb/data/fonts/.gitkeep
+spike/**/fonts/
+spike*/**/fonts/
+spike4/fonts/
+spike/fonts/
+
+# Local measurement artifacts
+fontdb/data/db/*.sqlite
+fontdb/data/renders/**
+!fontdb/data/renders/.gitkeep
+fontdb/data/cache/
+
+# GlyphWiki dumps (large; fetch via scripts)
+spike2/data/
+dump.tar.gz
+dump_*.txt
+
+# Spike raw downloads
+**/_raw/
+
+# Generated UFO/OTF builds
+fonts_out/build/
+**/MyMinchoSpike*
+
+# Matplotlib
+.matplotlib/

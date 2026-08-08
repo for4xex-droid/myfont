@@ -1,0 +1,44 @@
+# probe 定義（PLAN §2.4 / GOLDENRULES 掟7）
+# ROI・閾値・代表字セットの正本。実装は T5 で参照する
+
+common:
+  binarization_threshold: 128  # render_profile.threshold と一致させる
+  fail_rate_max: null        # T5 実装時に実書体 fail 率上限を設定
+  # 代表字セット（掟7: コードにハードコードしない）
+  corpus_glyphs: ["三", "十", "口", "田", "国", "日", "東", "鬱", "永", "あ", "の", "ん"]
+
+probes:
+  juu_contrast:
+    probe_id: juu_contrast
+    target_char: "十"
+    phase: alpha
+    description: "縦/横コントラスト（交点回避走査）"
+    protocol:
+      scan_offsets_face_frac: [0.15, 0.22]  # 交点の上下/左右オフセット
+      aggregation: median
+      max_run_frac:
+        vertical: 0.35
+        horizontal: 0.35
+    value: "vert_thickness / horiz_thickness"
+
+  san_uroko:
+    probe_id: san_uroko
+    target_char: "三"
+    fallback_char: "二"
+    phase: alpha
+    description: "三の上横画右端うろこ相対サイズ"
+    protocol:
+      top_region_frac: 0.45
+      projection_peak_frac: 0.45
+      fallback_top_frac: 0.28
+      body_column_frac: [0.35, 0.70]
+      right_roi_frac: 0.88
+      smooth_kernel: 5
+    thresholds:
+      clear_protrusion_px: 3.0
+      clear_relative_min: 0.15
+      stylistic_zero_px: 2.0
+      stylistic_zero_relative_max: 0.08
+      height_boost_px: 4.0
+      height_boost_relative_min: 0.10
+    value: "protrusion_px / body_thickness_px"

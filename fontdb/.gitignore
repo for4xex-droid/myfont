@@ -1,0 +1,7 @@
+data/fonts/
+data/renders/
+data/db/*.sqlite
+data/cache/
+.venv/
+__pycache__/
+output/

@@ -1,0 +1,75 @@
+# M2 交差ソルバ回帰テスト雛形（spike6）
+# PLAN.md §3.3 / P2 DoD: 期待 contour 数一致 + 自己交差ゼロ
+#
+# 期待 contour 数の解釈:
+#   - 十/木: 単一外輪郭 → 1
+#   - 二: 非接触の横画2本 → 2
+#   - 永: 点（側）が独立なら 2、接触融合なら 1（現行 prototype 骨格は非接触 → 2）
+#   - 口/日/田: pathops はホールも contour として数える
+#       口 = 外1+穴1 → 2
+#       日 = 外1+穴2 → 3
+#       田 = 外1+穴4 → 5
+#
+# known_gap: true の字は理想値を定義済みだが、本スパイク実装では未達
+# （Stage A の角接続・うろこ島・囲み構造が残件）。pytest は xfail 扱い。
+
+version: 1
+params: classic
+solver:
+  k: 0.15
+  area_ratio: 0.005          # ink 面積比
+  upm_area_ratio: 0.0008     # UPM² 比床（打ち込み島 ≈400–500 対策）
+  proximity: 8.0             # 微小片が「近接」とみなす bbox 距離
+  cleanup_mode: proximate    # 孤立小片（意図的点画）は消さない
+  detect_scale: 1.0
+
+glyphs:
+  - id: juu
+    char: 十
+    expected_contours: 1
+    self_intersect: false
+    notes: "十字交差。Stage A ヒット0（端点非近傍）。微小除去で 2→1"
+
+  - id: ni
+    char: 二
+    expected_contours: 2
+    self_intersect: false
+    notes: "非接触2横画。打ち込み島は proximate 除去"
+
+  - id: ei
+    char: 永
+    expected_contours: 2
+    self_intersect: false
+    notes: "点+本体。k=0.15 推奨（0.10/0.30 は策のうろこ島で 3 に悪化しうる）"
+
+  - id: ki
+    char: 木
+    expected_contours: 1
+    self_intersect: false
+    notes: "横×縦×はらい。spike6 実装で到達済み"
+
+  - id: hon
+    char: 本
+    expected_contours: 1
+    self_intersect: false
+    known_gap: true
+    notes: "現状 ≈3（下部横のうろこ島・はらい接合不足）。角/端物の Stage A 強化が必要"
+
+  - id: nichi
+    char: 日
+    expected_contours: 3
+    self_intersect: false
+    notes: "外1+穴2。spike6 で到達済み（ホールを contour としてカウント）"
+
+  - id: ta
+    char: 田
+    expected_contours: 5
+    self_intersect: false
+    known_gap: true
+    notes: "現状 ≈6（右うろこ島が残る）。囲み+十字の角接続が残件"
+
+  - id: kuchi
+    char: 口
+    expected_contours: 2
+    self_intersect: false
+    notes: "外1+穴1。spike6 で到達済み"

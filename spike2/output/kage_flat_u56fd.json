@@ -1,0 +1,159 @@
+[
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 12,
+    "end_tag": 13,
+    "points": [
+      {
+        "x": 30.0,
+        "y": 28.000000000000004
+      },
+      {
+        "x": 30.0,
+        "y": 172.0
+      }
+    ],
+    "source": "u56d7-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 2,
+    "end_tag": 2,
+    "points": [
+      {
+        "x": 30.0,
+        "y": 28.000000000000004
+      },
+      {
+        "x": 170.0,
+        "y": 28.000000000000004
+      }
+    ],
+    "source": "u56d7-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 22,
+    "end_tag": 23,
+    "points": [
+      {
+        "x": 170.0,
+        "y": 28.000000000000004
+      },
+      {
+        "x": 170.0,
+        "y": 172.0
+      }
+    ],
+    "source": "u56d7-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 2,
+    "end_tag": 2,
+    "points": [
+      {
+        "x": 30.0,
+        "y": 172.0
+      },
+      {
+        "x": 170.0,
+        "y": 172.0
+      }
+    ],
+    "source": "u56d7-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 0,
+    "end_tag": 0,
+    "points": [
+      {
+        "x": 50.6,
+        "y": 52.400000000000006
+      },
+      {
+        "x": 149.4,
+        "y": 52.400000000000006
+      }
+    ],
+    "source": "u738b-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 0,
+    "end_tag": 0,
+    "points": [
+      {
+        "x": 56.45,
+        "y": 100.7
+      },
+      {
+        "x": 143.55,
+        "y": 100.7
+      }
+    ],
+    "source": "u738b-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 32,
+    "end_tag": 32,
+    "points": [
+      {
+        "x": 100.0,
+        "y": 52.400000000000006
+      },
+      {
+        "x": 100.0,
+        "y": 149.7
+      }
+    ],
+    "source": "u738b-j"
+  },
+  {
+    "kage_type": 1,
+    "type_name": "straight",
+    "start_tag": 0,
+    "end_tag": 0,
+    "points": [
+      {
+        "x": 44.1,
+        "y": 149.7
+      },
+      {
+        "x": 155.9,
+        "y": 149.7
+      }
+    ],
+    "source": "u738b-j"
+  },
+  {
+    "kage_type": 2,
+    "type_name": "curve",
+    "start_tag": 7,
+    "end_tag": 8,
+    "points": [
+      {
+        "x": 115.6,
+        "y": 110.5
+      },
+      {
+        "x": 129.89999999999998,
+        "y": 120.3
+      },
+      {
+        "x": 139.0,
+        "y": 136.4
+      }
+    ],
+    "source": "u7389-j"
+  }
+]

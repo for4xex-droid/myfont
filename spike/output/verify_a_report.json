@@ -1,0 +1,107 @@
+{
+  "chars": {
+    "ei_classic": {
+      "param": "classic",
+      "n_polygons": 13,
+      "before_contours": 13,
+      "after_contours_raw": 8,
+      "after_contours_simplified": 4,
+      "union_ok": true,
+      "union_err": null,
+      "per_poly_self_intersect_suspects": [
+        {
+          "index": 1,
+          "msg": "simplify: contours 1->1, verbs 75->59, changed=True"
+        },
+        {
+          "index": 7,
+          "msg": "simplify: contours 1->1, verbs 75->67, changed=True"
+        }
+      ],
+      "after_self_intersect_heuristic": {
+        "changed_by_simplify": true,
+        "msg": "simplify: contours 8->4, verbs 501->494, changed=True"
+      },
+      "tiny_segments": {
+        "total_segments": 701,
+        "tiny_lt_0.5": 4,
+        "zeroish": 4
+      },
+      "juu": {
+        "before": 6,
+        "after": 2,
+        "ok": true,
+        "err": null
+      },
+      "svgs": {
+        "before": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_before_union_classic.svg",
+        "after": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_after_union_classic.svg",
+        "compare": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_union_compare_classic.svg"
+      }
+    },
+    "ei_modern": {
+      "param": "modern",
+      "n_polygons": 13,
+      "before_contours": 13,
+      "after_contours_raw": 8,
+      "after_contours_simplified": 4,
+      "union_ok": true,
+      "union_err": null,
+      "per_poly_self_intersect_suspects": [
+        {
+          "index": 1,
+          "msg": "simplify: contours 1->1, verbs 75->40, changed=True"
+        },
+        {
+          "index": 7,
+          "msg": "simplify: contours 1->1, verbs 75->35, changed=True"
+        }
+      ],
+      "after_self_intersect_heuristic": {
+        "changed_by_simplify": true,
+        "msg": "simplify: contours 8->4, verbs 484->477, changed=True"
+      },
+      "tiny_segments": {
+        "total_segments": 701,
+        "tiny_lt_0.5": 4,
+        "zeroish": 4
+      },
+      "juu": {
+        "before": 6,
+        "after": 2,
+        "ok": true,
+        "err": null
+      },
+      "svgs": {
+        "before": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_before_union_modern.svg",
+        "after": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_after_union_modern.svg",
+        "compare": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_union_compare_modern.svg"
+      }
+    }
+  },
+  "verdict": {
+    "ei_classic": {
+      "union_runs": true,
+      "contour_reduced": true,
+      "single_contour": false,
+      "juu_single": false,
+      "premise": "条件付き",
+      "note": "交差重なりは union で融合。非接触ストロークと端物の微小島が残り contours 13→4。Stage A join_overlap＋微小輪郭除去が前提条件。"
+    },
+    "ei_modern": {
+      "union_runs": true,
+      "contour_reduced": true,
+      "single_contour": false,
+      "juu_single": false,
+      "premise": "条件付き",
+      "note": "交差重なりは union で融合。非接触ストロークと端物の微小島が残り contours 13→4。Stage A join_overlap＋微小輪郭除去が前提条件。"
+    }
+  },
+  "overall": "条件付き",
+  "edge_cases": [
+    "点（側）が横画に重ならず別 contour として残る",
+    "打ち込みポリゴンの点接触/微小食い込み不足で 10–30u の島が残る（十・永とも）",
+    "一部本体ポリゴンは simplify で verb 数が減り自己交差疑い（オフセット由来）",
+    "zeroish セグメント（長さ≈0）が数個 — 閉包の重複点由来の可能性"
+  ]
+}

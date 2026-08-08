@@ -1,0 +1,96 @@
+protocol:
+  em_px: 1024
+  variable_policy: wght=400 に fontTools.varLib.instancer で固定してから計測（PLAN T1）
+  profile: ft_1024_nohint_gray_v1
+families:
+- family_id: source_han_serif_jp
+  display_name: 源ノ明朝 (Source Han Serif JP)
+  license: OFL-1.1
+  vendor: adobe-fonts/source-han-serif
+  notes: GitHub release 2.003R の JP subset zip から Regular を抽出
+  acquired: true
+  source_url: https://github.com/adobe-fonts/source-han-serif/releases/download/2.003R/12_SourceHanSerifJP.zip
+  sha256_source: c5a3bbc213980cea04932457899c9fc2da4784d3d1d7cae469c41909dd112230
+  sha256_measured: e5f502bb193c28829895b098498f0f9dd8f658c760b0f83656ad41c1137a8785
+  path_rel: fonts/source_han_serif_jp-Regular.otf
+  is_variable: false
+  instanced_wght400: false
+  instance_coords: null
+  error: null
+  mirrors_tried: []
+  zip_member: SubsetOTF/JP/SourceHanSerifJP-Regular.otf
+  units_per_em: 1000
+  file_bytes: 6210796
+- family_id: ipaex_mincho
+  display_name: IPAex明朝
+  license: IPA Font License
+  vendor: moji.or.jp (一般社団法人 文字情報技術促進協議会)
+  notes: 公式 Ver.004.01。moji.or.jp 配布
+  acquired: true
+  source_url: https://moji.or.jp/wp-content/ipafont/IPAexfont/ipaexm00401.zip
+  sha256_source: 9604c77067396b4d2ab49816b3e18db741a70c8b1d43eb28669ae75cd1ce5237
+  sha256_measured: 7a306386f930fee80922f71eebf4ffe0f1ff2817da8e619230953487673d71c7
+  path_rel: fonts/ipaex_mincho-Regular.ttf
+  is_variable: false
+  instanced_wght400: false
+  instance_coords: null
+  error: null
+  mirrors_tried: []
+  zip_member: ipaexm00401/ipaexm.ttf
+  units_per_em: 2048
+  file_bytes: 7835672
+- family_id: shippori_mincho
+  display_name: しっぽり明朝
+  license: OFL-1.1
+  vendor: google/fonts
+  notes: google/fonts ofl/shipporimincho 静的 Regular
+  acquired: true
+  source_url: https://github.com/google/fonts/raw/main/ofl/shipporimincho/ShipporiMincho-Regular.ttf
+  sha256_source: 769b5269f0f9bc6534b352c0e6bd856a566e03ff788f107191c2d835863570b2
+  sha256_measured: 769b5269f0f9bc6534b352c0e6bd856a566e03ff788f107191c2d835863570b2
+  path_rel: fonts/shippori_mincho-Regular.ttf
+  is_variable: false
+  instanced_wght400: false
+  instance_coords: null
+  error: null
+  mirrors_tried: []
+  units_per_em: 1000
+  file_bytes: 8677284
+- family_id: zen_old_mincho
+  display_name: Zen Old Mincho
+  license: OFL-1.1
+  vendor: google/fonts
+  notes: google/fonts ofl/zenoldmincho 静的 Regular
+  acquired: true
+  source_url: https://github.com/google/fonts/raw/main/ofl/zenoldmincho/ZenOldMincho-Regular.ttf
+  sha256_source: 4c051a78a21c4e8e9dccf1c754776d33f356b8cc6ef95d9b64761b9bae814b84
+  sha256_measured: 4c051a78a21c4e8e9dccf1c754776d33f356b8cc6ef95d9b64761b9bae814b84
+  path_rel: fonts/zen_old_mincho-Regular.ttf
+  is_variable: false
+  instanced_wght400: false
+  instance_coords: null
+  error: null
+  mirrors_tried: []
+  units_per_em: 1000
+  file_bytes: 5442512
+- family_id: biz_ud_mincho
+  display_name: BIZ UD明朝
+  license: OFL-1.1
+  vendor: google/fonts
+  notes: google/fonts ofl/bizudmincho 静的 Regular
+  acquired: true
+  source_url: https://github.com/google/fonts/raw/main/ofl/bizudmincho/BIZUDMincho-Regular.ttf
+  sha256_source: 468ee6d9b149ca144809e03841bf18740ecf014e055a00da6ecaf1aaf4165af2
+  sha256_measured: 468ee6d9b149ca144809e03841bf18740ecf014e055a00da6ecaf1aaf4165af2
+  path_rel: fonts/biz_ud_mincho-Regular.ttf
+  is_variable: false
+  instanced_wght400: false
+  instance_coords: null
+  error: null
+  mirrors_tried: []
+  units_per_em: 2048
+  file_bytes: 6153932
+summary:
+  acquired: 5
+  total: 5
+  missing: []

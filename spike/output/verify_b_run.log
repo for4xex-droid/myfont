@@ -1,0 +1,8 @@
+font: /Users/motista/Desktop/antigravity/myfont/spike/fonts/NotoSerifJP-Regular-wght400.ttf
+source: google/fonts NotoSerifJP variable → fontTools instancer wght=400
+family=b'Noto Serif JP' style=b'ExtraLight' upem=1000 faces_in_file≈(ttc index=0)
+juu {"status": "ok", "bbox": [45, 47, 980, 978], "scan_center": [512, 512], "vert_thickness_px": 70.0, "horiz_thickness_px": 29.0, "vert_thickness_em": 0.068359375, "horiz_thickness_em": 0.0283203125, "contrast_v_over_h": 2.413793103448276, "vert_cands": [70, 70, 70, 70], "horiz_cands": [29, 29, 29, 29], "face_w": 936, "face_h": 932}
+san {"status": "ok", "body_thickness_px": 29.0, "uroko_protrusion_px": 69.0, "uroko_height_boost_px": 69.0, "uroko_protrusion_em": 0.0673828125, "uroko_relative_to_stroke": 2.3793103448275863, "roi": [42, 96, 990, 320], "note": "簡易検出。様式的ゼロと検出不能の区別は閾値設計が必要（PLAN §2.4）"}
+ni {"status": "ok", "body_thickness_px": 29.0, "uroko_protrusion_px": 72.0, "uroko_height_boost_px": 72.0, "uroko_protrusion_em": 0.0703125, "uroko_relative_to_stroke": 2.4827586206896552, "roi": [51, 161, 977, 348], "note": "簡易検出。様式的ゼロと検出不能の区別は閾値設計が必要（PLAN §2.4）"}
+VERDICT: 成立
+wrote /Users/motista/Desktop/antigravity/myfont/spike/output/verify_b_report.json

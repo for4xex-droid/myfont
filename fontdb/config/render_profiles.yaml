@@ -1,0 +1,23 @@
+# render_profile 定義（PLAN §2.3 正本）
+# 外部書体と synthetic では経路が異なるため profile を分離する
+
+profiles:
+  ft_1024_nohint_gray_v1:
+    em_px: 1024
+    hinting: off
+    aa_mode: gray
+    threshold: 128
+    y_axis: image_down
+    engine: freetype-py
+    target: "OTF/TTF/UFO 由来"
+    notes: "freetype-py、hinting off、gray AA、閾値 T=128"
+
+  poly_pillow_1024_gray_v1:
+    em_px: 1024
+    hinting: off
+    aa_mode: gray
+    threshold: 128
+    y_axis: image_down
+    engine: pillow
+    target: "synthetic（接合前ポリゴン）"
+    notes: "頂点リスト→Pillow マスク描画。union 前の暫定計測・デバッグ用"

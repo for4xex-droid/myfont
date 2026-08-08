@@ -1,0 +1,1322 @@
+{
+  "k_values": [
+    0.1,
+    0.15,
+    0.3
+  ],
+  "area_ratio": 0.005,
+  "proximity": 8.0,
+  "A_micro_cleanup": {
+    "juu_classic": {
+      "label": "十",
+      "before": 6,
+      "union_only": 2,
+      "cleanup_area": 1,
+      "cleanup_proximate": 1,
+      "contour_infos_proximate": [
+        {
+          "index": 0,
+          "area": 87952.07,
+          "bbox": [
+            171.92,
+            193.0,
+            834.27,
+            831.0
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 1,
+          "area": 419.42,
+          "bbox": [
+            201.49,
+            465.54,
+            213.22,
+            510.52
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        }
+      ],
+      "self_intersect": "simplify: contours 1->1, verbs 84->84, changed=False"
+    },
+    "ni_classic": {
+      "label": "二",
+      "before": 6,
+      "union_only": 4,
+      "cleanup_area": 2,
+      "cleanup_proximate": 2,
+      "contour_infos_proximate": [
+        {
+          "index": 0,
+          "area": 32617.75,
+          "bbox": [
+            151.91,
+            588.6,
+            854.23,
+            732.87
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 1,
+          "area": 27059.05,
+          "bbox": [
+            191.92,
+            231.22,
+            814.27,
+            370.26
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 2,
+          "area": 448.83,
+          "bbox": [
+            181.44,
+            684.6,
+            193.27,
+            732.58
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        },
+        {
+          "index": 3,
+          "area": 419.42,
+          "bbox": [
+            221.49,
+            324.98,
+            233.22,
+            369.96
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        }
+      ],
+      "self_intersect": "simplify: contours 2->2, verbs 142->142, changed=False"
+    },
+    "ei_classic": {
+      "label": "永",
+      "before": 13,
+      "union_only": 4,
+      "cleanup_area": 2,
+      "cleanup_proximate": 2,
+      "contour_infos_proximate": [
+        {
+          "index": 0,
+          "area": 135054.56,
+          "bbox": [
+            140.0,
+            183.8,
+            860.0,
+            820.0
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 1,
+          "area": 4974.81,
+          "bbox": [
+            515.8,
+            156.63,
+            612.86,
+            245.0
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 2,
+          "area": 462.61,
+          "bbox": [
+            441.93,
+            428.93,
+            472.39,
+            458.81
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        },
+        {
+          "index": 3,
+          "area": 419.41,
+          "bbox": [
+            261.49,
+            284.14,
+            273.22,
+            329.12
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        }
+      ],
+      "self_intersect": "simplify: contours 2->2, verbs 484->484, changed=False"
+    },
+    "juu_modern": {
+      "label": "十",
+      "before": 6,
+      "union_only": 2,
+      "cleanup_area": 1,
+      "cleanup_proximate": 1,
+      "contour_infos_proximate": [
+        {
+          "index": 0,
+          "area": 80245.51,
+          "bbox": [
+            183.94,
+            196.0,
+            818.12,
+            827.0
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 1,
+          "area": 199.98,
+          "bbox": [
+            201.59,
+            465.14,
+            207.64,
+            507.13
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        }
+      ],
+      "self_intersect": "simplify: contours 1->1, verbs 103->103, changed=False"
+    },
+    "ni_modern": {
+      "label": "二",
+      "before": 6,
+      "union_only": 3,
+      "cleanup_area": 2,
+      "cleanup_proximate": 2,
+      "contour_infos_proximate": [
+        {
+          "index": 0,
+          "area": 31544.13,
+          "bbox": [
+            163.93,
+            627.11,
+            838.05,
+            730.66
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 1,
+          "area": 24294.02,
+          "bbox": [
+            203.94,
+            270.95,
+            798.12,
+            366.82
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 2,
+          "area": 199.98,
+          "bbox": [
+            221.59,
+            324.72,
+            227.64,
+            366.71
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        }
+      ],
+      "self_intersect": "simplify: contours 2->2, verbs 114->114, changed=False"
+    },
+    "ei_modern": {
+      "label": "永",
+      "before": 13,
+      "union_only": 4,
+      "cleanup_area": 2,
+      "cleanup_proximate": 2,
+      "contour_infos_proximate": [
+        {
+          "index": 0,
+          "area": 121976.26,
+          "bbox": [
+            140.0,
+            183.8,
+            860.0,
+            820.0
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 1,
+          "area": 3963.54,
+          "bbox": [
+            516.35,
+            158.52,
+            603.57,
+            245.0
+          ],
+          "removed": false,
+          "reason": ""
+        },
+        {
+          "index": 2,
+          "area": 368.09,
+          "bbox": [
+            453.94,
+            425.91,
+            472.31,
+            459.08
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        },
+        {
+          "index": 3,
+          "area": 199.98,
+          "bbox": [
+            261.59,
+            284.09,
+            267.64,
+            326.08
+          ],
+          "removed": true,
+          "reason": "micro+proximate(d<=8.0,cut=800)"
+        }
+      ],
+      "self_intersect": "simplify: contours 2->2, verbs 467->467, changed=False"
+    }
+  },
+  "B_stage_a": {
+    "juu_classic": {
+      "label": "十",
+      "k_sweep": {
+        "0.10": {
+          "overlap": 4.5,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 2,
+          "after_full": 1,
+          "removed": [
+            {
+              "index": 1,
+              "area": 419.42,
+              "bbox": [
+                201.49,
+                465.54,
+                213.22,
+                510.52
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 1->1, verbs 84->84, changed=False"
+        },
+        "0.15": {
+          "overlap": 6.75,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 2,
+          "after_full": 1,
+          "removed": [
+            {
+              "index": 1,
+              "area": 419.42,
+              "bbox": [
+                201.49,
+                465.54,
+                213.22,
+                510.52
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 1->1, verbs 84->84, changed=False"
+        },
+        "0.30": {
+          "overlap": 13.5,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 2,
+          "after_full": 1,
+          "removed": [
+            {
+              "index": 1,
+              "area": 419.42,
+              "bbox": [
+                201.49,
+                465.54,
+                213.22,
+                510.52
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 1->1, verbs 84->84, changed=False"
+        }
+      },
+      "ten_gap": null
+    },
+    "ni_classic": {
+      "label": "二",
+      "k_sweep": {
+        "0.10": {
+          "overlap": 4.5,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 4,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 448.83,
+              "bbox": [
+                181.44,
+                684.6,
+                193.27,
+                732.58
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 3,
+              "area": 419.42,
+              "bbox": [
+                221.49,
+                324.98,
+                233.22,
+                369.96
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 142->142, changed=False"
+        },
+        "0.15": {
+          "overlap": 6.75,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 4,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 448.83,
+              "bbox": [
+                181.44,
+                684.6,
+                193.27,
+                732.58
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 3,
+              "area": 419.42,
+              "bbox": [
+                221.49,
+                324.98,
+                233.22,
+                369.96
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 142->142, changed=False"
+        },
+        "0.30": {
+          "overlap": 13.5,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 4,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 448.83,
+              "bbox": [
+                181.44,
+                684.6,
+                193.27,
+                732.58
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 3,
+              "area": 419.42,
+              "bbox": [
+                221.49,
+                324.98,
+                233.22,
+                369.96
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 142->142, changed=False"
+        }
+      },
+      "ten_gap": null
+    },
+    "ei_classic": {
+      "label": "永",
+      "k_sweep": {
+        "0.10": {
+          "overlap": 4.5,
+          "hits": [
+            {
+              "stroke": 2,
+              "end": "start",
+              "target": 1,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.42
+            },
+            {
+              "stroke": 3,
+              "end": "start",
+              "target": 2,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.323
+            },
+            {
+              "stroke": 4,
+              "end": "start",
+              "target": 1,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.39
+            },
+            {
+              "stroke": 6,
+              "end": "start",
+              "target": 2,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.458
+            }
+          ],
+          "n_hits": 4,
+          "after_stageA_union": 5,
+          "after_full": 3,
+          "removed": [
+            {
+              "index": 3,
+              "area": 462.61,
+              "bbox": [
+                437.48,
+                429.32,
+                467.94,
+                459.2
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 4,
+              "area": 419.41,
+              "bbox": [
+                261.49,
+                284.14,
+                273.22,
+                329.12
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 3->3, verbs 483->483, changed=False"
+        },
+        "0.15": {
+          "overlap": 6.75,
+          "hits": [
+            {
+              "stroke": 2,
+              "end": "start",
+              "target": 1,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.42
+            },
+            {
+              "stroke": 3,
+              "end": "start",
+              "target": 2,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.323
+            },
+            {
+              "stroke": 4,
+              "end": "start",
+              "target": 1,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.39
+            },
+            {
+              "stroke": 6,
+              "end": "start",
+              "target": 2,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.458
+            }
+          ],
+          "n_hits": 4,
+          "after_stageA_union": 4,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 462.61,
+              "bbox": [
+                435.25,
+                429.52,
+                465.71,
+                459.39
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 3,
+              "area": 419.41,
+              "bbox": [
+                261.49,
+                284.14,
+                273.22,
+                329.12
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 485->485, changed=False"
+        },
+        "0.30": {
+          "overlap": 13.5,
+          "hits": [
+            {
+              "stroke": 2,
+              "end": "start",
+              "target": 1,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.42
+            },
+            {
+              "stroke": 3,
+              "end": "start",
+              "target": 2,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.323
+            },
+            {
+              "stroke": 4,
+              "end": "start",
+              "target": 1,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.39
+            },
+            {
+              "stroke": 6,
+              "end": "start",
+              "target": 2,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.458
+            }
+          ],
+          "n_hits": 4,
+          "after_stageA_union": 5,
+          "after_full": 3,
+          "removed": [
+            {
+              "index": 3,
+              "area": 462.61,
+              "bbox": [
+                428.57,
+                430.1,
+                459.03,
+                459.98
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 4,
+              "area": 419.41,
+              "bbox": [
+                261.49,
+                284.14,
+                273.22,
+                329.12
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 3->3, verbs 465->465, changed=False"
+        }
+      },
+      "ten_gap": {
+        "ten_endpoint_gaps": [
+          {
+            "ten_end": "start",
+            "other_idx": 0,
+            "kind": "horizontal",
+            "dist": 135.0,
+            "proj_t": 0.52
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 1,
+            "kind": "vertical",
+            "dist": 143.96,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 2,
+            "kind": "horizontal",
+            "dist": 279.64,
+            "proj_t": 0.533
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 3,
+            "kind": "left_hara",
+            "dist": 158.9,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 4,
+            "kind": "left_hara",
+            "dist": 49.24,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 5,
+            "kind": "right_hara",
+            "dist": 357.25,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 0,
+            "kind": "horizontal",
+            "dist": 55.0,
+            "proj_t": 0.67
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 1,
+            "kind": "vertical",
+            "dist": 136.57,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 2,
+            "kind": "horizontal",
+            "dist": 189.58,
+            "proj_t": 0.898
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 3,
+            "kind": "left_hara",
+            "dist": 154.35,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 4,
+            "kind": "left_hara",
+            "dist": 101.24,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 5,
+            "kind": "right_hara",
+            "dist": 298.08,
+            "proj_t": 0.0
+          }
+        ],
+        "min_gap": 49.24
+      }
+    },
+    "juu_modern": {
+      "label": "十",
+      "k_sweep": {
+        "0.10": {
+          "overlap": 4.2,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 2,
+          "after_full": 1,
+          "removed": [
+            {
+              "index": 1,
+              "area": 199.98,
+              "bbox": [
+                201.59,
+                465.14,
+                207.64,
+                507.13
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 1->1, verbs 103->103, changed=False"
+        },
+        "0.15": {
+          "overlap": 6.3,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 2,
+          "after_full": 1,
+          "removed": [
+            {
+              "index": 1,
+              "area": 199.98,
+              "bbox": [
+                201.59,
+                465.14,
+                207.64,
+                507.13
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 1->1, verbs 103->103, changed=False"
+        },
+        "0.30": {
+          "overlap": 12.6,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 2,
+          "after_full": 1,
+          "removed": [
+            {
+              "index": 1,
+              "area": 199.98,
+              "bbox": [
+                201.59,
+                465.14,
+                207.64,
+                507.13
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 1->1, verbs 103->103, changed=False"
+        }
+      },
+      "ten_gap": null
+    },
+    "ni_modern": {
+      "label": "二",
+      "k_sweep": {
+        "0.10": {
+          "overlap": 4.2,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 3,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 199.98,
+              "bbox": [
+                221.59,
+                324.72,
+                227.64,
+                366.71
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 114->114, changed=False"
+        },
+        "0.15": {
+          "overlap": 6.3,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 3,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 199.98,
+              "bbox": [
+                221.59,
+                324.72,
+                227.64,
+                366.71
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 114->114, changed=False"
+        },
+        "0.30": {
+          "overlap": 12.6,
+          "hits": [],
+          "n_hits": 0,
+          "after_stageA_union": 3,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 199.98,
+              "bbox": [
+                221.59,
+                324.72,
+                227.64,
+                366.71
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 114->114, changed=False"
+        }
+      },
+      "ten_gap": null
+    },
+    "ei_modern": {
+      "label": "永",
+      "k_sweep": {
+        "0.10": {
+          "overlap": 4.2,
+          "hits": [
+            {
+              "stroke": 2,
+              "end": "start",
+              "target": 1,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.42
+            },
+            {
+              "stroke": 3,
+              "end": "start",
+              "target": 2,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.323
+            },
+            {
+              "stroke": 4,
+              "end": "start",
+              "target": 1,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.39
+            },
+            {
+              "stroke": 6,
+              "end": "start",
+              "target": 2,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.458
+            }
+          ],
+          "n_hits": 4,
+          "after_stageA_union": 4,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 368.09,
+              "bbox": [
+                449.79,
+                426.26,
+                468.16,
+                459.43
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 3,
+              "area": 199.98,
+              "bbox": [
+                261.59,
+                284.09,
+                267.64,
+                326.08
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 472->472, changed=False"
+        },
+        "0.15": {
+          "overlap": 6.3,
+          "hits": [
+            {
+              "stroke": 2,
+              "end": "start",
+              "target": 1,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.42
+            },
+            {
+              "stroke": 3,
+              "end": "start",
+              "target": 2,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.323
+            },
+            {
+              "stroke": 4,
+              "end": "start",
+              "target": 1,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.39
+            },
+            {
+              "stroke": 6,
+              "end": "start",
+              "target": 2,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.458
+            }
+          ],
+          "n_hits": 4,
+          "after_stageA_union": 4,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 368.09,
+              "bbox": [
+                447.71,
+                426.44,
+                466.08,
+                459.6
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 3,
+              "area": 199.98,
+              "bbox": [
+                261.59,
+                284.09,
+                267.64,
+                326.08
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 488->488, changed=False"
+        },
+        "0.30": {
+          "overlap": 12.6,
+          "hits": [
+            {
+              "stroke": 2,
+              "end": "start",
+              "target": 1,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.42
+            },
+            {
+              "stroke": 3,
+              "end": "start",
+              "target": 2,
+              "dist": 0.0,
+              "type": "T",
+              "proj_t": 0.323
+            },
+            {
+              "stroke": 4,
+              "end": "start",
+              "target": 1,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.39
+            },
+            {
+              "stroke": 6,
+              "end": "start",
+              "target": 2,
+              "dist": 10.0,
+              "type": "T",
+              "proj_t": 0.458
+            }
+          ],
+          "n_hits": 4,
+          "after_stageA_union": 4,
+          "after_full": 2,
+          "removed": [
+            {
+              "index": 2,
+              "area": 368.09,
+              "bbox": [
+                441.47,
+                426.96,
+                459.84,
+                460.13
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            },
+            {
+              "index": 3,
+              "area": 199.98,
+              "bbox": [
+                261.59,
+                284.09,
+                267.64,
+                326.08
+              ],
+              "removed": true,
+              "reason": "micro+proximate(d<=8.0,cut=800)"
+            }
+          ],
+          "self_intersect_suspect": false,
+          "self_intersect_msg": "simplify: contours 2->2, verbs 478->478, changed=False"
+        }
+      },
+      "ten_gap": {
+        "ten_endpoint_gaps": [
+          {
+            "ten_end": "start",
+            "other_idx": 0,
+            "kind": "horizontal",
+            "dist": 135.0,
+            "proj_t": 0.52
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 1,
+            "kind": "vertical",
+            "dist": 143.96,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 2,
+            "kind": "horizontal",
+            "dist": 279.64,
+            "proj_t": 0.533
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 3,
+            "kind": "left_hara",
+            "dist": 158.9,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 4,
+            "kind": "left_hara",
+            "dist": 49.24,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "start",
+            "other_idx": 5,
+            "kind": "right_hara",
+            "dist": 357.25,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 0,
+            "kind": "horizontal",
+            "dist": 55.0,
+            "proj_t": 0.67
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 1,
+            "kind": "vertical",
+            "dist": 136.57,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 2,
+            "kind": "horizontal",
+            "dist": 189.58,
+            "proj_t": 0.898
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 3,
+            "kind": "left_hara",
+            "dist": 154.35,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 4,
+            "kind": "left_hara",
+            "dist": 101.24,
+            "proj_t": 0.0
+          },
+          {
+            "ten_end": "end",
+            "other_idx": 5,
+            "kind": "right_hara",
+            "dist": 298.08,
+            "proj_t": 0.0
+          }
+        ],
+        "min_gap": 49.24
+      }
+    }
+  },
+  "C_preview": {
+    "ki": {
+      "label": "木",
+      "before": 8,
+      "after_union": 2,
+      "after_full": 1,
+      "hits": 2,
+      "areas": [
+        141775.7
+      ]
+    },
+    "hon": {
+      "label": "本",
+      "before": 11,
+      "after_union": 5,
+      "after_full": 3,
+      "hits": 2,
+      "areas": [
+        160147.7,
+        7251.8,
+        2413.7
+      ]
+    },
+    "nichi": {
+      "label": "日",
+      "before": 12,
+      "after_union": 9,
+      "after_full": 3,
+      "hits": 10,
+      "areas": [
+        348900.2,
+        94072.7,
+        80744.4
+      ]
+    },
+    "ta": {
+      "label": "田",
+      "before": 15,
+      "after_union": 11,
+      "after_full": 6,
+      "hits": 12,
+      "areas": [
+        348900.2,
+        33052.9,
+        33001.1,
+        28498.0,
+        28498.0,
+        2413.7
+      ]
+    },
+    "kuchi": {
+      "label": "口",
+      "before": 9,
+      "after_union": 5,
+      "after_full": 2,
+      "hits": 8,
+      "areas": [
+        328245.3,
+        180285.7
+      ]
+    }
+  },
+  "expected": {
+    "juu": 1,
+    "ni": 2,
+    "ei": "2 if ten isolated else 1"
+  },
+  "verdicts": {
+    "classic": {
+      "A_only_juu_ok": true,
+      "A_only_ni_ok": true,
+      "A_only_ei_ok": true,
+      "AB_juu_ok": true,
+      "AB_ni_ok": true,
+      "AB_ei_ok": true,
+      "AB_ei_best_contours": 2,
+      "AB_ei_at_k015": 2
+    },
+    "modern": {
+      "A_only_juu_ok": true,
+      "A_only_ni_ok": true,
+      "A_only_ei_ok": true,
+      "AB_juu_ok": true,
+      "AB_ni_ok": true,
+      "AB_ei_ok": true,
+      "AB_ei_best_contours": 2,
+      "AB_ei_at_k015": 2
+    }
+  }
+}

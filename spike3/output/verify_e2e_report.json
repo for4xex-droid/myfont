@@ -1,0 +1,328 @@
+{
+  "plan_refs": {
+    "A": "§3.1 P3 / §0.1 座標系",
+    "B": "§2.3 理想経路（物差し1本化）",
+    "C": "§3.2 / P1 組見本"
+  },
+  "A": {
+    "union": {
+      "juu": {
+        "char_key": "juu",
+        "label": "十",
+        "param": "classic",
+        "n_input_polys": 6,
+        "before_contours": 6,
+        "after_contours": 2,
+        "areas_svg": [
+          87952.07332884986,
+          -419.4151191909332
+        ]
+      },
+      "ni": {
+        "char_key": "ni",
+        "label": "二",
+        "param": "classic",
+        "n_input_polys": 6,
+        "before_contours": 6,
+        "after_contours": 4,
+        "areas_svg": [
+          32617.747657766566,
+          27059.048459982034,
+          -448.82808353193104,
+          -419.4151191909332
+        ]
+      },
+      "ei": {
+        "char_key": "ei",
+        "label": "永",
+        "param": "classic",
+        "n_input_polys": 13,
+        "before_contours": 13,
+        "after_contours": 4,
+        "areas_svg": [
+          135054.56451744772,
+          4974.812843209133,
+          -462.610100325197,
+          -419.41495814174414
+        ]
+      }
+    },
+    "winding": {
+      "juu": {
+        "strategy": "all-contours-positive-fill (no intentional counters in spike glyphs)",
+        "roles": [
+          "fill",
+          "fill"
+        ],
+        "need_flip_all": false,
+        "areas_before": [
+          -87952.07332884986,
+          419.4151191909332
+        ],
+        "areas_after": [
+          87952.07332884986,
+          419.4151191909332
+        ]
+      },
+      "ni": {
+        "strategy": "all-contours-positive-fill (no intentional counters in spike glyphs)",
+        "roles": [
+          "fill",
+          "fill",
+          "fill",
+          "fill"
+        ],
+        "need_flip_all": false,
+        "areas_before": [
+          -32617.747657766566,
+          -27059.048459982034,
+          448.82808353193104,
+          419.4151191909332
+        ],
+        "areas_after": [
+          32617.747657766566,
+          27059.048459982034,
+          448.82808353193104,
+          419.4151191909332
+        ]
+      },
+      "ei": {
+        "strategy": "all-contours-positive-fill (no intentional counters in spike glyphs)",
+        "roles": [
+          "fill",
+          "fill",
+          "fill",
+          "fill"
+        ],
+        "need_flip_all": false,
+        "areas_before": [
+          -135054.56451744772,
+          -4974.812843209133,
+          462.610100325197,
+          419.41495814174414
+        ],
+        "areas_after": [
+          135054.56451744772,
+          4974.812843209133,
+          462.610100325197,
+          419.41495814174414
+        ]
+      }
+    },
+    "ufo": "/Users/motista/Desktop/antigravity/myfont/spike3/MyMinchoSpike.ufo",
+    "fontmake": {
+      "cmd": [
+        "/Users/motista/Desktop/antigravity/myfont/spike/.venv/bin/fontmake",
+        "-u",
+        "/Users/motista/Desktop/antigravity/myfont/spike3/MyMinchoSpike.ufo",
+        "-o",
+        "otf",
+        "--output-path",
+        "/Users/motista/Desktop/antigravity/myfont/spike3/output/MyMinchoSpike-Regular.otf"
+      ],
+      "returncode": 0,
+      "ok": true,
+      "stdout_tail": "",
+      "stderr_tail": "INFO:fontmake.font_project:Building OTF for MyMinchoSpike-Regular\nINFO:ufo2ft:Pre-processing glyphs\nINFO:ufo2ft.filters:Running DecomposeComponentsFilter on MyMinchoSpike-Regular\nINFO:ufo2ft.filters:Running RemoveOverlapsFilter on MyMinchoSpike-Regular\nINFO:ufo2ft:Building OpenType tables\nINFO:ufo2ft.postProcessor:Subroutinizing CFF table with cffsubr\nINFO:fontmake.font_project:Saving /Users/motista/Desktop/antigravity/myfont/spike3/output/MyMinchoSpike-Regular.otf\n",
+      "otf": "/Users/motista/Desktop/antigravity/myfont/spike3/output/MyMinchoSpike-Regular.otf"
+    },
+    "fill_check": {
+      "ok": true,
+      "ink_ratio": 0.20774550858980786,
+      "bbox": [
+        176,
+        75,
+        853,
+        727
+      ],
+      "inverted_suspect": false,
+      "png": "/Users/motista/Desktop/antigravity/myfont/spike3/output/A_fill_check_juu.png"
+    },
+    "verdict": {
+      "overall": "条件付き",
+      "premise": "成立",
+      "note": "union→Y反転→UFO→fontmake のビルドチェーンは通った。ただし P3 DoD（手設計同居・FB universal・自己交差別建て・cmap差分）は未検証。永は微小島が残り単一輪郭ではない（spike A / §3.3 と同趣旨）。",
+      "plan": "§3.1 P3（経路部分） / §0.1"
+    }
+  },
+  "B": {
+    "freetype": {
+      "status": "ok",
+      "bbox": [
+        176,
+        75,
+        853,
+        727
+      ],
+      "scan_center": [
+        514,
+        401
+      ],
+      "vert_thickness_px": 102.0,
+      "horiz_thickness_px": 46.0,
+      "vert_thickness_em": 0.099609375,
+      "horiz_thickness_em": 0.044921875,
+      "contrast_v_over_h": 2.217391304347826,
+      "vert_cands": [
+        102,
+        102,
+        102,
+        102
+      ],
+      "horiz_cands": [
+        46,
+        46,
+        45,
+        46
+      ],
+      "face_w": 678,
+      "face_h": 653,
+      "meta": {
+        "width": 679,
+        "rows": 654,
+        "pitch": 679,
+        "pixel_mode": 2,
+        "left": 176,
+        "top": 827,
+        "advance_x": 1024.0,
+        "units_per_EM": 1000
+      }
+    },
+    "poly_pillow": {
+      "status": "ok",
+      "bbox": [
+        176,
+        197,
+        854,
+        850
+      ],
+      "scan_center": [
+        515,
+        523
+      ],
+      "vert_thickness_px": 104.0,
+      "horiz_thickness_px": 47.0,
+      "vert_thickness_em": 0.1015625,
+      "horiz_thickness_em": 0.0458984375,
+      "contrast_v_over_h": 2.2127659574468086,
+      "vert_cands": [
+        104,
+        104,
+        104,
+        104
+      ],
+      "horiz_cands": [
+        47,
+        46,
+        47,
+        47
+      ],
+      "face_w": 679,
+      "face_h": 654
+    },
+    "diff": {
+      "vert_px_delta_ft_minus_poly": -2.0,
+      "horiz_px_delta_ft_minus_poly": -1.0,
+      "contrast_delta_ft_minus_poly": 0.0046253469010175685,
+      "vert_rel_pct": -1.9230769230769231,
+      "horiz_rel_pct": -2.127659574468085,
+      "contrast_rel_pct": 0.2090301003344478
+    },
+    "thresholds": {
+      "成立": "Δ太さ≤2px かつ コントラスト相対差≤5%",
+      "条件付き": "Δ太さ≤5px かつ 相対差≤15%",
+      "不成立": "それ以上 → profile分離必須"
+    },
+    "verdict": {
+      "overall": "成立",
+      "premise": "成立",
+      "note": "差が十分小さく、一時フォント化による物差し1本化は妥当。",
+      "plan": "§2.3 将来の理想経路: エンジン出力→一時UFO/TTF→freetype profile"
+    },
+    "pngs": {
+      "ft": "/Users/motista/Desktop/antigravity/myfont/spike3/output/B_ft_juu.png",
+      "poly": "/Users/motista/Desktop/antigravity/myfont/spike3/output/B_poly_juu.png"
+    }
+  },
+  "C": {
+    "uharfbuzz_freetype": {
+      "ok": true,
+      "shaped": [
+        {
+          "gid": 2,
+          "name": "uni5341",
+          "ax": 1000
+        },
+        {
+          "gid": 1,
+          "name": "uni4E8C",
+          "ax": 1000
+        },
+        {
+          "gid": 3,
+          "name": "uni6C38",
+          "ax": 1000
+        }
+      ],
+      "png": "/Users/motista/Desktop/antigravity/myfont/spike3/output/C_proof_juuni_ei.png"
+    },
+    "hb_view": {
+      "ok": true,
+      "cmd": [
+        "/opt/homebrew/bin/hb-view",
+        "-o",
+        "/Users/motista/Desktop/antigravity/myfont/spike3/output/C_proof_hbview_juuni_ei.png",
+        "-O",
+        "png",
+        "--font-size=256",
+        "/Users/motista/Desktop/antigravity/myfont/spike3/output/MyMinchoSpike-Regular.otf",
+        "十二永"
+      ],
+      "returncode": 0,
+      "stderr_tail": "",
+      "png": "/Users/motista/Desktop/antigravity/myfont/spike3/output/C_proof_hbview_juuni_ei.png"
+    },
+    "diffenator2": {
+      "install_ok": true,
+      "install_rc": 0,
+      "install_stderr_tail": "",
+      "proof_help_ok": false,
+      "proof_help_head": "",
+      "proof": {
+        "ok": false,
+        "cmd": [
+          "/Users/motista/Desktop/antigravity/myfont/spike/.venv/bin/diffenator2",
+          "proof",
+          "-o",
+          "/Users/motista/Desktop/antigravity/myfont/spike3/output/diffenator2_proof",
+          "/Users/motista/Desktop/antigravity/myfont/spike3/output/MyMinchoSpike-Regular.otf"
+        ],
+        "returncode": 1,
+        "stderr_tail": "ack (most recent call last):\n  File \"/Users/motista/Desktop/antigravity/myfont/spike/.venv/bin/diffenator2\", line 3, in <module>\n    from diffenator2.__main__ import main\n  File \"/Users/motista/Desktop/antigravity/myfont/spike/.venv/lib/python3.14/site-packages/diffenator2/__init__.py\", line 5, in <module>\n    from diffenator2.utils import dict_coords_to_string\n  File \"/Users/motista/Desktop/antigravity/myfont/spike/.venv/lib/python3.14/site-packages/diffenator2/utils.py\", line 18, in <module>\n    from pkg_resources import resource_filename\nModuleNotFoundError: No module named 'pkg_resources'\n",
+        "stdout_tail": "",
+        "htmls": []
+      }
+    },
+    "verdict": {
+      "overall": "成立",
+      "diffenator2": "不成立（proof失敗/HTML無し）",
+      "note": "§3.2: 組見本は全面自作せず hb-view / diffenator2 を第一候補。",
+      "plan": "§3.2 / P1"
+    }
+  },
+  "coord_pitfalls": [
+    "prototype は SVG(Y下)。UFO へ書く前に y' = UPM - y が必須（PLAN §0.1）。Y反転は shoelace 符号を反転する。最大輪郭に合わせて一括反転 → 微小島が穴化。bbox 内包判定も打ち込み島を誤爆。十/二/永（意図的カウンター無し）では全輪郭を正面積（塗り）へ揃えて解消。口・国など真の穴がある字は点-in-polygon 入れ子判定が別途必要。"
+  ],
+  "plan_amendments": [
+    "§0.1: SVG→フォント空間の Y 反転後は輪郭向きが逆転する。CFF(OTF) では塗り輪郭を CCW へ。一括反転も bbox 穴判定も打ち込み島を誤って穴化する実測あり → 輪郭ごと正面積化が安全。真のカウンター字は入れ子判定を別途。ビルド後 ink_ratio チェックを DoD に。",
+    "§2.3: 一時フォント化→freetype 計測の理想経路は本スパイクで端到端実証。poly_pillow との差（実測値を SPIKE3_REPORT に記載）に応じ、1本化採用 or profile 分離維持を明記する。",
+    "§3.1 P3: fontmake -u UFO→OTF の最小パイプラインは成立。ただし polyline のまま載せる節点爆発・Bezier 再適合ゲート（§3.2）は未決のまま。",
+    "§3.2: hb-view が macOS で利用可能なら黄金画像向きの第一候補として明記してよい。diffenator2 は install/proof の成否を SPIKE3 結果で更新。",
+    "§3.3: P3 スパイクでも永の微小島は残存。製品ビルド前に Stage A+微小輪郭除去が必須（spike と同結論、端到端でも変わらず）。"
+  ],
+  "overall": {
+    "A": "条件付き",
+    "B": "成立",
+    "C": "成立"
+  }
+}

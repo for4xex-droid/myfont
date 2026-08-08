@@ -1,0 +1,10 @@
+=== pip install fontmake ===
+=== fontbakery: try pip install, fallback pip download ===
+=== uharfbuzz shape あ ===
+{
+  "fontmake": "成立",
+  "fontbakery": "成立",
+  "uharfbuzz_proof": "不成立",
+  "overall": "条件付き"
+}
+wrote /Users/motista/Desktop/antigravity/myfont/spike/output/verify_c_report.json

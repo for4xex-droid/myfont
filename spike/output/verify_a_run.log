@@ -1,0 +1,80 @@
+{
+  "param": "classic",
+  "n_polygons": 13,
+  "before_contours": 13,
+  "after_contours_raw": 8,
+  "after_contours_simplified": 4,
+  "union_ok": true,
+  "union_err": null,
+  "per_poly_self_intersect_suspects": [
+    {
+      "index": 1,
+      "msg": "simplify: contours 1->1, verbs 75->59, changed=True"
+    },
+    {
+      "index": 7,
+      "msg": "simplify: contours 1->1, verbs 75->67, changed=True"
+    }
+  ],
+  "after_self_intersect_heuristic": {
+    "changed_by_simplify": true,
+    "msg": "simplify: contours 8->4, verbs 501->494, changed=True"
+  },
+  "tiny_segments": {
+    "total_segments": 701,
+    "tiny_lt_0.5": 4,
+    "zeroish": 4
+  },
+  "juu": {
+    "before": 6,
+    "after": 2,
+    "ok": true,
+    "err": null
+  },
+  "svgs": {
+    "before": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_before_union_classic.svg",
+    "after": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_after_union_classic.svg",
+    "compare": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_union_compare_classic.svg"
+  }
+}
+{
+  "param": "modern",
+  "n_polygons": 13,
+  "before_contours": 13,
+  "after_contours_raw": 8,
+  "after_contours_simplified": 4,
+  "union_ok": true,
+  "union_err": null,
+  "per_poly_self_intersect_suspects": [
+    {
+      "index": 1,
+      "msg": "simplify: contours 1->1, verbs 75->40, changed=True"
+    },
+    {
+      "index": 7,
+      "msg": "simplify: contours 1->1, verbs 75->35, changed=True"
+    }
+  ],
+  "after_self_intersect_heuristic": {
+    "changed_by_simplify": true,
+    "msg": "simplify: contours 8->4, verbs 484->477, changed=True"
+  },
+  "tiny_segments": {
+    "total_segments": 701,
+    "tiny_lt_0.5": 4,
+    "zeroish": 4
+  },
+  "juu": {
+    "before": 6,
+    "after": 2,
+    "ok": true,
+    "err": null
+  },
+  "svgs": {
+    "before": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_before_union_modern.svg",
+    "after": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_after_union_modern.svg",
+    "compare": "/Users/motista/Desktop/antigravity/myfont/spike/output/ei_union_compare_modern.svg"
+  }
+}
+OVERALL: 不成立
+wrote /Users/motista/Desktop/antigravity/myfont/spike/output/verify_a_report.json
