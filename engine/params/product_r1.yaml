@@ -1,0 +1,37 @@
+# 部分P0: 製品候補パラメータ snapshot（GOLDENRULES 掟13/16）
+# 伝統明朝クラスタ（源ノ・IPAex・しっぽり・Zen Old）の fontdb 実測中央値をアンカーに仮固定。
+# BIZ UD は外れ値として除外。
+
+snapshot_id: product_r1
+source: fontdb/output/measure_report.json
+profile: ft_1024_nohint_gray_v1
+extractor_version: "0.1.0"
+anchors:
+  # 伝統4書体の中央値（BIZ除外）
+  contrast_v_over_h: 2.439
+  uroko_relative: 0.857
+  # 参考: BIZ UD ≈ contrast 1.35 / uroko 0.41（UD寄り外れ値）
+notes: |
+  h_thickness=45 を据え置き、v_thickness = round(45 * 2.439) = 110 でコントラストを実測中央値に合わせた。
+  uroko_* は classic を継承（probe の uroko_relative は「突出/横画太さ」であり
+  uroko_height/h_thickness とは定義が異なるため、形状寸法は手設計核で再校正する）。
+  本 snapshot は仮固定。P0完成時に design_param_snapshot へ正式登録する。
+
+params:
+  name: product_r1
+  h_thickness: 45.0
+  v_thickness: 110.0
+  h_slope_deg: 1.5
+  uroko_height: 78.0
+  uroko_width: 72.0
+  uroko_dent: 16.0
+  uchikomi_depth: 26.0
+  uchikomi_angle_deg: 36.0
+  hane_length: 135.0
+  hane_thickness: 36.0
+  tome_slant: 20.0
+  left_hara_root: 100.0
+  right_hara_max: 108.0
+  right_hara_bulge_t: 0.60
+  ten_length: 92.0
+  ten_width: 74.0

@@ -1,0 +1,34 @@
+[project]
+name = "mymincho-engine"
+version = "0.1.0"
+description = "Mincho font engine — stroke synthesis and join solver (P2+)"
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+join = ["skia-pathops"]
+bridge = ["ufoLib2", "fontmake", "fonttools", "freetype-py", "numpy"]
+dev = ["pytest", "ruff"]
+numpy = ["numpy"]
+all = ["skia-pathops", "ufoLib2", "fontmake", "fonttools", "freetype-py", "numpy"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+engine = ["snapshots/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["EXE001", "T201"]

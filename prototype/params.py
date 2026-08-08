@@ -76,7 +76,31 @@ MODERN = MinchoParams(
 )
 
 
+# 正本は engine/params/product_r1.yaml（部分P0）。ここは prototype 互換のミラー。
+# 骨格（本の下部横など）の正本は engine/src/engine/extra_skeletons.py。
+PRODUCT_R1 = MinchoParams(
+    name="product_r1",
+    h_thickness=45.0,
+    v_thickness=110.0,
+    h_slope_deg=1.5,
+    uroko_height=78.0,
+    uroko_width=72.0,
+    uroko_dent=16.0,
+    uchikomi_depth=26.0,
+    uchikomi_angle_deg=36.0,
+    hane_length=135.0,
+    hane_thickness=36.0,
+    tome_slant=20.0,
+    left_hara_root=100.0,
+    right_hara_max=108.0,
+    right_hara_bulge_t=0.60,
+    ten_length=92.0,
+    ten_width=74.0,
+)
+
+
 PARAM_SETS = {
     "classic": CLASSIC,
     "modern": MODERN,
+    "product_r1": PRODUCT_R1,
 }
