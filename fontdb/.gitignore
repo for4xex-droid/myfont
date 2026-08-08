@@ -1,7 +1,11 @@
-data/fonts/
-data/renders/
+data/fonts/**
+!data/fonts/.gitkeep
+data/renders/**
+!data/renders/.gitkeep
 data/db/*.sqlite
 data/cache/
 .venv/
 __pycache__/
-output/
+output/**
+!output/scatters/
+!output/scatters/.gitkeep

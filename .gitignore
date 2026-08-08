@@ -47,3 +47,7 @@ fonts_out/build/
 
 # Matplotlib
 .matplotlib/
+**/.mplconfig/
+
+# Local spike DBs
+spike*/**/*.sqlite
