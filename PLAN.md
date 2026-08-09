@@ -290,10 +290,10 @@ spike7 の結合検証で判明した実態:
 8. **T7+: face 登録**: — **完了（2026-08-09）**。`fontdb.ingest.synthetic`＋`config/synthetic_faces.yaml`。classic/product_r1 を `face_kind=synthetic` で SQLite 登録（juu≈2.22/2.43、san_uroko ok）
 9. **P0完成**: — **完了（2026-08-09）**。`product_r1` を `status=frozen` で正式固定。`design_param_snapshot`＋`face_param_link`、字面規則 `docs/design_rules.md`、`engine/scripts/regen.py --params`
 10. 以下を実行（次フェーズ。優先順は §7.4 に従う）:
-   - **P1着手（最優先・唯一の Go/No-Go ゲート）**: ひらがな核心20字のラフ → Glyphs → UFO
-   - **S4 組見本ラッパ＋盲検プロトコル**: uharfbuzz 3種組見本（主＝UI/ゲームHUD）＋`docs/blind_test.md`（P1 の DoD 判定装置）
-   - **S1 出荷ゲートCLI の骨組み**: 着手条件は glyphset 正本の `data/` 凍結
-   - **S2a ブランド前提確認**: 商標ざっくり調査＋GlyphWiki 販売時再確認＋α免責文
+   - **P1着手（最優先・唯一の Go/No-Go ゲート）**: ひらがな核心20字のラフ → Glyphs → UFO — **足場済（2026-08-10）**（`fonts_out/manual_glyphs.txt`・`data/glyphset_p1_kana_core20.txt`）。**字形の手設計は未着手**
+   - **S4 組見本ラッパ＋盲検プロトコル**: — **骨組み完了（2026-08-10）**。`scripts/make_proofs.py`＋`proofs/texts/{ui,hud,literary}.txt`＋`docs/blind_test.md`（主＝UI/HUD）
+   - **S1 出荷ゲートCLI の骨組み**: — **骨組み完了（2026-08-10）**。`data/glyphset_*.txt` 凍結済、`engine/scripts/ship_gate.py`＋`docs/ship_gate_rules.md`
+   - **S2a ブランド前提確認**: — **雛形作成（2026-08-10）**。`docs/licenses/precheck.md`（商標調査・GlyphWiki再確認は未実施チェックリスト）
    - **P4a本番は α Go 後**（§7.3。P1 物理待ちのみ例外）。cubic 再適合 opt-in は問題が出てから
 11. 隔週レビュー（docs/weekly.md、3行のみ）
 
@@ -375,9 +375,9 @@ spike7 の結合検証で判明した実態:
 
 ### 7.4 直近の優先順（次の一手）
 
-1. **P1: ひらがな核心20字**（紙/iPad ラフ → Glyphs → UFO。§3.5 の順序）
-2. **S4: 組見本ラッパ＋盲検手順書**（P1 の DoD 判定装置。**主面は UI／ゲームHUD**。uharfbuzz 経路は spike3 実証済み）
-3. **S1: 出荷ゲート骨組み**（着手条件: glyphset 正本の `data/` 凍結。FontBakery 採否ルールの文書化から）
-4. **S2a: 商標ざっくり調査＋GlyphWiki 販売時再確認＋α免責文**（ブランド確定前ブロッカー）
+1. **P1: ひらがな核心20字**（紙/iPad ラフ → Glyphs → UFO。§3.5 の順序）— **コード足場済。字形制作が次のブロッカー**
+2. ~~S4: 組見本ラッパ＋盲検手順書~~ — **骨組み完了**（盲検の実地実施は P1 字形後）
+3. ~~S1: 出荷ゲート骨組み~~ — **骨組み完了**（α OTF ができたら本適用）
+4. **S2a: 商標ざっくり調査＋GlyphWiki 販売時再確認** — 雛形あり。**調査実施が残作業**
 
 P4a は **α Go 後**。S0/S2b/S3/S5 は α 盲検合格後に着手（合格前に販売準備をしない＝失敗シナリオ2の回避）。

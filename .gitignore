@@ -48,6 +48,9 @@ fonts_out/build/
 engine/output/
 **/MyMinchoSpike*
 
+# Proof renders (texts + golden stay tracked)
+proofs/out/
+
 # Matplotlib
 .matplotlib/
 **/.mplconfig/

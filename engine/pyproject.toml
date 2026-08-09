@@ -10,9 +10,10 @@ dependencies = [
 [project.optional-dependencies]
 join = ["skia-pathops"]
 bridge = ["ufoLib2", "fontmake", "fonttools", "freetype-py", "numpy"]
+proofs = ["uharfbuzz", "freetype-py", "numpy", "pillow"]
 dev = ["pytest", "ruff"]
 numpy = ["numpy"]
-all = ["skia-pathops", "ufoLib2", "fontmake", "fonttools", "freetype-py", "numpy"]
+all = ["skia-pathops", "ufoLib2", "fontmake", "fonttools", "freetype-py", "numpy", "uharfbuzz", "pillow"]
 
 [build-system]
 requires = ["setuptools>=61"]
