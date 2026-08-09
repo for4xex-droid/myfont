@@ -25,6 +25,9 @@ python scripts/07_viz_scatter.py    # T6: コントラスト×うろこ散布図
 #   pip install -e "../engine[join,bridge]"
 python scripts/06_ingest_prototype.py          # 一時OTF → SQLite synthetic face
 python scripts/06_ingest_prototype.py --no-db  # ファイル成果物のみ
+python scripts/08_freeze_p0.py                 # P0: product_r1 を design_param_snapshot に frozen
+# エンジン再生成（別 venv）:
+#   cd ../engine && python scripts/regen.py --params product_r1
 ```
 
 成果物:
@@ -39,3 +42,4 @@ python scripts/06_ingest_prototype.py --no-db  # ファイル成果物のみ
 - T0〜T6 実装済み・実行確認済み（5書体、glyph 60/60 ok、san_uroko 5/5 ok）
 - T7: `engine.bridge` で一時フォント化（classic/product_r1）
 - T7+: `face_kind=synthetic` で SQLite 正式 ingest（`config/synthetic_faces.yaml`）。juu contrast classic≈2.22 / product_r1≈2.43
+- P0: `product_r1` frozen（`design_param_snapshot`）。字面規則は `docs/design_rules.md`

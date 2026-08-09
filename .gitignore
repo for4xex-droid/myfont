@@ -45,6 +45,7 @@ dump_*.txt
 
 # Generated UFO/OTF builds
 fonts_out/build/
+engine/output/
 **/MyMinchoSpike*
 
 # Matplotlib

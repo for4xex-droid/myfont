@@ -80,3 +80,23 @@ CREATE TABLE IF NOT EXISTS probe_metric (
     reason              TEXT,
     UNIQUE (face_id, probe_id, render_profile_id, extractor_version)
 );
+
+-- P0: 製品パラメータ snapshot（掟16）。face とは face_param_link で紐付ける
+CREATE TABLE IF NOT EXISTS design_param_snapshot (
+    snapshot_id         TEXT PRIMARY KEY,
+    status              TEXT NOT NULL CHECK (status IN ('candidate', 'frozen')),
+    params_json         TEXT NOT NULL,
+    params_sha256       TEXT NOT NULL,
+    source              TEXT,
+    profile             TEXT,
+    extractor_version   TEXT,
+    anchors_json        TEXT,
+    notes               TEXT,
+    frozen_at           TEXT
+);
+
+CREATE TABLE IF NOT EXISTS face_param_link (
+    face_id             TEXT NOT NULL REFERENCES face(face_id),
+    snapshot_id         TEXT NOT NULL REFERENCES design_param_snapshot(snapshot_id),
+    PRIMARY KEY (face_id, snapshot_id)
+);

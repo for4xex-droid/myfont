@@ -178,7 +178,7 @@ B1: ウェイト追加・自作代表字拡充（三・国・あ の骨格追加
 
 | フェーズ | 内容 | 完了条件 |
 |---|---|---|
-| **P0 パラメータ校正基盤** | fontdb 計測スライス（T3+T4+T5α）の実測から初期値確定。字面規則・advance規則を文書化 | 製品候補パラメータ1系統が数値固定。**漢字全角幅=1000、仮名幅方針、字面ボックス数値を文書化**。`scripts/regen.py --params <name>` の1コマンドで全再生成 |
+| **P0 パラメータ校正基盤** | fontdb 計測スライス（T3+T4+T5α）の実測から初期値確定。字面規則・advance規則を文書化 | **達成（2026-08-09）**: `product_r1` frozen＋`design_param_snapshot`。字面規則は `docs/design_rules.md`。再生成は `engine/scripts/regen.py --params` |
 | **P1 手設計核** | 仮名約170字＋基準漢字50〜100字 | 仮名・約物・数字が OTF で組める（**P3 以前は Glyphs 直接書き出しで可、と明示**）。固定文面の組見本を `proofs/golden/` に凍結し比較基準とする |
 | **P2 交差ソルバ** | 接合整形＋単一輪郭化 | join20 グリーン。曲線再適合は **rdp_polyline 既定**（cubic は非デフォルト据え置き） |
 | **P3 エンジン製品化** | 骨格JSON→肉付け→接合→UFO→fontmake | 手設計字とエンジン字が同一UFOに同居。**FontBakery universal ＋ 自己交差チェック（pathops または AFDKO checkoutlinesufo。FontBakery は自己交差を十分カバーしないため別建て必須）＋ cmap欠字チェック（glyphset差分）を通過**。manual_glyphs.txt の上書き検出を CI 相当で自動化。**最小パイプ（union→Y反転→UFO→OTF）は spike3 で実証済み**であり、P3 の残作業は品質ゲートと運用整備 |
@@ -287,12 +287,12 @@ spike7 の結合検証で判明した実態:
 6. **P2+ join20**: — **完了（2026-08-09）**。`tests/regression_join20.yaml` 20字×3 params グリーン（掟14）
 7. **P2++ 曲線再適合**: — **完了（2026-08-09）**。既定=`rdp_polyline`（cubic 非デフォルト）。`engine.curve_refit`＋bridge 接続、節点削減＋誤差ゲート
 8. **T7+: face 登録**: — **完了（2026-08-09）**。`fontdb.ingest.synthetic`＋`config/synthetic_faces.yaml`。classic/product_r1 を `face_kind=synthetic` で SQLite 登録（juu≈2.22/2.43、san_uroko ok）
-9. 以下を並行（次フェーズ）:
+9. **P0完成**: — **完了（2026-08-09）**。`product_r1` を `status=frozen` で正式固定。`design_param_snapshot`＋`face_param_link`、字面規則 `docs/design_rules.md`、`engine/scripts/regen.py --params`
+10. 以下を並行（次フェーズ）:
    - **P1着手**: ひらがな核心20字のラフ → Glyphs → UFO ＋ 組見本ラッパ（uharfbuzz）
+   - **P4a本番**: 部品展開器＋写像仕様書＋100字品質ゲート
    - （任意）cubic 再適合の opt-in 実装（品質ゲート付き）
-10. **P0完成**: 製品候補パラメータ1系統を正式固定（`design_param_snapshot`）
-11. **P4a本番**: 部品展開器＋写像仕様書＋100字品質ゲート
-12. 隔週レビュー（docs/weekly.md、3行のみ）
+11. 隔週レビュー（docs/weekly.md、3行のみ）
 
 ---
 

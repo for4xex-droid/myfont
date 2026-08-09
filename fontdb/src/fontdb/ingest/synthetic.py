@@ -22,6 +22,7 @@ import yaml
 
 from fontdb.config_load import load_render_profile
 from fontdb.ingest.db import connect, init_db
+from fontdb.ingest.snapshots import link_face_to_snapshot
 from fontdb.paths import (
     DEFAULT_PROFILE_ID,
     EXTRACTOR_VERSION,
@@ -328,6 +329,15 @@ def ingest_synthetic_faces(
         )
         face_report["params_name"] = params_name
         face_report["params_sha256"] = params_sha
+        # 掟16: frozen snapshot が既にあれば face に紐付け
+        if params_name == "product_r1":
+            has_snap = conn.execute(
+                "SELECT 1 FROM design_param_snapshot WHERE snapshot_id=?",
+                ("product_r1",),
+            ).fetchone()
+            if has_snap:
+                link_face_to_snapshot(conn, face_id, "product_r1")
+                face_report["linked_snapshot"] = "product_r1"
         report["faces"][family_id] = face_report
         juu = face_report["probes"].get("juu_contrast", {})
         san = face_report["probes"].get("san_uroko", {})

@@ -1,8 +1,10 @@
-# 部分P0: 製品候補パラメータ snapshot（GOLDENRULES 掟13/16）
-# 伝統明朝クラスタ（源ノ・IPAex・しっぽり・Zen Old）の fontdb 実測中央値をアンカーに仮固定。
+# P0完成: 製品候補パラメータ snapshot（GOLDENRULES 掟16）
+# 伝統明朝クラスタ（源ノ・IPAex・しっぽり・Zen Old）の fontdb 実測中央値をアンカーに固定。
 # BIZ UD は外れ値として除外。
 
 snapshot_id: product_r1
+status: frozen
+frozen_at: "2026-08-09"
 source: fontdb/output/measure_report.json
 profile: ft_1024_nohint_gray_v1
 extractor_version: "0.1.0"
@@ -11,11 +13,12 @@ anchors:
   contrast_v_over_h: 2.439
   uroko_relative: 0.857
   # 参考: BIZ UD ≈ contrast 1.35 / uroko 0.41（UD寄り外れ値）
+  # T7+ synthetic face 実測（ft_1024_nohint_gray_v1）: juu≈2.43 / san_uroko≈0.81
 notes: |
   h_thickness=45 を据え置き、v_thickness = round(45 * 2.439) = 110 でコントラストを実測中央値に合わせた。
-  uroko_* は classic を継承（probe の uroko_relative は「突出/横画太さ」であり
-  uroko_height/h_thickness とは定義が異なるため、形状寸法は手設計核で再校正する）。
-  本 snapshot は仮固定。P0完成時に design_param_snapshot へ正式登録する。
+  uroko_* は classic 系寸法を継承（probe の uroko_relative は「突出/横画太さ」であり
+  uroko_height/h_thickness とは定義が異なる。形状の微調整は P1 手設計核で行う）。
+  2026-08-09: P0完成として design_param_snapshot に status=frozen で正式登録。
 
 params:
   name: product_r1

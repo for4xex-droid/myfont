@@ -27,6 +27,8 @@ def init_db(conn: sqlite3.Connection, *, reset: bool = False) -> None:
     if reset:
         conn.executescript(
             """
+            DROP TABLE IF EXISTS face_param_link;
+            DROP TABLE IF EXISTS design_param_snapshot;
             DROP TABLE IF EXISTS probe_metric;
             DROP TABLE IF EXISTS glyph_metric;
             DROP TABLE IF EXISTS probe_def;
