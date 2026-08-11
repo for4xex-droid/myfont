@@ -1,0 +1,42 @@
+# P1-B スパイク8b': ひらがな「く」
+# 座標: svg_y_down_legacy（y 下向き）
+#
+# 構造: 右上→左角→右下の「<」型（apex左）
+# 参照帯: aspect 0.29–0.54 / topL 0.53–0.66 / botCX 0.83–0.90 / ink 0.19–0.26
+# 幅: 入口≤18・最大≤36・全キー∈[8,40] / spine y≤980
+
+char: く
+glyph_id: ku
+unicode: 0x304F
+name: uni304F
+motif: corner_ku
+
+elements:
+  - id: main
+    spine:
+      - [742, 320]   # P0
+      - [580, 440]   # P1 左へ寄せ topL
+      - [460, 490]   # P2
+      - [385, 520]   # P3 apex 左（topL）※aspectは縦で相殺
+      - [468, 740]   # P4
+      - [600, 900]   # P5
+      - [742, 985]   # P6 わずかに下げ aspect
+    width:
+      - {s: 0.0, hw: 16}
+      - {s: 0.28, hw: 28}
+      - {s: 0.48, hw: 16}
+      - {s: 0.60, hw: 36}
+      - {s: 1.0, hw: 14}
+    ends:
+      entry: karui_uchikomi
+      exit: nuki
+
+gate:
+  expect_contours: 1
+  bbox:
+    width: [280, 520]
+    height: [550, 900]
+    aspect_w_over_h: [0.28, 0.60]
+  tips:
+    - {element: main, end: entry, bearing_deg: [-150, -100]}
+    - {element: main, end: exit, bearing_deg: [-60, -15]}

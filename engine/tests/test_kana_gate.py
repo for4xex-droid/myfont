@@ -76,7 +76,7 @@ def test_loader_rejects_unknown_top_level(tmp_path: Path):
         load_kana_skeleton(p)
 
 
-@pytest.mark.parametrize("gid", ["shi", "i", "to", "tsu"])
+@pytest.mark.parametrize("gid", ["shi", "i", "to", "tsu", "ku"])
 def test_current_glyphs_gate_green(gid: str, pathops):
     report = run_gate(gid, params="product_r1")
     assert report.ok, report.to_dict()
