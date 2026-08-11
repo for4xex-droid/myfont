@@ -9,13 +9,26 @@ from enum import Enum
 
 from engine.geometry import (
     Vec2,
+    curvature_radii,
+    interpolate_width_keys,
+    parse_cubic_chain,
     polygon_to_svg_path,
+    resample_by_arclength,
     sample_cubic,
+    sample_cubic_chain,
     sample_polyline,
     smooth_tangents,
     variable_width_outline,
 )
 from engine.params import MinchoParams
+
+# 仮名肉付け前ゲート: 局所曲率半径 ≥ この係数 × 局所半幅（違反は YAML 側 fail）
+# 離散曲率は過大推定しがちなので 1.0 厳格にはしない（自己交差の実害が出る帯で止める）
+KANA_CURVATURE_RADIUS_FACTOR = 0.55
+# 弧長一様サンプル数（仮名）
+KANA_ARCLENGTH_SAMPLES = 72
+# cubic 節点上限（制御点込みの点数 = 3n+1 ≤ この値 → n≤6 なら 19）
+KANA_MAX_SPINE_POINTS = 19
 
 
 class StrokeKind(str, Enum):
@@ -24,6 +37,7 @@ class StrokeKind(str, Enum):
     LEFT_HARA = "left_hara"  # 左はらい（撇）
     RIGHT_HARA = "right_hara"  # 右はらい（捺）
     TEN = "ten"  # 点
+    KANA_CURVE = "kana_curve"  # 仮名パラメトリック曲線（P1-B）
 
 
 class EndTag(str, Enum):
@@ -42,11 +56,14 @@ class SkeletonStroke:
 
     kind: StrokeKind
     # 直線なら [start, end]、曲線なら [p0, p1, p2, p3]（3次ベジェ）
+    # KANA_CURVE は連結 cubic（3n+1 点）
     points: Sequence[Vec2]
     start_tag: EndTag = EndTag.NONE
     end_tag: EndTag = EndTag.NONE
     # 任意の上書き太さ（None なら params 既定）
     thickness: float | None = None
+    # KANA_CURVE: 弧長 s∈[0,1] → 半幅 UPM（非単調可）。None なら thickness から単調テーパー
+    width_keys: Sequence[tuple[float, float]] | None = None
 
 
 def _apply_slope(p0: Vec2, p1: Vec2, slope_deg: float) -> tuple[Vec2, Vec2]:
@@ -297,6 +314,64 @@ def build_ten(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]]:
     return [outline]
 
 
+def _default_kana_width_keys(half_max: float) -> list[tuple[float, float]]:
+    """幅キー未指定時の仮名テーパー（入口やや細・中太・抜き先細）。"""
+    return [
+        (0.0, half_max * 0.45),
+        (0.28, half_max),
+        (0.70, half_max * 0.85),
+        (1.0, half_max * 0.08),
+    ]
+
+
+def kana_max_half_width(stroke: SkeletonStroke, p: MinchoParams) -> float:
+    if stroke.width_keys:
+        return max(float(w) for _, w in stroke.width_keys)
+    if stroke.thickness is not None:
+        return stroke.thickness * 0.5
+    return p.h_thickness * 0.5
+
+
+def build_kana_curve(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]]:
+    """仮名曲線: cubic 列 → 弧長再サンプル → 幅プロファイル → 肉付け。
+
+    仮名は RDP をかけない前提（bridge 側で passthrough）。端物テンプレは
+    幅キーで近似し、専用パーツ生成は後続スパイクで足す。
+    """
+    pts = list(stroke.points)
+    if len(pts) > KANA_MAX_SPINE_POINTS:
+        raise ValueError(
+            f"KANA_CURVE spine too many points: {len(pts)} > {KANA_MAX_SPINE_POINTS} "
+            "(節点上限: 制御点込み 3n+1、n≤6)"
+        )
+    # 構文検証（3n+1）
+    parse_cubic_chain(pts)
+    dense = sample_cubic_chain(pts, n_per_seg=48)
+    dense = smooth_tangents(dense)
+    max_hw = kana_max_half_width(stroke, p)
+    keys = (
+        list(stroke.width_keys)
+        if stroke.width_keys
+        else _default_kana_width_keys(max_hw)
+    )
+    arc = resample_by_arclength(dense, n=KANA_ARCLENGTH_SAMPLES)
+    samples = [(pos, tan) for pos, tan, _s in arc]
+    half_widths = [interpolate_width_keys(s, keys) for _pos, _tan, s in arc]
+    # 局所半幅に対する曲率ゲート（太い所だけ厳しく。先細り部は許容）
+    radii = curvature_radii(samples)
+    for i, (r, hw) in enumerate(zip(radii, half_widths)):
+        floor_r = KANA_CURVATURE_RADIUS_FACTOR * hw
+        if r < floor_r:
+            s = arc[i][2]
+            raise ValueError(
+                f"KANA_CURVE curvature gate failed at s={s:.2f}: "
+                f"radius={r:.2f} < {floor_r:.2f} (= {KANA_CURVATURE_RADIUS_FACTOR}×hw={hw:.2f}). "
+                "骨格 YAML 側を緩めてください（エンジンは黙って補正しない）"
+            )
+    outline = variable_width_outline(samples, half_widths, close=True)
+    return [outline]
+
+
 def build_stroke(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]]:
     """ストローク種別ごとにアウトライン（1本以上のポリゴン）を生成。"""
     if stroke.kind == StrokeKind.HORIZONTAL:
@@ -309,6 +384,8 @@ def build_stroke(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]]:
         return build_right_hara(stroke, p)
     if stroke.kind == StrokeKind.TEN:
         return build_ten(stroke, p)
+    if stroke.kind == StrokeKind.KANA_CURVE:
+        return build_kana_curve(stroke, p)
     raise ValueError(f"unknown stroke kind: {stroke.kind}")
 
 

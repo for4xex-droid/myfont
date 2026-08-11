@@ -21,6 +21,7 @@ from engine.curve_refit import RefitConfig, load_refit_config, refit_contours
 from engine.extra_skeletons import all_characters, all_labels
 from engine.geometry import UPM, y_for_font
 from engine.join_solver import SolveResult, solve_glyph, split_contours
+from engine.kana import KANA_GLYPH_META, kana_characters
 from engine.params import PARAM_SETS, MinchoParams
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,27 @@ CORE_GLYPHS: dict[str, dict[str, Any]] = {
     "san": {"name": "uni4E09", "unicode": 0x4E09, "char": "三"},
     "ei": {"name": "uni6C38", "unicode": 0x6C38, "char": "永"},
 }
+
+# 仮名は RDP しない（節点ノイズ＝安フォント感。計画書 §2）
+_KANA_PASSTHROUGH = RefitConfig(mode="passthrough", enabled=True)
+
+
+def glyph_meta(glyph_id: str) -> dict[str, Any] | None:
+    """CORE + 仮名 YAML メタを統合参照。"""
+    if glyph_id in CORE_GLYPHS:
+        return CORE_GLYPHS[glyph_id]
+    # kana_characters() が KANA_GLYPH_META を埋める
+    if glyph_id not in KANA_GLYPH_META:
+        kana_characters()
+    return KANA_GLYPH_META.get(glyph_id)
+
+
+def is_kana_glyph(glyph_id: str) -> bool:
+    if glyph_id in CORE_GLYPHS:
+        return False
+    if glyph_id not in KANA_GLYPH_META:
+        kana_characters()
+    return glyph_id in KANA_GLYPH_META
 
 
 @dataclass
@@ -142,9 +164,18 @@ def solve_to_font_contours(
     if glyph_id not in chars:
         raise KeyError(f"unknown glyph id: {glyph_id}")
     labels = all_labels()
-    result: SolveResult = solve_glyph(chars[glyph_id], params, k=k)
+    # 仮名單画は Stage A 延長の対象外（検出ヒットもほぼ無いが明示）
+    apply_a = not is_kana_glyph(glyph_id)
+    result: SolveResult = solve_glyph(
+        chars[glyph_id], params, k=k, apply_stage_a=apply_a
+    )
     internal = extract_contours_xy(result.path)
-    cfg = refit_cfg if refit_cfg is not None else load_refit_config()
+    if refit_cfg is not None:
+        cfg = refit_cfg
+    elif is_kana_glyph(glyph_id):
+        cfg = _KANA_PASSTHROUGH
+    else:
+        cfg = load_refit_config()
     refit_out = refit_contours(internal, cfg)
     # extract 後の輪郭数と比較（pathops 件数と抽出フィルタがずれる余地があるため）
     if len(refit_out.contours) != len(internal):
@@ -154,7 +185,7 @@ def solve_to_font_contours(
         )
     font = to_font_contours(refit_out.contours)
     font, winding = ensure_positive_fill(font)
-    meta = CORE_GLYPHS.get(glyph_id, {})
+    meta = glyph_meta(glyph_id) or {}
     return BridgeGlyphResult(
         glyph_id=glyph_id,
         char=str(meta.get("char") or labels.get(glyph_id, glyph_id)),
@@ -219,9 +250,11 @@ def build_ufo(
     _draw_contours(nd, _notdef_contours())
 
     for gr in glyph_results:
-        meta = CORE_GLYPHS.get(gr.glyph_id)
+        meta = glyph_meta(gr.glyph_id)
         if meta is None:
-            raise ValueError(f"glyph {gr.glyph_id} not in CORE_GLYPHS (T7 MVP)")
+            raise ValueError(
+                f"glyph {gr.glyph_id} not in CORE_GLYPHS or kana skeletons"
+            )
         g = font.newGlyph(meta["name"])
         g.width = UPM
         g.unicodes = [meta["unicode"]]
@@ -375,8 +408,13 @@ def build_temp_font(
     glyph_results = [solve_to_font_contours(gid, params) for gid in ids]
     build_ufo(glyph_results, family_name=fam, out_dir=ufo_dir)
     compile_otf(ufo_dir, otf_path)
-    fill = check_fill_juu(otf_path)
-    measure = measure_juu_from_otf(otf_path)
+    # 十が無い仮名のみビルドでは juu 塗り検査をスキップ（fail-open にしない）
+    if "juu" in ids:
+        fill = check_fill_juu(otf_path)
+        measure = measure_juu_from_otf(otf_path)
+    else:
+        fill = {"ok": True, "skipped": True, "reason": "juu not in glyph_ids"}
+        measure = {"status": "skipped", "reason": "juu not in glyph_ids"}
     if not keep_ufo:
         shutil.rmtree(ufo_dir, ignore_errors=True)
     return BridgeBuildResult(

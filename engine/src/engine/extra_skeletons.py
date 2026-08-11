@@ -484,12 +484,19 @@ def all_characters() -> dict[str, list[SkeletonStroke]]:
     """回帰用骨格。呼び出しごとにコピーを返し共有破壊を防ぐ。"""
     import copy
 
+    from engine.kana import kana_characters
+
     merged = {k: copy.deepcopy(v) for k, v in PROTO_CHARS.items()}
     merged.update({k: copy.deepcopy(v) for k, v in EXTRA_CHARACTERS.items()})
+    # 仮名 YAML（P1-B）は毎回ロードして編集即反映
+    merged.update(kana_characters())
     return merged
 
 
 def all_labels() -> dict[str, str]:
+    from engine.kana import kana_labels
+
     merged = dict(PROTO_LABELS)
     merged.update(EXTRA_LABELS)
+    merged.update(kana_labels())
     return merged

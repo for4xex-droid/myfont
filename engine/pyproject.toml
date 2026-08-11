@@ -23,7 +23,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-engine = ["snapshots/*.yaml"]
+engine = ["snapshots/*.yaml", "kana/skeletons/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

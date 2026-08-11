@@ -233,6 +233,10 @@ def stroke_thickness(stroke: SkeletonStroke, params: MinchoParams) -> float:
         return params.right_hara_max
     if stroke.kind == StrokeKind.TEN:
         return params.ten_width
+    if stroke.kind == StrokeKind.KANA_CURVE:
+        from engine.strokes import kana_max_half_width
+
+        return kana_max_half_width(stroke, params) * 2.0
     return params.h_thickness
 
 
