@@ -55,6 +55,7 @@ proofs/review/
 # Local secrets / API keys (kana vision review etc.)
 .env
 .env.*
+!.env.example
 
 # Matplotlib
 .matplotlib/
