@@ -96,9 +96,10 @@ def split_contours(path: Path) -> list[Path]:
         elif verb == PathVerb.LINE:
             cur.lineTo(pts[0][0], pts[0][1])
         elif verb == PathVerb.QUAD:
-            cur.qCurveTo(pts[0][0], pts[0][1], pts[1][0], pts[1][1])
+            cur.quadTo(pts[0][0], pts[0][1], pts[1][0], pts[1][1])
         elif verb == PathVerb.CUBIC:
-            cur.curveTo(
+            # pathops.Path API は cubicTo（fontTools Pen の curveTo ではない）
+            cur.cubicTo(
                 pts[0][0], pts[0][1],
                 pts[1][0], pts[1][1],
                 pts[2][0], pts[2][1],
@@ -122,7 +123,8 @@ def contour_points(path: Path) -> list[tuple[float, float]]:
     return pts
 
 
-def polygon_area(pts: Sequence[tuple[float, float]]) -> float:
+def polygon_signed_area(pts: Sequence[tuple[float, float]]) -> float:
+    """shoelace 符号つき面積（閉路。y-down では外形正・穴負が典型）。"""
     if len(pts) < 3:
         return 0.0
     a = 0.0
@@ -131,7 +133,12 @@ def polygon_area(pts: Sequence[tuple[float, float]]) -> float:
         x1, y1 = pts[i]
         x2, y2 = pts[(i + 1) % n]
         a += x1 * y2 - x2 * y1
-    return abs(a) * 0.5
+    return a * 0.5
+
+
+def polygon_area(pts: Sequence[tuple[float, float]]) -> float:
+    """絶対面積（後方互換）。微小除去の閾値比較用。"""
+    return abs(polygon_signed_area(pts))
 
 
 def contour_bbox(pts: Sequence[tuple[float, float]]) -> tuple[float, float, float, float]:
@@ -337,11 +344,12 @@ def stage_a_extend(
 @dataclass
 class ContourInfo:
     index: int
-    area: float
+    area: float  # 絶対面積（閾値比較用）
     bbox: tuple[float, float, float, float]
     path: Path
     removed: bool = False
     reason: str = ""
+    signed_area: float = 0.0  # 符号つき（y-down では負≈穴）。除去判定は深度＋面積床
 
 
 @dataclass
@@ -374,12 +382,88 @@ def micro_area_threshold(
     return max(area_ratio * total_ink, upm_area_ratio * (UPM * UPM), 50.0)
 
 
+def _point_in_poly_xy(
+    x: float, y: float, poly: Sequence[tuple[float, float]]
+) -> bool:
+    n = len(poly)
+    inside = False
+    j = n - 1
+    for i in range(n):
+        xi, yi = poly[i]
+        xj, yj = poly[j]
+        if ((yi > y) != (yj > y)) and (
+            x < (xj - xi) * (y - yi) / (yj - yi + 1e-15) + xi
+        ):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _interior_point(
+    pts: Sequence[tuple[float, float]],
+) -> tuple[float, float]:
+    """包含判定用の内点。頂点平均が外なら辺中点から内側へオフセット。"""
+    n = len(pts)
+    if n == 0:
+        return (0.0, 0.0)
+    cx = sum(p[0] for p in pts) / n
+    cy = sum(p[1] for p in pts) / n
+    if _point_in_poly_xy(cx, cy, pts):
+        return (cx, cy)
+    signed = polygon_signed_area(pts)
+    sign = 1.0 if signed >= 0 else -1.0
+    for i in range(n):
+        x1, y1 = pts[i]
+        x2, y2 = pts[(i + 1) % n]
+        mx, my = (x1 + x2) * 0.5, (y1 + y2) * 0.5
+        dx, dy = x2 - x1, y2 - y1
+        nx, ny = -dy, dx
+        length = (nx * nx + ny * ny) ** 0.5
+        if length < 1e-12:
+            continue
+        nx, ny = (nx / length) * sign, (ny / length) * sign
+        for dist in (2.0, 5.0, 10.0, 20.0, 40.0):
+            px, py = mx + nx * dist, my + ny * dist
+            if _point_in_poly_xy(px, py, pts):
+                return (px, py)
+    return (cx, cy)
+
+
+def _nesting_depths_from_points(
+    point_lists: Sequence[Sequence[tuple[float, float]]],
+    areas: Sequence[float],
+) -> list[int]:
+    """各輪郭の包含深度（0=外形、1=穴…）。絶対面積が大きい側を親候補にする。"""
+    depths: list[int] = []
+    for i, pts in enumerate(point_lists):
+        if len(pts) < 3:
+            depths.append(0)
+            continue
+        rx, ry = _interior_point(pts)
+        depth = 0
+        for j, other in enumerate(point_lists):
+            if i == j or len(other) < 3:
+                continue
+            if areas[j] <= areas[i] + 1e-6:
+                continue
+            if _point_in_poly_xy(rx, ry, other):
+                depth += 1
+        depths.append(depth)
+    return depths
+
+
+# 入れ子穴の保護床（UPM²比）。端物の巻きくず（実測 max≈2414）より上、
+# 微小除去床（0.0035→3500）より下。この帯の真カウンターを将来保護する。
+HOLE_KEEP_UPM_AREA_RATIO = 0.0025  # → 2500 units²
+
+
 def remove_micro_contours(
     path: Path,
     area_ratio: float = 0.005,
     upm_area_ratio: float = 0.0035,
     proximity: float = 8.0,
     mode: str = "proximate",
+    hole_keep_upm_area_ratio: float = HOLE_KEEP_UPM_AREA_RATIO,
 ) -> tuple[Path, list[ContourInfo]]:
     """
     union 後の微小輪郭除去。
@@ -388,17 +472,27 @@ def remove_micro_contours(
       - "area": 面積閾値未満を除去
       - "proximate": 面積閾値未満かつ、より大きい輪郭に重なる/近接するもののみ除去
       - "none": 除去しない
+
+    Phase 0a: 包含深度が奇数（入れ子穴）かつ面積 ≥ hole_keep 床の輪郭は除去しない。
+    深度奇数でも床未満の端物巻きくずは従来どおり除去対象。
     """
     contours = split_contours(path)
     infos: list[ContourInfo] = []
+    point_lists: list[list[tuple[float, float]]] = []
     for i, c in enumerate(contours):
         pts = contour_points(c)
-        area = polygon_area(pts)
+        signed = polygon_signed_area(pts)
+        area = abs(signed)
         bb = contour_bbox(pts) if pts else (0, 0, 0, 0)
-        infos.append(ContourInfo(i, area, bb, c))
+        infos.append(ContourInfo(i, area, bb, c, signed_area=signed))
+        point_lists.append(pts)
 
     total_ink = sum(inf.area for inf in infos) or 1.0
     area_cut = micro_area_threshold(total_ink, area_ratio, upm_area_ratio)
+    hole_keep = max(hole_keep_upm_area_ratio * (UPM * UPM), 50.0)
+    depths = _nesting_depths_from_points(
+        point_lists, [inf.area for inf in infos]
+    )
 
     if mode == "none":
         return path, infos
@@ -408,7 +502,12 @@ def remove_micro_contours(
         )
 
     keep: list[Path] = []
-    for inf in infos:
+    for inf, depth in zip(infos, depths):
+        # 入れ子穴で保護床以上 → 微小除去床未満でも残す
+        if depth % 2 == 1 and inf.area >= hole_keep:
+            keep.append(inf.path)
+            inf.reason = f"kept_hole(depth={depth},area>={hole_keep:.0f})"
+            continue
         if inf.area >= area_cut:
             keep.append(inf.path)
             continue

@@ -34,14 +34,24 @@ CORE_GLYPHS: dict[str, dict[str, Any]] = {
     "ei": {"name": "uni6C38", "unicode": 0x6C38, "char": "永"},
 }
 
-# 仮名は RDP しない（節点ノイズ＝安フォント感。計画書 §2）
+# 穴付き漢字など、extra_skeletons 由来で UFO 化するメタ（Phase 0a）
+EXTRA_GLYPHS: dict[str, dict[str, Any]] = {
+    "kuchi": {"name": "uni53E3", "unicode": 0x53E3, "char": "口"},
+    "nichi": {"name": "uni65E5", "unicode": 0x65E5, "char": "日"},
+    "ta": {"name": "uni7530", "unicode": 0x7530, "char": "田"},
+    "naka": {"name": "uni4E2D", "unicode": 0x4E2D, "char": "中"},
+}
+
+# 後方互換: 明示 passthrough が必要なテスト用
 _KANA_PASSTHROUGH = RefitConfig(mode="passthrough", enabled=True)
 
 
 def glyph_meta(glyph_id: str) -> dict[str, Any] | None:
-    """CORE + 仮名 YAML メタを統合参照。"""
+    """CORE + EXTRA + 仮名 YAML メタを統合参照。"""
     if glyph_id in CORE_GLYPHS:
         return CORE_GLYPHS[glyph_id]
+    if glyph_id in EXTRA_GLYPHS:
+        return EXTRA_GLYPHS[glyph_id]
     # kana_characters() が KANA_GLYPH_META を埋める
     if glyph_id not in KANA_GLYPH_META:
         kana_characters()
@@ -49,7 +59,7 @@ def glyph_meta(glyph_id: str) -> dict[str, Any] | None:
 
 
 def is_kana_glyph(glyph_id: str) -> bool:
-    if glyph_id in CORE_GLYPHS:
+    if glyph_id in CORE_GLYPHS or glyph_id in EXTRA_GLYPHS:
         return False
     if glyph_id not in KANA_GLYPH_META:
         kana_characters()
@@ -64,6 +74,8 @@ class BridgeGlyphResult:
     font_contours: list[list[tuple[float, float]]]
     winding: dict[str, Any] = field(default_factory=dict)
     refit: dict[str, Any] = field(default_factory=dict)
+    # Phase 1: cubic_fit 時の ContourPath（UFO 描画優先）
+    font_paths: list[Any] | None = None
 
 
 @dataclass
@@ -77,7 +89,11 @@ class BridgeBuildResult:
 
 
 def extract_contours_xy(path) -> list[list[tuple[float, float]]]:
-    """pathops Path → 折れ線輪郭（内部座標）。"""
+    """pathops Path → 折れ線輪郭（内部座標）。
+
+    Phase 0c: QUAD/CUBIC を黙って頂点列に潰さない（サイレント幾何破損の防止）。
+    曲線を流す経路を入れるときは verb 保持版へ置換する。
+    """
     out: list[list[tuple[float, float]]] = []
     for contour in split_contours(path):
         pts: list[tuple[float, float]] = []
@@ -85,12 +101,15 @@ def extract_contours_xy(path) -> list[list[tuple[float, float]]]:
             if verb in (PathVerb.MOVE, PathVerb.LINE):
                 pts.append((float(p[0][0]), float(p[0][1])))
             elif verb == PathVerb.QUAD:
-                pts.append((float(p[0][0]), float(p[0][1])))
-                pts.append((float(p[1][0]), float(p[1][1])))
+                raise ValueError(
+                    "extract_contours_xy: QUAD verb not supported "
+                    "(would corrupt geometry; use a curve-preserving extractor)"
+                )
             elif verb == PathVerb.CUBIC:
-                pts.append((float(p[0][0]), float(p[0][1])))
-                pts.append((float(p[1][0]), float(p[1][1])))
-                pts.append((float(p[2][0]), float(p[2][1])))
+                raise ValueError(
+                    "extract_contours_xy: CUBIC verb not supported "
+                    "(would corrupt geometry; use a curve-preserving extractor)"
+                )
         if len(pts) >= 3:
             if pts[0] == pts[-1]:
                 pts = pts[:-1]
@@ -121,36 +140,183 @@ def to_font_contours(
     return [[(x, y_for_font(y)) for x, y in c] for c in contours_internal]
 
 
-def ensure_positive_fill(
+def _open_ring(contour: Sequence[tuple[float, float]]) -> list[tuple[float, float]]:
+    pts = [(float(x), float(y)) for x, y in contour]
+    if len(pts) >= 2 and pts[0] == pts[-1]:
+        pts = pts[:-1]
+    return pts
+
+
+def _point_in_poly(x: float, y: float, poly: Sequence[tuple[float, float]]) -> bool:
+    n = len(poly)
+    inside = False
+    j = n - 1
+    for i in range(n):
+        xi, yi = poly[i]
+        xj, yj = poly[j]
+        if ((yi > y) != (yj > y)) and (
+            x < (xj - xi) * (y - yi) / (yj - yi + 1e-15) + xi
+        ):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _rep_point(poly: Sequence[tuple[float, float]]) -> tuple[float, float]:
+    """包含判定用の内点。頂点平均が外なら辺中点から内側へオフセットする。"""
+    n = len(poly)
+    if n == 0:
+        return (0.0, 0.0)
+    cx = sum(p[0] for p in poly) / n
+    cy = sum(p[1] for p in poly) / n
+    if _point_in_poly(cx, cy, poly):
+        return (cx, cy)
+    # 凹型・C字で重心が外れる場合: 符号つき面積で内側法線を決め、辺中点から探す
+    area = shoelace(poly)
+    sign = 1.0 if area >= 0 else -1.0
+    for i in range(n):
+        x1, y1 = poly[i]
+        x2, y2 = poly[(i + 1) % n]
+        mx, my = (x1 + x2) * 0.5, (y1 + y2) * 0.5
+        dx, dy = x2 - x1, y2 - y1
+        nx, ny = -dy, dx
+        length = (nx * nx + ny * ny) ** 0.5
+        if length < 1e-12:
+            continue
+        nx, ny = (nx / length) * sign, (ny / length) * sign
+        for dist in (2.0, 5.0, 10.0, 20.0, 40.0):
+            px, py = mx + nx * dist, my + ny * dist
+            if _point_in_poly(px, py, poly):
+                return (px, py)
+    # 最後の手段（深度0の単一輪郭では親探索に使われない）
+    return (cx, cy)
+
+
+def nesting_depths(
+    contours: Sequence[Sequence[tuple[float, float]]],
+) -> list[int]:
+    """各輪郭の包含深度（0=外形、1=穴、2=穴の中の島…）。"""
+    polys = [_open_ring(c) for c in contours]
+    areas = [abs(shoelace(p)) for p in polys]
+    depths: list[int] = []
+    for i, poly in enumerate(polys):
+        if len(poly) < 3:
+            depths.append(0)
+            continue
+        rx, ry = _rep_point(poly)
+        depth = 0
+        for j, other in enumerate(polys):
+            if i == j or len(other) < 3:
+                continue
+            # より大きい輪郭に内包されているときだけ親とみなす
+            if areas[j] <= areas[i] + 1e-6:
+                continue
+            if _point_in_poly(rx, ry, other):
+                depth += 1
+        depths.append(depth)
+    return depths
+
+
+def normalize_fill_winding(
     contours: Sequence[Sequence[tuple[float, float]]],
 ) -> tuple[list[list[tuple[float, float]]], dict[str, Any]]:
     """
-    CFF/OTF 向けに塗り輪郭を正面積（反時計）へ揃える。
+    CFF/OTF 向けに塗り向きを正規化する（Phase 0a）。
 
-    コア試験字（十/二/永）には意図的カウンターが無い前提（spike3 同）。
-    口・日など穴付き字は入れ子判定が別途必要。
+    前提: solve 側は fix_winding 済みで、内部座標（y-down）では
+    外形=正面積・穴=負面積が決定的（pathops カナリアで固定）。
+    Y 反転で全輪郭の向きが一様に裏返るため、全輪郭を一括 reverse して
+    相対巻きを保存したままフォント空間（外形正・穴負）へ戻す。
+
+    仕上げに包含深度と面積符号の整合を検証し、不整合は raise する
+    （自動修正しない）。
     """
-    out: list[list[tuple[float, float]]] = []
-    before = []
-    reversed_flags = []
-    for c in contours:
-        pts = list(c)
-        if pts and pts[0] == pts[-1]:
-            pts = pts[:-1]
-        a = shoelace(pts)
-        before.append(a)
-        if a < 0:
-            out.append(list(reversed(pts)))
-            reversed_flags.append(True)
-        else:
-            out.append(pts)
-            reversed_flags.append(False)
+    opened = [_open_ring(c) for c in contours]
+    before = [shoelace(c) for c in opened]
+    # 一括 reverse（相対巻きを保存）
+    out = [list(reversed(c)) if c else c for c in opened]
+    after = [shoelace(c) for c in out]
+    depths = nesting_depths(out)
+
+    for i, (area, depth) in enumerate(zip(after, depths)):
+        # 偶深度=外形（正）、奇深度=穴（負）
+        expect_positive = (depth % 2) == 0
+        if expect_positive and area <= 0:
+            raise ValueError(
+                f"winding verify failed: contour[{i}] depth={depth} "
+                f"(outer) but signed_area={area:.3f} (expected >0)"
+            )
+        if (not expect_positive) and area >= 0:
+            raise ValueError(
+                f"winding verify failed: contour[{i}] depth={depth} "
+                f"(hole) but signed_area={area:.3f} (expected <0)"
+            )
+
     return out, {
         "areas_before": before,
-        "areas_after": [shoelace(c) for c in out],
-        "reversed": reversed_flags,
-        "strategy": "all-positive-fill",
+        "areas_after": after,
+        "depths": depths,
+        "reversed": [True] * len(out),
+        "strategy": "bulk-reverse-verify",
+        "n_holes": sum(1 for d in depths if d % 2 == 1),
     }
+
+
+def ensure_positive_fill(
+    contours: Sequence[Sequence[tuple[float, float]]],
+) -> tuple[list[list[tuple[float, float]]], dict[str, Any]]:
+    """後方互換エイリアス。Phase 0a 以降は normalize_fill_winding を使う。"""
+    return normalize_fill_winding(contours)
+
+
+def normalize_fill_winding_paths(paths: Sequence[Any]) -> tuple[list[Any], dict[str, Any]]:
+    """ContourPath 列の一括 reverse＋オンカーブ点での検証。"""
+    from engine.curve_fit import ContourPath
+
+    opened = [p if isinstance(p, ContourPath) else p for p in paths]
+    reversed_paths = [p.reversed() for p in opened]
+    font_like = [p.on_curve_points() for p in reversed_paths]
+    # 検証のみ normalize_fill_winding に載せる（もう reverse 済みなので
+    # 一時的に「正しい符号」を期待する検証関数を呼ぶ）
+    depths = nesting_depths(font_like)
+    after = [shoelace(c) for c in font_like]
+    for i, (area, depth) in enumerate(zip(after, depths)):
+        expect_positive = (depth % 2) == 0
+        if expect_positive and area <= 0:
+            raise ValueError(
+                f"winding verify failed (path): contour[{i}] depth={depth} "
+                f"(outer) but signed_area={area:.3f}"
+            )
+        if (not expect_positive) and area >= 0:
+            raise ValueError(
+                f"winding verify failed (path): contour[{i}] depth={depth} "
+                f"(hole) but signed_area={area:.3f}"
+            )
+    return list(reversed_paths), {
+        "areas_before": [shoelace(p.on_curve_points()) for p in opened],
+        "areas_after": after,
+        "depths": depths,
+        "reversed": [True] * len(reversed_paths),
+        "strategy": "bulk-reverse-verify-path",
+        "n_holes": sum(1 for d in depths if d % 2 == 1),
+    }
+
+
+def _kana_refit_config() -> RefitConfig:
+    """仮名用: snapshot の kana_mode を mode に載せ替えた Config。"""
+    base = load_refit_config()
+    return RefitConfig(
+        mode=base.kana_mode,
+        epsilon_upm=base.epsilon_upm,
+        max_error_upm=base.max_error_upm,
+        max_points_soft=base.max_points_soft,
+        min_points=base.min_points,
+        enabled=base.enabled,
+        kana_mode=base.kana_mode,
+        cubic_max_error_upm=base.cubic_max_error_upm,
+        cubic_corner_deg=base.cubic_corner_deg,
+        cubic_max_anchors=base.cubic_max_anchors,
+    )
 
 
 def solve_to_font_contours(
@@ -173,7 +339,7 @@ def solve_to_font_contours(
     if refit_cfg is not None:
         cfg = refit_cfg
     elif is_kana_glyph(glyph_id):
-        cfg = _KANA_PASSTHROUGH
+        cfg = _kana_refit_config()
     else:
         cfg = load_refit_config()
     refit_out = refit_contours(internal, cfg)
@@ -183,8 +349,19 @@ def solve_to_font_contours(
             f"curve_refit changed contour count for {glyph_id}: "
             f"{len(internal)} -> {len(refit_out.contours)}"
         )
-    font = to_font_contours(refit_out.contours)
-    font, winding = ensure_positive_fill(font)
+
+    font_paths = None
+    if refit_out.paths:
+        # Y 反転 → winding 正規化（ContourPath）
+        flipped = [
+            p.transform(lambda x, y: (x, y_for_font(y))) for p in refit_out.paths
+        ]
+        font_paths, winding = normalize_fill_winding_paths(flipped)
+        font = [p.on_curve_points() for p in font_paths]
+    else:
+        font = to_font_contours(refit_out.contours)
+        font, winding = normalize_fill_winding(font)
+
     meta = glyph_meta(glyph_id) or {}
     return BridgeGlyphResult(
         glyph_id=glyph_id,
@@ -193,6 +370,7 @@ def solve_to_font_contours(
         font_contours=font,
         winding=winding,
         refit=refit_out.meta,
+        font_paths=font_paths,
     )
 
 
@@ -215,6 +393,23 @@ def _draw_contours(glyph, contours: Sequence[Sequence[tuple[float, float]]]) -> 
         pen.moveTo(pts[0])
         for pt in pts[1:]:
             pen.lineTo(pt)
+        pen.closePath()
+
+
+def _draw_paths(glyph, paths: Sequence[Any]) -> None:
+    """ContourPath 列を curveTo/lineTo で描く（Phase 1）。"""
+    pen = glyph.getPen()
+    for path in paths:
+        pen.moveTo(path.start)
+        for seg in path.segs:
+            if seg[0] == "L":
+                pen.lineTo((float(seg[1]), float(seg[2])))
+            else:
+                pen.curveTo(
+                    (float(seg[1]), float(seg[2])),
+                    (float(seg[3]), float(seg[4])),
+                    (float(seg[5]), float(seg[6])),
+                )
         pen.closePath()
 
 
@@ -253,12 +448,15 @@ def build_ufo(
         meta = glyph_meta(gr.glyph_id)
         if meta is None:
             raise ValueError(
-                f"glyph {gr.glyph_id} not in CORE_GLYPHS or kana skeletons"
+                f"glyph {gr.glyph_id} not in CORE/EXTRA/kana glyph meta"
             )
         g = font.newGlyph(meta["name"])
         g.width = UPM
         g.unicodes = [meta["unicode"]]
-        _draw_contours(g, gr.font_contours)
+        if gr.font_paths:
+            _draw_paths(g, gr.font_paths)
+        else:
+            _draw_contours(g, gr.font_contours)
 
     font.save(out_dir)
     return out_dir

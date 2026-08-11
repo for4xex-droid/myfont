@@ -1,0 +1,139 @@
+{
+  "version": "kana_golden_cubic_fit_v1",
+  "frozen_at": "2026-08-11T20:47:57Z",
+  "reason": "Phase2: kana_mode cubic_fit 既定化に伴う黄金再凍結（掟18）",
+  "params": "product_r1",
+  "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+  "refit": {
+    "kana_mode": "cubic_fit",
+    "mode_kanji": "rdp_polyline"
+  },
+  "files": {
+    "proofs/golden/kana_board/quad.png": {
+      "sha256": "9b0c4f47ba0923bebd46a654c9f7afb76b2eea5a7a88960900316e5827b6833a",
+      "text": "しいとつ",
+      "png_sha256": "9b0c4f47ba0923bebd46a654c9f7afb76b2eea5a7a88960900316e5827b6833a",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": null,
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_i/single.png": {
+      "sha256": "5df414bba2ac5ddaf124cfac3ca836cad09605bfed494b342bd6295c2bc480df",
+      "text": "い",
+      "png_sha256": "5df414bba2ac5ddaf124cfac3ca836cad09605bfed494b342bd6295c2bc480df",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "eea4f89f951dcc502d048ceccf2ad3b1938a3232969aac1a29c7b25e6e924bd1",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_i/walk.png": {
+      "sha256": "5df414bba2ac5ddaf124cfac3ca836cad09605bfed494b342bd6295c2bc480df",
+      "text": "い",
+      "png_sha256": "5df414bba2ac5ddaf124cfac3ca836cad09605bfed494b342bd6295c2bc480df",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "eea4f89f951dcc502d048ceccf2ad3b1938a3232969aac1a29c7b25e6e924bd1",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_ku/single.png": {
+      "sha256": "f7780d144720e6758c41760d237e07b4fe32117df49eeaeff0adb7883f55fd1a",
+      "text": "く",
+      "png_sha256": "f7780d144720e6758c41760d237e07b4fe32117df49eeaeff0adb7883f55fd1a",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "a8b71975a2bf664ae3c7674467d9d0815a2c83a49f274347031cc43c8d5f378d",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_ku/walk.png": {
+      "sha256": "11344eea1b821108a1d4e0fd2f21ec2cb0feb4e53077415364edb51df0293115",
+      "text": "くくく",
+      "png_sha256": "11344eea1b821108a1d4e0fd2f21ec2cb0feb4e53077415364edb51df0293115",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "a8b71975a2bf664ae3c7674467d9d0815a2c83a49f274347031cc43c8d5f378d",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_shi/mix.png": {
+      "sha256": "b662abcb4bbb9bf3d579aa02315372a52d14569a9a963340b26fea99e5d46813",
+      "text": "し",
+      "png_sha256": "b662abcb4bbb9bf3d579aa02315372a52d14569a9a963340b26fea99e5d46813",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "39fd3ca804f14c61c900c8ebfa1b9e04b309862d20191db92ad801abfde63f07",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_shi/single.png": {
+      "sha256": "b662abcb4bbb9bf3d579aa02315372a52d14569a9a963340b26fea99e5d46813",
+      "text": "し",
+      "png_sha256": "b662abcb4bbb9bf3d579aa02315372a52d14569a9a963340b26fea99e5d46813",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "39fd3ca804f14c61c900c8ebfa1b9e04b309862d20191db92ad801abfde63f07",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_shi/walk.png": {
+      "sha256": "5e17dfd59eda3e8983764ab9c5d43f7643ef52d460e3cfab74c601333e38a493",
+      "text": "ししし",
+      "png_sha256": "5e17dfd59eda3e8983764ab9c5d43f7643ef52d460e3cfab74c601333e38a493",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "39fd3ca804f14c61c900c8ebfa1b9e04b309862d20191db92ad801abfde63f07",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_to/mix.png": {
+      "sha256": "3797a4a1add9c1a141abf899042a73de576f04b3717ef0bd32fca9fd5cd1dcf7",
+      "text": "しいと",
+      "png_sha256": "3797a4a1add9c1a141abf899042a73de576f04b3717ef0bd32fca9fd5cd1dcf7",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "8b66c7aca05e0847d5084089e5ea9116419aba86ab15048b077f46f06975119c",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_to/single.png": {
+      "sha256": "5ff7c384e15c83aaf1c0dc66d5b3c988bdbb1e81772bf404dbf37ead869b5796",
+      "text": "と",
+      "png_sha256": "5ff7c384e15c83aaf1c0dc66d5b3c988bdbb1e81772bf404dbf37ead869b5796",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "8b66c7aca05e0847d5084089e5ea9116419aba86ab15048b077f46f06975119c",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_to/walk.png": {
+      "sha256": "5ff7c384e15c83aaf1c0dc66d5b3c988bdbb1e81772bf404dbf37ead869b5796",
+      "text": "と",
+      "png_sha256": "5ff7c384e15c83aaf1c0dc66d5b3c988bdbb1e81772bf404dbf37ead869b5796",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "8b66c7aca05e0847d5084089e5ea9116419aba86ab15048b077f46f06975119c",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_tsu/mix.png": {
+      "sha256": "06dcb0516793cbf50fbd9e11db0bcf0142a380d15752a183248154aba6dfb878",
+      "text": "つ",
+      "png_sha256": "06dcb0516793cbf50fbd9e11db0bcf0142a380d15752a183248154aba6dfb878",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "265e002189e41173cd6ad8b8f3d40ef003b363955b9ce43923db1fec0984d359",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_tsu/single.png": {
+      "sha256": "06dcb0516793cbf50fbd9e11db0bcf0142a380d15752a183248154aba6dfb878",
+      "text": "つ",
+      "png_sha256": "06dcb0516793cbf50fbd9e11db0bcf0142a380d15752a183248154aba6dfb878",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "265e002189e41173cd6ad8b8f3d40ef003b363955b9ce43923db1fec0984d359",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    },
+    "proofs/golden/kana_tsu/walk.png": {
+      "sha256": "82691e685f454ea96e5b7143687e94dcc8da10825a307246b6a929c015e0f21b",
+      "text": "つつつ",
+      "png_sha256": "82691e685f454ea96e5b7143687e94dcc8da10825a307246b6a929c015e0f21b",
+      "otf_sha256": "aae36173512b83cea9e228c6457b461e1c1cc32644ed27240e3c2bb4c5bdc9a2",
+      "skeleton_yaml_sha256": "265e002189e41173cd6ad8b8f3d40ef003b363955b9ce43923db1fec0984d359",
+      "params": "product_r1",
+      "render_version": "kana_render_v1"
+    }
+  }
+}

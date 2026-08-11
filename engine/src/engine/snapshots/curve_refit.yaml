@@ -1,14 +1,20 @@
-# union 後の曲線再適合ゲート（P2++）
+# union 後の曲線再適合ゲート（P2++ / Phase 1）
 # 正本: この YAML。コードは load_refit_config() 経由でのみ読む。
 #
-# 方針（2026-08-09 決定）:
-#   - デフォルト mode = rdp_polyline
-#   - フル cubic 再適合は角・うろこで形状崩壊リスクが高いため M2 では非デフォルト
-#   - UFO には簡略化折れ線を載せる（節点爆発の抑制が第一目的）
+# 方針:
+#   - 漢字 mode = rdp_polyline（角・うろこ保護）
+#   - 仮名 kana_mode = cubic_fit（Phase 1: 出荷折れ線→角ロック cubic）
+#   - 問題が出たら kana_mode: passthrough に戻す
 
-mode: rdp_polyline          # rdp_polyline | passthrough
+mode: rdp_polyline          # 漢字: rdp_polyline | passthrough | cubic_fit
+kana_mode: cubic_fit        # 仮名専用（bridge が mode に載せ替え）
 epsilon_upm: 1.5            # RDP 許容誤差（UPM）
-max_error_upm: 1.5          # ゲート: 原輪郭への Hausdorff 上限（通常 epsilon と同値）
-max_points_soft: 120        # ソフト警告のみ（超過でも失敗にしない）
+max_error_upm: 1.5          # RDP ゲート
+max_points_soft: 120        # RDP ソフト警告
 min_points: 3
 enabled: true
+
+# Phase 1 cubic_fit（Hausdorff≤0.5。単画仮名は概ね≤40、接合字「と」は48）
+cubic_max_error_upm: 0.5
+cubic_corner_deg: 30.0
+cubic_max_anchors: 48       # 1輪郭あたり（複画「い」は輪郭ごと。yaml で調整可）

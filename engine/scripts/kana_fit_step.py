@@ -109,7 +109,21 @@ def main(argv: list[str] | None = None) -> int:
     record["gate_exit"] = code
     if report_path.is_file():
         try:
-            record["gate"] = json.loads(report_path.read_text(encoding="utf-8"))
+            gate_doc = json.loads(report_path.read_text(encoding="utf-8"))
+            record["gate"] = gate_doc
+            # Phase 0b: 観測は合否と分離してトップレベルにも抜粋
+            obs = gate_doc.get("observe")
+            if isinstance(obs, dict):
+                record["observe"] = {
+                    "points_after": (obs.get("outline") or {}).get("points_after"),
+                    "anchor_count": (obs.get("outline") or {}).get("anchor_count"),
+                    "curvature_p95": (obs.get("curvature") or {}).get(
+                        "curvature_p95"
+                    ),
+                    "min_radius_upm": (obs.get("curvature") or {}).get(
+                        "min_radius_upm"
+                    ),
+                }
         except json.JSONDecodeError:
             record["gate"] = None
 

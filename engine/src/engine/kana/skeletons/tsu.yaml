@@ -16,24 +16,23 @@ motif: curve_tsu
 elements:
   - id: main
     spine:
-      - [250, 355]   # P0 起筆（やや下げて上帯から外し、左端は幅維持）
-      - [530, 245]   # P1 右上へ（上帯ink左端をさらに右へ）
-      - [650, 210]   # P2 天
-      - [800, 280]   # P3 右肩
-      - [950, 420]   # P4 右腹（横へ伸ばしaspect回復・丸み）
-      - [740, 640]   # P5 底（浅めに戻し右寄せでbotCX）
-      - [420, 645]   # P6 抜き（右寄せで底重心を中央へ）
+      - [250, 365]   # P0 起筆（左端維持）
+      - [570, 255]   # P1 上帯左端を右へ（topL↑）
+      - [675, 218]   # P2 天
+      - [795, 288]   # P3 右肩
+      - [950, 430]   # P4 右腹
+      - [770, 655]   # P5 底右寄せ
+      - [455, 660]   # P6 抜き
     width:
       - {s: 0.0, hw: 10}
       - {s: 0.35, hw: 24}
       - {s: 0.60, hw: 32}
       - {s: 0.85, hw: 15}
-      - {s: 1.0, hw: 3}   # 3/32 ≈ 0.09 ≤ 0.35
+      - {s: 1.0, hw: 3}
     ends:
       entry: karui_uchikomi
       exit: nuki
 
-# 入口: 右上がり（+5〜+50°）。出口: 左向き（±180 近傍。ラップ帯）
 gate:
   expect_contours: 1
   bbox:
@@ -42,4 +41,4 @@ gate:
     aspect_w_over_h: [1.20, 1.80]
   tips:
     - {element: main, end: entry, bearing_deg: [5, 50]}
-    - {element: main, end: exit, bearing_deg: [160, -150]}   # 左向き（wrap）
+    - {element: main, end: exit, bearing_deg: [160, -150]}

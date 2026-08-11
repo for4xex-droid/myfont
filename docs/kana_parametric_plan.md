@@ -126,7 +126,7 @@ P1（ひらがな核心20字）を「Glyphs で人が描く」代わりに、**�
 | `StrokeKind.KANA_CURVE`＋弧長幅 | **済**（`engine/strokes.py` / `geometry.py`） |
 | 曲率半径ゲート | **済**（違反は YAML fail） |
 | DSL ローダ＋`shi.yaml` | **済**（`engine/kana/`） |
-| bridge 登録・仮名 passthrough refit | **済** |
+| bridge 登録・仮名 `cubic_fit` refit（Phase1–2） | **済**（黄金 `kana_golden_cubic_fit_v1`） |
 | G1（contour=1・再現ハッシュ） | **済**（`engine/tests/test_kana_curve.py` / `scripts/kana_gate.py`） |
 | regen | `python scripts/regen.py --params product_r1 --glyphs shi` |
 | 「し」内部合格（向き・識別・釣り針） | **済**（2026-08-12。明朝端物の本格追求は後回し） |

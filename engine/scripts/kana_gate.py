@@ -41,9 +41,15 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="optional skeleton YAML path (fixtures); else registered glyph_id",
     )
+    ap.add_argument(
+        "--no-observe",
+        action="store_true",
+        help="skip Phase 0b observation block (default: attach observe)",
+    )
     args = ap.parse_args(argv)
 
     from engine.kana.gate import run_gate, run_gate_path
+    from engine.kana.observe import observe_glyph
     from engine.params import PARAM_SETS
 
     if args.params not in PARAM_SETS:
@@ -69,8 +75,26 @@ def main(argv: list[str] | None = None) -> int:
         tag = "ok" if c.ok else "FAIL"
         print(f"[{tag}] {c.name}: {c.detail}")
 
+    payload = report.to_dict()
+    if not args.no_observe:
+        obs = observe_glyph(
+            report.glyph_id,
+            params=args.params,
+            yaml_path=args.yaml,
+        )
+        payload["observe"] = obs
+        curv = obs.get("curvature") or {}
+        outline = obs.get("outline") or {}
+        print(
+            "[observe] "
+            f"points_after={outline.get('points_after')} "
+            f"anchor_count={outline.get('anchor_count')} "
+            f"curvature_p95={curv.get('curvature_p95')} "
+            f"min_radius={curv.get('min_radius_upm')}"
+        )
+
     args.report.write_text(
-        json.dumps(report.to_dict(), ensure_ascii=False, indent=2) + "\n",
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
     print(

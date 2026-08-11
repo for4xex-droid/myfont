@@ -16,7 +16,8 @@ from typing import Any, Literal
 import yaml
 
 Point = tuple[float, float]
-RefitMode = Literal["rdp_polyline", "passthrough"]
+RefitMode = Literal["rdp_polyline", "passthrough", "cubic_fit"]
+KanaMode = Literal["rdp_polyline", "passthrough", "cubic_fit"]
 
 _SNAPSHOT = Path(__file__).resolve().parent / "snapshots" / "curve_refit.yaml"
 
@@ -29,12 +30,19 @@ class RefitConfig:
     max_points_soft: int = 120
     min_points: int = 3
     enabled: bool = True
+    # Phase 1: 仮名専用モード（漢字の mode とは独立）
+    kana_mode: KanaMode = "passthrough"
+    cubic_max_error_upm: float = 0.5
+    cubic_corner_deg: float = 30.0
+    cubic_max_anchors: int = 48
 
 
 @dataclass
 class RefitResult:
     contours: list[list[Point]]
     meta: dict[str, Any] = field(default_factory=dict)
+    # Phase 1: cubic_fit 時のみ ContourPath 列（描画は bridge が優先）
+    paths: list[Any] | None = None
 
 
 def load_refit_config(path: Path | None = None) -> RefitConfig:
@@ -45,10 +53,15 @@ def load_refit_config(path: Path | None = None) -> RefitConfig:
         )
     raw = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
     mode = str(raw.get("mode", "rdp_polyline"))
-    if mode not in ("rdp_polyline", "passthrough"):
+    allowed = ("rdp_polyline", "passthrough", "cubic_fit")
+    if mode not in allowed:
         raise ValueError(
-            f"unsupported curve_refit mode: {mode!r} "
-            "(allowed: rdp_polyline, passthrough; cubic is deferred)"
+            f"unsupported curve_refit mode: {mode!r} (allowed: {allowed})"
+        )
+    kana_mode = str(raw.get("kana_mode", "passthrough"))
+    if kana_mode not in allowed:
+        raise ValueError(
+            f"unsupported curve_refit kana_mode: {kana_mode!r} (allowed: {allowed})"
         )
     return RefitConfig(
         mode=mode,  # type: ignore[arg-type]
@@ -57,11 +70,28 @@ def load_refit_config(path: Path | None = None) -> RefitConfig:
         max_points_soft=int(raw.get("max_points_soft", 120)),
         min_points=int(raw.get("min_points", 3)),
         enabled=bool(raw.get("enabled", True)),
+        kana_mode=kana_mode,  # type: ignore[arg-type]
+        cubic_max_error_upm=float(raw.get("cubic_max_error_upm", 0.5)),
+        cubic_corner_deg=float(raw.get("cubic_corner_deg", 30.0)),
+        cubic_max_anchors=int(raw.get("cubic_max_anchors", 48)),
     )
 
 
 def _dist(a: Point, b: Point) -> float:
     return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
+
+
+def _signed_area(contour: Sequence[Point]) -> float:
+    pts = _open_ring(contour)
+    if len(pts) < 3:
+        return 0.0
+    a = 0.0
+    n = len(pts)
+    for i in range(n):
+        x1, y1 = pts[i]
+        x2, y2 = pts[(i + 1) % n]
+        a += x1 * y2 - x2 * y1
+    return 0.5 * a
 
 
 def _perp_dist(p: Point, a: Point, b: Point) -> float:
@@ -157,6 +187,41 @@ def refit_contour(
             "soft_over_points": before_n > cfg.max_points_soft,
         }
 
+    if cfg.mode == "cubic_fit":
+        # 単一輪郭 API では paths を meta に載せる（複数は refit_contours）
+        from engine.curve_fit import fit_closed_contour
+
+        path, cmeta = fit_closed_contour(
+            src,
+            max_error_upm=cfg.cubic_max_error_upm,
+            corner_deg=cfg.cubic_corner_deg,
+            max_anchors=cfg.cubic_max_anchors,
+        )
+        err = float(cmeta["max_error"])
+        anchors = int(cmeta["anchor_count"])
+        if err > cfg.cubic_max_error_upm + 1e-6:
+            raise ValueError(
+                f"curve_refit cubic_fit gate failed: max_error={err:.4f} > "
+                f"cubic_max_error_upm={cfg.cubic_max_error_upm}"
+            )
+        if anchors > cfg.cubic_max_anchors:
+            raise ValueError(
+                f"curve_refit cubic_fit gate failed: anchors={anchors} > "
+                f"cubic_max_anchors={cfg.cubic_max_anchors}"
+            )
+        on = path.on_curve_points()
+        meta = {
+            "mode": "cubic_fit",
+            "points_before": before_n,
+            "points_after": anchors,
+            "on_curve_after": len(on),
+            "max_error": err,
+            "soft_over_points": anchors > cfg.cubic_max_anchors,
+            "path": path,
+            **{k: cmeta[k] for k in ("corners", "n_corners", "n_segs", "n_cubic", "n_line", "anchor_count")},
+        }
+        return on, meta
+
     simplified = rdp_closed(src, cfg.epsilon_upm)
     if len(simplified) < cfg.min_points:
         simplified = src
@@ -177,6 +242,32 @@ def refit_contour(
     return simplified, meta
 
 
+def _paths_self_intersect(paths: Sequence[Any]) -> bool:
+    """pathops simplify で輪郭数が増えたら自己交差とみなす。"""
+    import pathops
+
+    p = pathops.Path()
+    for path in paths:
+        p.moveTo(float(path.start[0]), float(path.start[1]))
+        for seg in path.segs:
+            if seg[0] == "L":
+                p.lineTo(float(seg[1]), float(seg[2]))
+            else:
+                p.cubicTo(
+                    float(seg[1]),
+                    float(seg[2]),
+                    float(seg[3]),
+                    float(seg[4]),
+                    float(seg[5]),
+                    float(seg[6]),
+                )
+        p.close()
+    n_before = sum(1 for _ in p.contours)
+    p.simplify(fix_winding=True)
+    n_after = sum(1 for _ in p.contours)
+    return n_after != n_before
+
+
 def refit_contours(
     contours: Sequence[Sequence[Point]],
     cfg: RefitConfig | None = None,
@@ -185,21 +276,41 @@ def refit_contours(
     cfg = cfg or load_refit_config()
     out: list[list[Point]] = []
     per: list[dict[str, Any]] = []
+    paths = []
     for c in contours:
         simp, meta = refit_contour(c, cfg)
         out.append(simp)
         per.append(meta)
+        if "path" in meta:
+            paths.append(meta.pop("path"))
 
     if len(out) != len(contours):
         raise ValueError("curve_refit changed contour count (internal bug)")
 
+    if paths and _paths_self_intersect(paths):
+        raise ValueError("curve_refit cubic_fit gate failed: self-intersect after fit")
+
+    # 穴構造（面積符号）不変: オンカーブ shoelace 符号列
+    if paths:
+        before_signs = [1 if _signed_area(c) > 0 else -1 for c in contours]
+        after_signs = [
+            1 if _signed_area(p.on_curve_points()) > 0 else -1 for p in paths
+        ]
+        if before_signs != after_signs:
+            raise ValueError(
+                "curve_refit cubic_fit gate failed: signed-area structure changed "
+                f"{before_signs} -> {after_signs}"
+            )
+
     pts_before = sum(m["points_before"] for m in per)
     pts_after = sum(m["points_after"] for m in per)
     worst = max((m["max_error"] for m in per), default=0.0)
+    mode = cfg.mode if cfg.enabled else "disabled"
     return RefitResult(
         contours=out,
+        paths=paths if paths else None,
         meta={
-            "mode": cfg.mode if cfg.enabled else "disabled",
+            "mode": mode,
             "enabled": cfg.enabled,
             "n_contours": len(out),
             "points_before": pts_before,
@@ -208,8 +319,18 @@ def refit_contours(
                 (1.0 - pts_after / pts_before) if pts_before else 0.0
             ),
             "max_error": worst,
-            "max_error_upm": cfg.max_error_upm,
+            "max_error_upm": (
+                cfg.cubic_max_error_upm
+                if mode == "cubic_fit"
+                else cfg.max_error_upm
+            ),
             "any_soft_over_points": any(m["soft_over_points"] for m in per),
             "per_contour": per,
+            "total_anchors": (
+                sum(m.get("anchor_count", m["points_after"]) for m in per)
+                if mode == "cubic_fit"
+                else pts_after
+            ),
+            "self_intersect": False,
         },
     )

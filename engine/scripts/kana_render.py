@@ -6,6 +6,7 @@ S4 make_proofs には触らない。OTF は非コミット前提で SHA を meta
 例:
   python scripts/kana_render.py --glyph shi
   python scripts/kana_render.py --glyph to --text しいと --tag trio
+  python scripts/kana_render.py --text しいとつ --tag quad   # 複数字まとめ（board/）
 """
 
 from __future__ import annotations
@@ -124,7 +125,11 @@ def render_text_png(
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Deterministic kana review render")
-    ap.add_argument("--glyph", required=True, help="glyph_id e.g. shi")
+    ap.add_argument(
+        "--glyph",
+        default=None,
+        help="glyph_id e.g. shi（省略時は --text 必須・出力は board/）",
+    )
     ap.add_argument("--params", default="product_r1")
     ap.add_argument(
         "--font",
@@ -135,7 +140,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--text",
         default=None,
-        help="override string (default: glyph char from YAML)",
+        help="描画文字列（省略時は glyph の1字。複数字まとめ可）",
     )
     ap.add_argument("--tag", default="single", help="output tag name")
     ap.add_argument(
@@ -147,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--compare-golden",
         action="store_true",
-        help="SHA256 compare against proofs/golden/kana_<glyph>/<tag>.png",
+        help="SHA256 compare against proofs/golden/kana_<glyph|board>/<tag>.png",
     )
     args = ap.parse_args(argv)
 
@@ -159,28 +164,39 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     chars = kana_characters()
-    if args.glyph not in chars:
-        print(f"error: unknown kana glyph {args.glyph}", file=sys.stderr)
-        return 2
+    board_mode = args.glyph is None
+    if board_mode:
+        if not args.text:
+            print("error: --glyph か --text のどちらかが必要", file=sys.stderr)
+            return 2
+        text = args.text
+        glyph_id = "board"
+        yaml_path = None
+    else:
+        if args.glyph not in chars:
+            print(f"error: unknown kana glyph {args.glyph}", file=sys.stderr)
+            return 2
+        glyph_id = args.glyph
+        meta_g = KANA_GLYPH_META[glyph_id]
+        text = args.text if args.text is not None else str(meta_g["char"])
+        yaml_path = skeletons_dir() / f"{glyph_id}.yaml"
+        if not yaml_path.is_file():
+            cands = list(skeletons_dir().glob("*.yaml"))
+            yaml_path = next(
+                (p for p in cands if load_match(p, glyph_id)), yaml_path
+            )
 
-    meta_g = KANA_GLYPH_META[args.glyph]
-    text = args.text if args.text is not None else str(meta_g["char"])
     font = args.font or _default_otf(args.params)
     if not font.is_file():
+        hint = args.glyph or "shi i to tsu"
         print(
             f"error: OTF not found: {font}\n"
-            f"  run: python scripts/regen.py --params {args.params} --glyphs {args.glyph}",
+            f"  run: python scripts/regen.py --params {args.params} --glyphs {hint}",
             file=sys.stderr,
         )
         return 2
 
-    yaml_path = skeletons_dir() / f"{args.glyph}.yaml"
-    if not yaml_path.is_file():
-        # glyph_id と stem が一致しない場合のフォールバック
-        cands = list(skeletons_dir().glob("*.yaml"))
-        yaml_path = next((p for p in cands if load_match(p, args.glyph)), yaml_path)
-
-    out_dir = args.out_root / args.glyph
+    out_dir = args.out_root / glyph_id
     out_png = out_dir / f"{args.tag}.png"
     out_meta = out_dir / f"{args.tag}.meta.json"
 
@@ -193,16 +209,16 @@ def main(argv: list[str] | None = None) -> int:
     params_yaml = ROOT / "params" / f"{args.params}.yaml"
     meta = {
         "render_version": RENDER_VERSION,
-        "glyph_id": args.glyph,
+        "glyph_id": glyph_id,
         "text": text,
         "tag": args.tag,
         "params": args.params,
         "coordinate_space": COORDINATE_SPACE,
         "otf_path": str(font),
         "otf_sha256": _sha256_file(font),
-        "skeleton_yaml": str(yaml_path) if yaml_path.is_file() else None,
+        "skeleton_yaml": str(yaml_path) if yaml_path and yaml_path.is_file() else None,
         "skeleton_yaml_sha256": (
-            _sha256_file(yaml_path) if yaml_path.is_file() else None
+            _sha256_file(yaml_path) if yaml_path and yaml_path.is_file() else None
         ),
         "params_yaml_sha256": (
             _sha256_file(params_yaml) if params_yaml.is_file() else None
@@ -225,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"png_sha256={meta['png_sha256'][:16]}… otf_sha256={meta['otf_sha256'][:16]}…")
 
     if args.compare_golden:
-        golden = REPO / "proofs" / "golden" / f"kana_{args.glyph}" / f"{args.tag}.png"
+        golden = REPO / "proofs" / "golden" / f"kana_{glyph_id}" / f"{args.tag}.png"
         if not golden.is_file():
             print(f"golden: missing {golden}")
             return 1
