@@ -119,16 +119,23 @@ regen → [A render] → B gate
 
 ```bash
 cd engine
+# 0) 参照帯を先に取る（新字は必ず最初に。「つ」の迷走の再発防止）
+.venv/bin/python scripts/kana_ref_compare.py <char> --out /tmp/<gid>_ref.png
+#    → 参照4書体のスカラー帯を YAML コメント・gate 帯の根拠にする（座標転記は禁止）
 # 1) 生成＋ゲート（B green まで繰り返し。修正は骨格YAMLのみ）
 .venv/bin/python scripts/regen.py --params product_r1 --glyphs <gid>
 .venv/bin/python scripts/kana_gate.py <gid>          # → gate_report.json
 # 2) レンダ（人間確認・C 入力用）
 .venv/bin/python scripts/kana_render.py --glyph <gid>
-# 3) 任意: Gemini 観察
+# 3) 任意: Gemini 観察（v2: reads_as_target / confusable_with。attention は exit=3）
 cd .. && python scripts/kana_vision_review.py --glyph <gid>
 # 4) 人間 accept → 黄金凍結
 #    proofs/golden/kana_<gid>/ にPNGコピー＋コミット（YAML SHA をメッセージに記載）
 ```
+
+D レーンの実行主体: 帯・構造が確定した後の数値磨き込みは **Grok 4.5 サブエージェント**へ委譲する
+（§3 の様式＋参照帯・計測コマンドを渡す。オーケストレータは帯の設計と目視検収のみ）。
+「つ」実績: 3イテレーションで全スカラー帯内・gate green。
 
 ## 2. 作業順序と見積（監査反映）
 

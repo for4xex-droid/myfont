@@ -4,9 +4,12 @@
 キーは環境変数 `GEMINI_API_KEY`、またはリポジトリ直下の `.env`（gitignore 済み）。
 無い場合は status=skipped（B の合否には影響しない）。CI では走らせない。
 
+観察で「対象に見えない／取り違えあり」のときは exit=3（注意。B の合否ではない）。
+空虚な観察（構造・取り違え無し）はスクリプト側で注意扱い。
+
 例:
   cp .env.example .env   # 値を書き換えて chmod 600 .env
-  python scripts/kana_vision_review.py --glyph shi
+  python scripts/kana_vision_review.py --glyph tsu
 """
 
 from __future__ import annotations
@@ -22,10 +25,25 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from load_dotenv import load_repo_dotenv, redact_secrets  # noqa: E402
 
-PROMPT_PATH = ROOT / "scripts" / "prompts" / "kana_review_v1.txt"
-DEFAULT_MODEL = "gemini-2.0-flash"
+PROMPT_PATH = ROOT / "scripts" / "prompts" / "kana_review_v2.txt"
+DEFAULT_MODEL = "gemini-2.5-flash"
 PLACEHOLDER_KEYS = frozenset(
     {"", "your_gemini_api_key_here", "changeme", "xxx", "TODO"}
+)
+
+# 字ごとの既知取り違え（プロンプトに必ず渡す）
+CONFUSABLES: dict[str, list[str]] = {
+    "し": ["つ", "へ", "じ"],
+    "つ": ["し", "へ", "っ"],
+    "い": ["り", "ん"],
+    "と": ["ど", "て"],
+}
+
+EMPTY_NOTE_MARKERS = (
+    "単一の曲線",
+    "一画で構成",
+    "なめらかな曲線",
+    "単一の曲線で構成",
 )
 
 
@@ -38,16 +56,42 @@ def _sha256_file(path: Path) -> str:
 
 
 def _resolve_api_key() -> tuple[str | None, str]:
-    """(key or None, source). source は env / dotenv / missing / placeholder。"""
     load_repo_dotenv(ROOT)
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not key:
         return None, "missing"
     if key in PLACEHOLDER_KEYS:
         return None, "placeholder"
-    # 既に export されていたか、dotenv 由来かは厳密に区別しない（値は出さない）
-    source = "env_or_dotenv"
-    return key, source
+    return key, "env_or_dotenv"
+
+
+def _attention_reasons(observation: dict, char: str) -> list[str]:
+    """合否語は使わず、エージェントが放置できない観察欠陥を列挙。"""
+    reasons: list[str] = []
+    if observation.get("parse_error"):
+        reasons.append("observation_parse_error")
+        return reasons
+    reads = str(observation.get("reads_as_target", "")).lower()
+    if reads in ("no", "unclear", ""):
+        reasons.append(f"reads_as_target={reads or 'missing'}")
+    conf = observation.get("confusable_with") or []
+    if isinstance(conf, list) and conf:
+        reasons.append(f"confusable_with={conf}")
+    sil = str(observation.get("silhouette", ""))
+    if char == "つ" and sil in ("fishhook_shi", "latin_c", "open_c_tsu", "valley_he"):
+        reasons.append(f"silhouette={sil}_for_tsu")
+    if char == "し" and sil in ("bowl_tsu", "open_c_tsu", "latin_c"):
+        reasons.append(f"silhouette={sil}_for_shi")
+    notes = observation.get("notes") or []
+    if isinstance(notes, list):
+        joined = " ".join(str(n) for n in notes)
+        if any(m in joined for m in EMPTY_NOTE_MARKERS) and len(joined) < 40:
+            reasons.append("empty_notes")
+        if char and char not in joined and reads != "yes":
+            # 対象字への言及が無く、かつ yes でもない
+            if not conf:
+                reasons.append("notes_omit_target_or_confusion")
+    return reasons
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -102,11 +146,20 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     png_sha = _sha256_file(png)
-    cache_path = out_dir / f"cache_{png_sha[:16]}.json"
+    # プロンプト版をキャッシュキーに含め、v1 の空虚観察を再利用しない
+    prompt_sha = _sha256_file(PROMPT_PATH)[:8]
+    cache_path = out_dir / f"cache_{prompt_sha}_{png_sha[:16]}.json"
     if cache_path.is_file():
-        out_json.write_text(cache_path.read_text(encoding="utf-8"), encoding="utf-8")
+        payload = json.loads(cache_path.read_text(encoding="utf-8"))
+        out_json.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        obs = payload.get("observation") or {}
+        attn = _attention_reasons(obs, str(payload.get("char") or ""))
         print(f"status=cache_hit report={out_json}")
-        return 0
+        _print_obs(obs, attn)
+        return 3 if attn else 0
 
     import urllib.error
     import urllib.request
@@ -124,8 +177,13 @@ def main(argv: list[str] | None = None) -> int:
     except Exception:
         pass
 
+    confusable = CONFUSABLES.get(char, CONFUSABLES.get(args.glyph, []))
     prompt = PROMPT_PATH.read_text(encoding="utf-8")
-    prompt += f"\n\n対象文字: {char}\n"
+    prompt += (
+        f"\n\n対象文字: {char}\n"
+        f"取り違え候補（この中から選んで confusable_with に入れる）: {confusable}\n"
+        f"期待: 対象が「{char}」に読め、候補字により近く見えないこと。\n"
+    )
     import base64
 
     b64 = base64.b64encode(png.read_bytes()).decode("ascii")
@@ -144,11 +202,10 @@ def main(argv: list[str] | None = None) -> int:
             }
         ],
         "generationConfig": {
-            "temperature": 0.2,
+            "temperature": 0.1,
             "responseMimeType": "application/json",
         },
     }
-    # キーはクエリに載せない（ログ・プロキシ履歴への混入を減らす）
     url = (
         f"https://generativelanguage.googleapis.com/v1beta/models/"
         f"{args.model}:generateContent"
@@ -186,23 +243,40 @@ def main(argv: list[str] | None = None) -> int:
     except (KeyError, IndexError, json.JSONDecodeError, TypeError):
         observation = {"raw_text": text, "parse_error": True}
 
-    # 合否語が混入しても無視。キーは絶対に書き出さない。
+    attn = _attention_reasons(observation, char)
     payload = {
-        "status": "ok",
+        "status": "attention" if attn else "ok",
         "glyph_id": args.glyph,
         "char": char,
         "model": args.model,
         "png": str(png),
         "png_sha256": png_sha,
         "prompt": str(PROMPT_PATH.name),
+        "confusable_candidates": confusable,
+        "attention_reasons": attn,
         "observation": observation,
-        "note": "observation only; ignore any OK/NG if present",
+        "note": "observation only; status=attention means revise YAML before human accept",
     }
     blob = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     out_json.write_text(blob, encoding="utf-8")
     cache_path.write_text(blob, encoding="utf-8")
-    print(f"status=ok report={out_json}")
-    return 0
+    print(f"status={payload['status']} report={out_json}")
+    _print_obs(observation, attn)
+    return 3 if attn else 0
+
+
+def _print_obs(observation: dict, attn: list[str]) -> None:
+    print(
+        "observe: "
+        f"silhouette={observation.get('silhouette')} "
+        f"reads_as_target={observation.get('reads_as_target')} "
+        f"confusable_with={observation.get('confusable_with')} "
+        f"tip={observation.get('tip_direction')}"
+    )
+    for n in observation.get("notes") or []:
+        print(f"  note: {n}")
+    if attn:
+        print(f"attention: {attn}  → YAML を直してから人間へ渡すこと", file=sys.stderr)
 
 
 if __name__ == "__main__":

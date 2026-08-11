@@ -27,11 +27,13 @@ def _reject_unknown(path: str, raw: dict[str, Any], allowed: frozenset[str]) -> 
         raise ValueError(f"{path}: unknown keys {unknown}; allowed={sorted(allowed)}")
 
 
-def _pair_f(path: str, key: str, raw: Any) -> tuple[float, float]:
+def _pair_f(
+    path: str, key: str, raw: Any, *, allow_wrap: bool = False
+) -> tuple[float, float]:
     if not isinstance(raw, (list, tuple)) or len(raw) != 2:
         raise ValueError(f"{path}: {key} must be [lo, hi], got {raw!r}")
     lo, hi = float(raw[0]), float(raw[1])
-    if lo > hi:
+    if lo > hi and not allow_wrap:
         raise ValueError(f"{path}: {key} lo>hi ({lo}>{hi})")
     return lo, hi
 
@@ -154,7 +156,10 @@ def parse_gate(path: str, raw: Any) -> GateSpec | None:
                 GateTipSpec(
                     element=str(item["element"]),
                     end=end,
-                    bearing_deg=_pair_f(tp, "bearing_deg", item["bearing_deg"]),
+                    # ±180 近傍のセクターは lo>hi のラップ帯を許可
+                    bearing_deg=_pair_f(
+                        tp, "bearing_deg", item["bearing_deg"], allow_wrap=True
+                    ),
                 )
             )
 
