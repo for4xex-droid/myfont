@@ -49,3 +49,17 @@ elements:
     ends:
       entry: karui_uchikomi
       exit: nuki
+
+joins:
+  - {from: left, to: right, mode: separate}
+
+gate:
+  expect_contours: 2
+  bbox:
+    width: [280, 520]
+    height: [520, 900]
+    aspect_w_over_h: [0.35, 0.85]
+  tips:
+    - {element: left, end: exit, bearing_deg: [0, 55]}
+  gaps:
+    - {a: left, b: right, min_upm: 40, max_upm: 220}

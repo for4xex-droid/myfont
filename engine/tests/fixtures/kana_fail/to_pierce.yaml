@@ -1,0 +1,57 @@
+# 旧失敗: 点画が主画を突き抜けて「t」化 → overshoot FAIL
+char: と
+glyph_id: to_pierce
+unicode: 0x3068
+name: uni3068_pierce
+motif: pair_to
+
+elements:
+  - id: main
+    spine:
+      - [700, 195]
+      - [630, 340]
+      - [542, 482]
+      - [467, 627]
+      - [404, 766]
+      - [540, 910]
+      - [750, 795]
+    width:
+      - {s: 0.0, hw: 11}
+      - {s: 0.30, hw: 30}
+      - {s: 0.65, hw: 34}
+      - {s: 0.88, hw: 16}
+      - {s: 1.0, hw: 3}
+    ends:
+      entry: karui_uchikomi
+      exit: nuki
+
+  - id: ten
+    spine:
+      - [280, 310]
+      - [380, 350]
+      - [480, 390]
+      - [560, 420]
+      - [640, 450]
+      - [720, 480]
+      - [800, 510]
+    width:
+      - {s: 0.0, hw: 7}
+      - {s: 0.40, hw: 18}
+      - {s: 0.75, hw: 12}
+      - {s: 1.0, hw: 2}
+    ends:
+      entry: karui_uchikomi
+      exit: nuki
+
+joins:
+  - {from: ten, to: main, mode: abut}
+
+gate:
+  expect_contours: 1
+  max_overshoot_upm: 8
+  bbox:
+    width: [280, 900]
+    height: [520, 900]
+    aspect_w_over_h: [0.35, 1.20]
+  tips:
+    - {element: main, end: exit, bearing_deg: [15, 75]}

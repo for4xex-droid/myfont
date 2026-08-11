@@ -47,3 +47,16 @@ elements:
     ends:
       entry: karui_uchikomi
       exit: nuki
+
+joins:
+  - {from: ten, to: main, mode: abut}
+
+gate:
+  expect_contours: 1
+  max_overshoot_upm: 8
+  bbox:
+    width: [280, 620]
+    height: [520, 900]
+    aspect_w_over_h: [0.35, 0.85]
+  tips:
+    - {element: main, end: exit, bearing_deg: [15, 75]}

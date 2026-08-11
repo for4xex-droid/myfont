@@ -29,3 +29,13 @@ elements:
     ends:
       entry: karui_uchikomi
       exit: nuki
+
+# 数値ゲート（レビューループ B）。方位角: atan2(-dy,dx)・0°=右・90°=上
+gate:
+  expect_contours: 1
+  bbox:
+    width: [280, 520]
+    height: [520, 900]
+    aspect_w_over_h: [0.30, 0.75]
+  tips:
+    - {element: main, end: exit, bearing_deg: [15, 75]}

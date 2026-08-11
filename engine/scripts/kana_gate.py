@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""P1-B 仮名スパイク用ゲート（G1: 輪郭数・再現性）。
+"""P1-B 仮名数値ゲート CLI（コアは engine.kana.gate）。
 
 例:
   python scripts/kana_gate.py shi
-  python scripts/kana_gate.py shi --params product_r1
+  python scripts/kana_gate.py to --params product_r1 --report gate_report.json
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -21,58 +20,66 @@ if str(SRC) not in sys.path:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Kana spike gate (G1)")
-    ap.add_argument("glyph_id", help="e.g. shi")
+    ap = argparse.ArgumentParser(description="Kana numeric gate (review-loop B)")
+    ap.add_argument("glyph_id", help="e.g. shi / i / to")
     ap.add_argument("--params", default="product_r1")
     ap.add_argument(
         "--expect-contours",
         type=int,
-        default=1,
-        help="expected contour count after cleanup (し=1)",
+        default=None,
+        help="override gate.expect_contours (migration only)",
+    )
+    ap.add_argument(
+        "--report",
+        type=Path,
+        default=Path("gate_report.json"),
+        help="write GateReport JSON (default: ./gate_report.json)",
+    )
+    ap.add_argument(
+        "--yaml",
+        type=Path,
+        default=None,
+        help="optional skeleton YAML path (fixtures); else registered glyph_id",
     )
     args = ap.parse_args(argv)
 
-    from engine.bridge import extract_contours_xy, is_kana_glyph
-    from engine.extra_skeletons import all_characters
-    from engine.join_solver import solve_glyph
+    from engine.kana.gate import run_gate, run_gate_path
     from engine.params import PARAM_SETS
 
     if args.params not in PARAM_SETS:
         print(f"error: unknown params {args.params}", file=sys.stderr)
         return 2
-    chars = all_characters()
-    if args.glyph_id not in chars:
-        print(f"error: unknown glyph {args.glyph_id}", file=sys.stderr)
-        return 2
-    if not is_kana_glyph(args.glyph_id):
-        print(f"error: {args.glyph_id} is not a kana skeleton", file=sys.stderr)
-        return 2
 
-    params = PARAM_SETS[args.params]
-    r1 = solve_glyph(chars[args.glyph_id], params, apply_stage_a=False)
-    r2 = solve_glyph(all_characters()[args.glyph_id], params, apply_stage_a=False)
-    c1 = extract_contours_xy(r1.path)
-    c2 = extract_contours_xy(r2.path)
-    h1 = hashlib.sha256(json.dumps(c1).encode()).hexdigest()
-    h2 = hashlib.sha256(json.dumps(c2).encode()).hexdigest()
-
-    failed = False
-    if r1.after_cleanup != args.expect_contours:
-        print(
-            f"[FAIL] contours: got {r1.after_cleanup}, expect {args.expect_contours}"
+    if args.yaml is not None:
+        report = run_gate_path(
+            args.yaml,
+            params=args.params,
+            expect_contours_override=args.expect_contours,
         )
-        failed = True
     else:
-        print(f"[ok] contours={r1.after_cleanup}")
+        report = run_gate(
+            args.glyph_id,
+            params=args.params,
+            expect_contours_override=args.expect_contours,
+        )
 
-    if h1 != h2:
-        print("[FAIL] reproducibility: contour hash mismatch")
-        failed = True
-    else:
-        print(f"[ok] reproducible sha256={h1[:16]}…")
+    if report.error:
+        print(f"[FAIL] {report.error}")
+    for c in report.checks:
+        tag = "ok" if c.ok else "FAIL"
+        print(f"[{tag}] {c.name}: {c.detail}")
 
-    print(f"params={args.params} glyph={args.glyph_id}")
-    return 1 if failed else 0
+    args.report.write_text(
+        json.dumps(report.to_dict(), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(
+        f"params={report.params} glyph={report.glyph_id} "
+        f"coordinate_space={report.coordinate_space} "
+        f"bearing={report.bearing_convention} "
+        f"report={args.report} ok={report.ok}"
+    )
+    return 0 if report.ok else 1
 
 
 if __name__ == "__main__":

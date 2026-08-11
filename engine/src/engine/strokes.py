@@ -64,6 +64,8 @@ class SkeletonStroke:
     thickness: float | None = None
     # KANA_CURVE: 弧長 s∈[0,1] → 半幅 UPM（非単調可）。None なら thickness から単調テーパー
     width_keys: Sequence[tuple[float, float]] | None = None
+    # 仮名 YAML elements[].id（ゲート接合参照用。漢字骨格は None）
+    element_id: str | None = None
 
 
 def _apply_slope(p0: Vec2, p1: Vec2, slope_deg: float) -> tuple[Vec2, Vec2]:

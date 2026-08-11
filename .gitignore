@@ -50,6 +50,11 @@ engine/output/
 
 # Proof renders (texts + golden stay tracked)
 proofs/out/
+proofs/review/
+
+# Local secrets / API keys (kana vision review etc.)
+.env
+.env.*
 
 # Matplotlib
 .matplotlib/

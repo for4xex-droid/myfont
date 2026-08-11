@@ -1,0 +1,36 @@
+# 旧失敗: しを左右反転（抜きが左上）→ tip bearing FAIL
+char: し
+glyph_id: shi_mirror
+unicode: 0x3057
+name: uni3057_mirror
+motif: curve_shi
+
+elements:
+  - id: main
+    spine:
+      # x' = 1000 - x（shi.yaml の左右反転）
+      - [530, 100]
+      - [535, 300]
+      - [560, 480]
+      - [575, 640]
+      - [585, 800]
+      - [430, 950]
+      - [270, 700]
+    width:
+      - {s: 0.0, hw: 12}
+      - {s: 0.25, hw: 30}
+      - {s: 0.60, hw: 36}
+      - {s: 0.85, hw: 18}
+      - {s: 1.0, hw: 3}
+    ends:
+      entry: karui_uchikomi
+      exit: nuki
+
+gate:
+  expect_contours: 1
+  bbox:
+    width: [280, 520]
+    height: [520, 900]
+    aspect_w_over_h: [0.30, 0.75]
+  tips:
+    - {element: main, end: exit, bearing_deg: [15, 75]}
