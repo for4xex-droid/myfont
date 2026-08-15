@@ -89,6 +89,7 @@ def main(argv: list[str] | None = None) -> int:
             "[observe] "
             f"points_after={outline.get('points_after')} "
             f"anchor_count={outline.get('anchor_count')} "
+            f"hole_area_ratio={outline.get('hole_area_ratio')} "
             f"curvature_p95={curv.get('curvature_p95')} "
             f"min_radius={curv.get('min_radius_upm')}"
         )

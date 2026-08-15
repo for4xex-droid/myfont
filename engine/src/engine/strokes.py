@@ -19,6 +19,7 @@ from engine.geometry import (
     sample_polyline,
     smooth_tangents,
     variable_width_outline,
+    variable_width_ring_outlines,
 )
 from engine.params import MinchoParams
 
@@ -66,6 +67,10 @@ class SkeletonStroke:
     width_keys: Sequence[tuple[float, float]] | None = None
     # 仮名 YAML elements[].id（ゲート接合参照用。漢字骨格は None）
     element_id: str | None = None
+    # ループ字（の 等）: 閉じ中心線 → outer+inner リング生成
+    loop_closed: bool = False
+    loop_overlap_upm: float = 0.0
+    loop_join_angle_deg: float | None = None
 
 
 def _apply_slope(p0: Vec2, p1: Vec2, slope_deg: float) -> tuple[Vec2, Vec2]:
@@ -337,8 +342,7 @@ def kana_max_half_width(stroke: SkeletonStroke, p: MinchoParams) -> float:
 def build_kana_curve(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]]:
     """仮名曲線: cubic 列 → 弧長再サンプル → 幅プロファイル → 肉付け。
 
-    仮名は RDP をかけない前提（bridge 側で passthrough）。端物テンプレは
-    幅キーで近似し、専用パーツ生成は後続スパイクで足す。
+    loop_closed 時は outer+inner の明示リング（自己交差 union 頼みにしない）。
     """
     pts = list(stroke.points)
     if len(pts) > KANA_MAX_SPINE_POINTS:
@@ -348,6 +352,18 @@ def build_kana_curve(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]
         )
     # 構文検証（3n+1）
     parse_cubic_chain(pts)
+    if stroke.loop_closed:
+        gap = (pts[0] - pts[-1]).length()
+        tol = max(1.0, float(stroke.loop_overlap_upm))
+        if gap > tol:
+            raise ValueError(
+                f"KANA_CURVE loop_closure: spine endpoints {gap:.2f} UPM apart "
+                f"> overlap_upm={tol:.2f}; close the ring in YAML"
+            )
+        # 厳密クローズ（終点を始点へスナップ）
+        pts = list(pts)
+        pts[-1] = pts[0]
+
     dense = sample_cubic_chain(pts, n_per_seg=48)
     dense = smooth_tangents(dense)
     max_hw = kana_max_half_width(stroke, p)
@@ -361,6 +377,23 @@ def build_kana_curve(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]
     half_widths = [interpolate_width_keys(s, keys) for _pos, _tan, s in arc]
     # 局所半幅に対する曲率ゲート（太い所だけ厳しく。先細り部は許容）
     radii = curvature_radii(samples)
+    if stroke.loop_closed and len(samples) >= 3:
+        # 閉路: 端点も前後ラップで曲率を見る
+        pts_c = [s[0] for s in samples]
+        n = len(pts_c)
+        for i in range(n):
+            a, b, c = pts_c[(i - 1) % n], pts_c[i], pts_c[(i + 1) % n]
+            ab, bc = b - a, c - b
+            lab, lbc = ab.length(), bc.length()
+            if lab < 1e-9 or lbc < 1e-9:
+                continue
+            cross = abs(ab.cross(bc))
+            sin_theta = min(1.0, cross / (lab * lbc))
+            theta = math.asin(sin_theta)
+            chord = (c - a).length() * 0.5
+            if theta < 1e-8 or chord < 1e-9:
+                continue
+            radii[i] = chord / max(theta, 1e-8)
     for i, (r, hw) in enumerate(zip(radii, half_widths)):
         floor_r = KANA_CURVATURE_RADIUS_FACTOR * hw
         if r < floor_r:
@@ -370,6 +403,9 @@ def build_kana_curve(stroke: SkeletonStroke, p: MinchoParams) -> list[list[Vec2]
                 f"radius={r:.2f} < {floor_r:.2f} (= {KANA_CURVATURE_RADIUS_FACTOR}×hw={hw:.2f}). "
                 "骨格 YAML 側を緩めてください（エンジンは黙って補正しない）"
             )
+    if stroke.loop_closed:
+        outer, inner = variable_width_ring_outlines(samples, half_widths)
+        return [outer, inner]
     outline = variable_width_outline(samples, half_widths, close=True)
     return [outline]
 

@@ -73,19 +73,33 @@ def outline_point_stats(
     per = [len(c) for c in gr.font_contours]
     points_after = sum(per)
     refit = gr.refit or {}
+    from engine.join_solver import polygon_signed_area
+
+    signed = [polygon_signed_area(c) for c in gr.font_contours]
+    # 正面積＝外形の囲い（穴を含む）。インクは外形−穴。
+    outer_area = sum(a for a in signed if a > 0)
+    hole_area = sum(-a for a in signed if a < 0)
+    ink_area = outer_area - hole_area
+    hole_area_ratio = (hole_area / outer_area) if outer_area > 1e-9 else None
+    per_refit = refit.get("per_contour") or []
+    refit_anchors = sum(int(pc.get("anchor_count") or 0) for pc in per_refit)
     return {
         "params": params_name,
         "n_contours": len(per),
         "points_per_contour": per,
         "points_after": points_after,
-        # Phase 1 前: 折れ線なのでオンカーブ点数＝アンカー数
-        "anchor_count": points_after,
+        "anchor_count": refit_anchors if refit_anchors > 0 else points_after,
         "segment_count": max(0, points_after - len(per)) if per else 0,
         "refit_mode": refit.get("mode"),
         "refit_points_before": refit.get("points_before"),
         "refit_points_after": refit.get("points_after", points_after),
         "n_holes": gr.winding.get("n_holes"),
         "winding_strategy": gr.winding.get("strategy"),
+        # 合否非接続。参照帯未凍結（掟8）なのでゲートにしない
+        "hole_area_upm2": hole_area if hole_area > 0 else 0.0,
+        "outer_area_upm2": outer_area,
+        "ink_area_upm2": ink_area,
+        "hole_area_ratio": hole_area_ratio,
     }
 
 

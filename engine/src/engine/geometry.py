@@ -311,6 +311,66 @@ def smooth_tangents(samples: list[tuple[Vec2, Vec2]]) -> list[tuple[Vec2, Vec2]]
     return out
 
 
+def _offset_sides(
+    samples: Sequence[tuple[Vec2, Vec2]],
+    half_widths: Sequence[float],
+) -> tuple[list[Vec2], list[Vec2]]:
+    """中心線サンプルから左右オフセット点列（未クローズ）。"""
+    assert len(samples) == len(half_widths)
+    left: list[Vec2] = []
+    right: list[Vec2] = []
+    prev_n: Vec2 | None = None
+    for (pos, tan), hw in zip(samples, half_widths):
+        n = tan.perpendicular().normalized()
+        if n.length() < 1e-9:
+            n = prev_n if prev_n is not None else Vec2(0.0, -1.0)
+        if prev_n is not None and n.dot(prev_n) < 0:
+            n = n * -1.0
+        prev_n = n
+        left.append(pos + n * hw)
+        right.append(pos - n * hw)
+    return left, right
+
+
+def _poly_abs_area(poly: Sequence[Vec2]) -> float:
+    pts = list(poly)
+    if len(pts) >= 2 and pts[0].as_tuple() == pts[-1].as_tuple():
+        pts = pts[:-1]
+    if len(pts) < 3:
+        return 0.0
+    a = 0.0
+    n = len(pts)
+    for i in range(n):
+        x1, y1 = pts[i].x, pts[i].y
+        x2, y2 = pts[(i + 1) % n].x, pts[(i + 1) % n].y
+        a += x1 * y2 - x2 * y1
+    return abs(0.5 * a)
+
+
+def _poly_signed_area(poly: Sequence[Vec2]) -> float:
+    pts = list(poly)
+    if len(pts) >= 2 and pts[0].as_tuple() == pts[-1].as_tuple():
+        pts = pts[:-1]
+    if len(pts) < 3:
+        return 0.0
+    a = 0.0
+    n = len(pts)
+    for i in range(n):
+        x1, y1 = pts[i].x, pts[i].y
+        x2, y2 = pts[(i + 1) % n].x, pts[(i + 1) % n].y
+        a += x1 * y2 - x2 * y1
+    return 0.5 * a
+
+
+def _close_ring(pts: Sequence[Vec2]) -> list[Vec2]:
+    out = list(pts)
+    if len(out) >= 2 and out[0].as_tuple() == out[-1].as_tuple():
+        out = out[:-1]
+    if out and out[0].as_tuple() != out[-1].as_tuple():
+        out.append(out[0])
+    return out
+
+
 def variable_width_outline(
     samples: Sequence[tuple[Vec2, Vec2]],
     half_widths: Sequence[float],
@@ -320,20 +380,7 @@ def variable_width_outline(
     中心線サンプルと半幅から左右オフセットし、閉じたポリゴンを返す。
     進行方向左側が left、右側が right。
     """
-    assert len(samples) == len(half_widths)
-    left: list[Vec2] = []
-    right: list[Vec2] = []
-    prev_n: Vec2 | None = None
-    for (pos, tan), hw in zip(samples, half_widths):
-        n = tan.perpendicular().normalized()
-        if n.length() < 1e-9:
-            n = prev_n if prev_n is not None else Vec2(0.0, -1.0)
-        # 法線フリップ防止（急カーブで裏返らないように）
-        if prev_n is not None and n.dot(prev_n) < 0:
-            n = n * -1.0
-        prev_n = n
-        left.append(pos + n * hw)
-        right.append(pos - n * hw)
+    left, right = _offset_sides(samples, half_widths)
 
     # 先端半幅が 0 に近い場合は左右が重なるので先端を1点にまとめる
     tip_hw = half_widths[-1]
@@ -356,6 +403,38 @@ def variable_width_outline(
     if close and poly and poly[0] != poly[-1]:
         poly.append(poly[0])
     return poly
+
+
+def variable_width_ring_outlines(
+    samples: Sequence[tuple[Vec2, Vec2]],
+    half_widths: Sequence[float],
+) -> tuple[list[Vec2], list[Vec2]]:
+    """閉じた中心線から outer / inner の2輪郭を返す（穴付きリング）。
+
+    pathops union で穴を残すため、inner は outer と逆巻きにする。
+    """
+    if len(samples) < 3:
+        raise ValueError("ring outline needs ≥3 samples")
+    # 閉じサンプルの重複終点を落とす
+    work = list(samples)
+    hws = list(half_widths)
+    if (
+        len(work) >= 2
+        and (work[0][0] - work[-1][0]).length() < 1e-6
+    ):
+        work = work[:-1]
+        hws = hws[:-1]
+    left, right = _offset_sides(work, hws)
+    ring_a = _close_ring(left)
+    ring_b = _close_ring(right)
+    if _poly_abs_area(ring_a) >= _poly_abs_area(ring_b):
+        outer, inner = ring_a, ring_b
+    else:
+        outer, inner = ring_b, ring_a
+    # 同符号なら inner を反転（union で穴が潰れるのを防ぐ）
+    if _poly_signed_area(outer) * _poly_signed_area(inner) > 0:
+        inner = list(reversed(inner))
+    return outer, inner
 
 
 def polygon_to_svg_path(points: Sequence[Vec2], precision: int = 2) -> str:

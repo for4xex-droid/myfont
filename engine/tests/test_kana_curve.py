@@ -138,3 +138,54 @@ def test_shi_solve_with_param_sets(params_name):
         all_characters()["shi"], PARAM_SETS[params_name], apply_stage_a=False
     )
     assert result.after_cleanup == 1
+
+
+def test_no_element_poly_is_outer_not_concatenated():
+    """リング字のゲート代表輪郭は外形1本（inner を連結しない）。"""
+    from engine.kana.gate import _element_polys
+    from engine.kana import kana_characters
+    from engine.geometry import _poly_abs_area
+
+    chars = kana_characters()
+    parts = build_kana_curve(chars["no"][0], CLASSIC)
+    assert len(parts) == 2
+    polys = _element_polys(chars["no"], CLASSIC)
+    assert set(polys) == {"main", "tail"}
+    body = polys["main"]
+    assert _poly_abs_area(body) == max(_poly_abs_area(p) for p in parts)
+    # 連結したら点数はほぼ合計。代表は大きい方1本
+    assert len(body) <= max(len(p) for p in parts) + 1
+
+
+def test_ring_outlines_opposite_winding():
+    """明示リングは inner を逆巻きにし、union 後も穴が残る。"""
+    import math
+
+    from engine.geometry import Vec2, variable_width_ring_outlines
+    from engine.join_solver import (
+        pathops_union,
+        poly_to_path,
+        polygon_signed_area,
+        count_contours,
+    )
+    from engine.bridge import extract_contours_xy
+    import pathops
+
+    n = 36
+    samples = []
+    for i in range(n):
+        t = 2 * math.pi * i / n
+        pos = Vec2(500 + 180 * math.cos(t), 500 + 140 * math.sin(t))
+        tan = Vec2(-math.sin(t), math.cos(t))
+        samples.append((pos, tan))
+    hws = [28.0] * n
+    outer, inner = variable_width_ring_outlines(samples, hws)
+    so = polygon_signed_area([(p.x, p.y) for p in outer])
+    si = polygon_signed_area([(p.x, p.y) for p in inner])
+    assert so * si < 0
+    united = pathops_union([poly_to_path(outer), poly_to_path(inner)])
+    united = pathops.simplify(united, fix_winding=True)
+    assert count_contours(united) == 2
+    areas = [polygon_signed_area(c) for c in extract_contours_xy(united)]
+    assert any(a > 0 for a in areas)
+    assert any(a < 0 for a in areas)

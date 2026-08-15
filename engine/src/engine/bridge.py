@@ -314,6 +314,7 @@ def _kana_refit_config() -> RefitConfig:
         enabled=base.enabled,
         kana_mode=base.kana_mode,
         cubic_max_error_upm=base.cubic_max_error_upm,
+        cubic_loop_max_error_upm=base.cubic_loop_max_error_upm,
         cubic_corner_deg=base.cubic_corner_deg,
         cubic_max_anchors=base.cubic_max_anchors,
     )

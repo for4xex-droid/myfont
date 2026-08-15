@@ -14,7 +14,8 @@ max_points_soft: 120        # RDP ソフト警告
 min_points: 3
 enabled: true
 
-# Phase 1 cubic_fit（Hausdorff≤0.5。単画仮名は概ね≤40、接合字「と」は48）
+# Phase 1 cubic_fit。単画は 0.5。穴付き（の）だけ loop 予算
 cubic_max_error_upm: 0.5
+cubic_loop_max_error_upm: 0.75
 cubic_corner_deg: 30.0
 cubic_max_anchors: 48       # 1輪郭あたり（複画「い」は輪郭ごと。yaml で調整可）

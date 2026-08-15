@@ -1,0 +1,74 @@
+# P1-B スパイク8c: ひらがな「の」
+# 座標: svg_y_down_legacy（y 下向き）
+#
+# 構造: 閉じた楕円リング＋左肩テール（abut）。G2 帯入り（2026-08-16）。
+# 参照帯: aspect 1.065–1.142 / ink 0.24–0.268 / centroid_y 0.479–0.486
+#         botCX 0.56–0.604 / topL 0.223–0.241 / topR 0.806–0.821
+# 実測: aspect=1.115 topL=0.227 topR=0.82 botCX=0.589 cy=0.484 ink=0.24
+# テールはリング本体に乗せて止める（穴へ突き抜けない）。
+
+char: の
+glyph_id: no
+unicode: 0x306E
+name: uni306E
+motif: loop_no
+
+elements:
+  - id: main
+    spine:
+      - [590, 220]   # P0 top
+      - [820, 235]
+      - [900, 400]
+      - [908, 560]   # P3 right
+      - [888, 735]
+      - [755, 832]
+      - [635, 848]   # P6 bottom
+      - [475, 822]
+      - [310, 690]
+      - [275, 520]   # P9 left
+      - [298, 358]   # P10 テール着地
+      - [345, 216]   # P11 天を左へ（topL↓）
+      - [590, 220]   # P12 = P0
+    width:
+      - {s: 0.0, hw: 18}
+      - {s: 0.04, hw: 32}
+      - {s: 0.08, hw: 36}
+      - {s: 0.25, hw: 40}
+      - {s: 0.40, hw: 36}
+      - {s: 0.55, hw: 27}
+      - {s: 0.78, hw: 24}
+      - {s: 1.0, hw: 18}
+    ends:
+      entry: none
+      exit: none
+    loop_closure:
+      overlap_upm: 4.0
+      join_angle: 0.0
+
+  - id: tail
+    spine:
+      - [195, 318]
+      - [245, 338]
+      - [285, 355]
+      - [330, 368]
+    width:
+      # product_r1 既定テーパーに合わせ明示（出口は nuki 床 3）
+      - {s: 0.0, hw: 10}
+      - {s: 0.28, hw: 22}
+      - {s: 0.70, hw: 19}
+      - {s: 1.0, hw: 3}
+    ends:
+      entry: karui_uchikomi
+      exit: nuki
+
+joins:
+  - {from: tail, to: main, mode: abut}
+
+gate:
+  expect_contours: 2
+  expect_holes: 1
+  max_overshoot_upm: 48
+  bbox:
+    width: [450, 800]
+    height: [450, 800]
+    aspect_w_over_h: [0.95, 1.25]

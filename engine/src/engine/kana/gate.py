@@ -155,23 +155,108 @@ def _measure_overshoot(from_stroke: SkeletonStroke, to_poly: Sequence[Vec2]) -> 
     return 0.0
 
 
-def _element_polys(
+def _element_parts(
     strokes: Sequence[SkeletonStroke], params: MinchoParams
-) -> dict[str, list[Vec2]]:
+) -> dict[str, list[list[Vec2]]]:
+    """element id → build_stroke の全輪郭（リングは outer+inner）。"""
     from engine.strokes import build_stroke
 
-    out: dict[str, list[Vec2]] = {}
+    out: dict[str, list[list[Vec2]]] = {}
     for s in strokes:
         eid = s.element_id or f"_anon_{id(s)}"
         parts = build_stroke(s, params)
         if not parts:
             raise ValueError(f"element {eid}: empty outline")
-        # KANA_CURVE は通常1ポリゴン。複数なら連結して扱う
-        poly: list[Vec2] = []
-        for part in parts:
-            poly.extend(part)
-        out[eid] = poly
+        out[eid] = parts
     return out
+
+
+def _outers_from_parts(
+    parts_by_id: dict[str, list[list[Vec2]]],
+) -> dict[str, list[Vec2]]:
+    """リングは面積最大を外形代表にする（inner を接合判定に混ぜない）。"""
+    from engine.geometry import _poly_abs_area
+
+    out: dict[str, list[Vec2]] = {}
+    for eid, parts in parts_by_id.items():
+        out[eid] = parts[0] if len(parts) == 1 else max(parts, key=_poly_abs_area)
+    return out
+
+
+def _element_polys(
+    strokes: Sequence[SkeletonStroke], params: MinchoParams
+) -> dict[str, list[Vec2]]:
+    return _outers_from_parts(_element_parts(strokes, params))
+
+
+def _element_holes(
+    parts_by_id: dict[str, list[list[Vec2]]],
+) -> dict[str, list[list[Vec2]]]:
+    """リング要素の inner（面積最大以外）。単画は空。"""
+    from engine.geometry import _poly_abs_area
+
+    out: dict[str, list[list[Vec2]]] = {}
+    for eid, parts in parts_by_id.items():
+        if len(parts) <= 1:
+            out[eid] = []
+            continue
+        outer = max(parts, key=_poly_abs_area)
+        out[eid] = [p for p in parts if p is not outer]
+    return out
+
+
+def _depth_in_holes(
+    pts: Sequence[Vec2], hole_polys: Sequence[Sequence[Vec2]]
+) -> float | None:
+    """点が穴内なら縁までの最大深さ。未侵入なら None。"""
+    worst: float | None = None
+    for pt in pts:
+        for hole in hole_polys:
+            if len(hole) < 3:
+                continue
+            if _point_in_poly(pt.x, pt.y, hole):
+                d = _nearest_edge_dist(pt, hole)
+                if worst is None or d > worst:
+                    worst = d
+    return worst
+
+
+def _poly_counter_pierce(
+    from_poly: Sequence[Vec2], hole_polys: Sequence[Sequence[Vec2]]
+) -> float | None:
+    """肉付け後の外形頂点＋辺中点が穴に入った最大深さ。"""
+    if not hole_polys or not from_poly:
+        return None
+    pts = list(from_poly)
+    n = len(from_poly)
+    for i in range(n):
+        a = from_poly[i]
+        b = from_poly[(i + 1) % n]
+        pts.append(Vec2((a.x + b.x) * 0.5, (a.y + b.y) * 0.5))
+    return _depth_in_holes(pts, hole_polys)
+
+
+def _measure_counter_pierce(
+    from_stroke: SkeletonStroke,
+    hole_polys: Sequence[Sequence[Vec2]],
+    from_poly: Sequence[Vec2] | None = None,
+) -> float | None:
+    """中心線または肉付け外形が相手の穴に入った最大深さ。未侵入なら None。
+
+    先端だけ／中心線だけ見ると、(1) 穴横断着地 (2) 太いインクだけが穴に入る
+    突き抜けを逃す。
+    """
+    if not hole_polys:
+        return None
+    samples = sample_cubic_chain(list(from_stroke.points), n_per_seg=48)
+    spine_pts = [p for p, _tan in samples]
+    worst = _depth_in_holes(spine_pts, hole_polys)
+    ink = _poly_counter_pierce(from_poly or (), hole_polys)
+    if ink is None:
+        return worst
+    if worst is None:
+        return ink
+    return max(worst, ink)
 
 
 def _polys_abut(a: Sequence[Vec2], b: Sequence[Vec2], max_gap: float) -> tuple[bool, str]:
@@ -222,7 +307,9 @@ def run_gate_on(
 
     # --- curvature / build ---
     try:
-        element_polys = _element_polys(strokes, params)
+        parts_by_id = _element_parts(strokes, params)
+        element_polys = _outers_from_parts(parts_by_id)
+        element_holes = _element_holes(parts_by_id)
     except ValueError as e:
         report.ok = False
         report.checks.append(
@@ -253,21 +340,39 @@ def run_gate_on(
     if not ok_c:
         report.ok = False
 
+    # holes（負面積輪郭。Phase 0a winding 前提の solve 空間）
+    if gate.expect_holes is not None:
+        from engine.join_solver import polygon_signed_area
+
+        conts = extract_contours_xy(r1.path)
+        n_holes = sum(1 for c in conts if polygon_signed_area(c) < 0)
+        ok_holes = n_holes == gate.expect_holes
+        report.checks.append(
+            CheckResult(
+                "holes",
+                ok_holes,
+                f"got {n_holes}, expect {gate.expect_holes}",
+                {"got": n_holes, "expect": gate.expect_holes},
+            )
+        )
+        if not ok_holes:
+            report.ok = False
+
     # reproducibility
     c1 = extract_contours_xy(r1.path)
     c2 = extract_contours_xy(r2.path)
     h1 = hashlib.sha256(json.dumps(c1, sort_keys=True).encode()).hexdigest()
     h2 = hashlib.sha256(json.dumps(c2, sort_keys=True).encode()).hexdigest()
-    ok_h = h1 == h2
+    ok_hash = h1 == h2
     report.checks.append(
         CheckResult(
             "reproducibility",
-            ok_h,
-            f"sha256={h1[:16]}…" if ok_h else "contour hash mismatch",
-            {"sha256": h1 if ok_h else None},
+            ok_hash,
+            f"sha256={h1[:16]}…" if ok_hash else "contour hash mismatch",
+            {"sha256": h1 if ok_hash else None},
         )
     )
-    if not ok_h:
+    if not ok_hash:
         report.ok = False
 
     # self-intersect
@@ -314,20 +419,40 @@ def run_gate_on(
         if not ok_j:
             report.ok = False
 
-        # overshoot (abut joins only)
-        if j.mode == "abut" and gate.max_overshoot_upm is not None:
+        # overshoot / 穴突き抜け（abut のみ。pierce は予算キー無しでも見る）
+        if j.mode == "abut":
             from_stroke = _stroke_by_id(strokes, j.from_id)
-            over = _measure_overshoot(from_stroke, pb)
-            ok_o = over <= gate.max_overshoot_upm
+            if gate.max_overshoot_upm is not None:
+                over = _measure_overshoot(from_stroke, pb)
+                ok_o = over <= gate.max_overshoot_upm
+                report.checks.append(
+                    CheckResult(
+                        f"overshoot:{j.from_id}->{j.to_id}",
+                        ok_o,
+                        f"overshoot={over:.2f} max={gate.max_overshoot_upm}",
+                        {"overshoot_upm": over, "max": gate.max_overshoot_upm},
+                    )
+                )
+                if not ok_o:
+                    report.ok = False
+
+            # 外形 overshoot は「outer 内のまま」なので穴内を 0 と誤る。
+            # 中心線が相手リングの inner に入ったら無条件 fail。
+            pierce = _measure_counter_pierce(
+                from_stroke,
+                element_holes.get(j.to_id) or (),
+                from_poly=pa,
+            )
+            ok_p = pierce is None
             report.checks.append(
                 CheckResult(
-                    f"overshoot:{j.from_id}->{j.to_id}",
-                    ok_o,
-                    f"overshoot={over:.2f} max={gate.max_overshoot_upm}",
-                    {"overshoot_upm": over, "max": gate.max_overshoot_upm},
+                    f"counter_pierce:{j.from_id}->{j.to_id}",
+                    ok_p,
+                    "clean" if ok_p else f"tip_in_hole depth={pierce:.2f}",
+                    {"depth_upm": pierce},
                 )
             )
-            if not ok_o:
+            if not ok_p:
                 report.ok = False
 
     # bbox

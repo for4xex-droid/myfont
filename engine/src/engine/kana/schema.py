@@ -9,10 +9,18 @@ from typing import Any
 _TOP_KEYS = frozenset(
     {"char", "glyph_id", "unicode", "name", "motif", "elements", "joins", "gate"}
 )
-_ELEMENT_KEYS = frozenset({"id", "spine", "width", "ends"})
+_ELEMENT_KEYS = frozenset({"id", "spine", "width", "ends", "loop_closure"})
+_LOOP_KEYS = frozenset({"overlap_upm", "join_angle"})
 _JOIN_KEYS = frozenset({"from", "to", "mode"})
 _GATE_KEYS = frozenset(
-    {"expect_contours", "max_overshoot_upm", "bbox", "tips", "gaps"}
+    {
+        "expect_contours",
+        "expect_holes",
+        "max_overshoot_upm",
+        "bbox",
+        "tips",
+        "gaps",
+    }
 )
 _BBOX_KEYS = frozenset({"width", "height", "aspect_w_over_h"})
 _TIP_KEYS = frozenset({"element", "end", "bearing_deg"})
@@ -68,12 +76,36 @@ class GateBBoxSpec:
 
 
 @dataclass(frozen=True)
+class LoopClosureSpec:
+    overlap_upm: float
+    join_angle: float | None = None
+
+
+@dataclass(frozen=True)
 class GateSpec:
     expect_contours: int
+    expect_holes: int | None = None
     max_overshoot_upm: float | None = None
     bbox: GateBBoxSpec | None = None
     tips: tuple[GateTipSpec, ...] = ()
     gaps: tuple[GateGapSpec, ...] = ()
+
+
+def parse_loop_closure(path: str, raw: Any) -> LoopClosureSpec | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError(f"{path}: loop_closure must be mapping")
+    _reject_unknown(path, raw, _LOOP_KEYS)
+    if "overlap_upm" not in raw:
+        raise ValueError(f"{path}: missing required key 'overlap_upm'")
+    overlap = float(raw["overlap_upm"])
+    if overlap < 0:
+        raise ValueError(f"{path}: overlap_upm must be ≥0")
+    join_angle = None
+    if "join_angle" in raw:
+        join_angle = float(raw["join_angle"])
+    return LoopClosureSpec(overlap_upm=overlap, join_angle=join_angle)
 
 
 def parse_joins(path: str, raw: Any) -> tuple[JoinSpec, ...]:
@@ -110,6 +142,12 @@ def parse_gate(path: str, raw: Any) -> GateSpec | None:
     expect = int(raw["expect_contours"])
     if expect < 1:
         raise ValueError(f"{path}:gate: expect_contours must be ≥1")
+
+    expect_holes: int | None = None
+    if "expect_holes" in raw:
+        expect_holes = int(raw["expect_holes"])
+        if expect_holes < 0:
+            raise ValueError(f"{path}:gate: expect_holes must be ≥0")
 
     max_over: float | None = None
     if "max_overshoot_upm" in raw:
@@ -190,6 +228,7 @@ def parse_gate(path: str, raw: Any) -> GateSpec | None:
 
     return GateSpec(
         expect_contours=expect,
+        expect_holes=expect_holes,
         max_overshoot_upm=max_over,
         bbox=bbox,
         tips=tuple(tips),

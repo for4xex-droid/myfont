@@ -16,6 +16,7 @@ from engine.kana.schema import (
     JoinSpec,
     parse_gate,
     parse_joins,
+    parse_loop_closure,
     validate_element_keys,
     validate_top_level,
 )
@@ -138,6 +139,7 @@ def load_kana_skeleton(path: Path) -> tuple[str, list[SkeletonStroke], dict[str,
             raise ValueError(f"{ep}: ends must be mapping")
         start_tag = _end_tag_from_template(ends.get("entry"))
         end_tag = _end_tag_from_template(ends.get("exit"))
+        loop = parse_loop_closure(f"{ep}.loop_closure", el.get("loop_closure"))
         strokes.append(
             SkeletonStroke(
                 kind=StrokeKind.KANA_CURVE,
@@ -146,6 +148,9 @@ def load_kana_skeleton(path: Path) -> tuple[str, list[SkeletonStroke], dict[str,
                 end_tag=end_tag,
                 width_keys=width_keys or None,
                 element_id=eid,
+                loop_closed=loop is not None,
+                loop_overlap_upm=float(loop.overlap_upm) if loop else 0.0,
+                loop_join_angle_deg=loop.join_angle if loop else None,
             )
         )
 

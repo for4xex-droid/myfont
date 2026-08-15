@@ -1,0 +1,37 @@
+{
+  "version": "kana_no_g2_v1",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "8c「の」G2: テール abut＋参照帯。Phase2 cubic 凍結とは OTF 世代が違うため分離（掟18）",
+  "params": "product_r1",
+  "otf_sha256": "fb9c21d0259be831afe4c46b49740c0062773a343a0d59a8109f24456f311ac3",
+  "skeleton_yaml_sha256": "0d0404a3e45138286470ebc17781045d9d39265ae1a457998642ef3dedcb9909",
+  "band": {
+    "aspect_w_over_h": [1.065, 1.142],
+    "top_ink_left_frac": [0.223, 0.241],
+    "top_ink_right_frac": [0.806, 0.821],
+    "bottom_cx_frac": [0.56, 0.604],
+    "centroid_y_frac": [0.479, 0.486],
+    "ink_density": [0.24, 0.268],
+    "ours": {
+      "aspect_w_over_h": 1.115,
+      "top_ink_left_frac": 0.227,
+      "top_ink_right_frac": 0.82,
+      "bottom_cx_frac": 0.589,
+      "centroid_y_frac": 0.484,
+      "ink_density": 0.24
+    },
+    "note": "帯は kana_ref_compare 256px/th64 のその場計測。kana_targets.yaml 未凍結（掟8）"
+  },
+  "files": {
+    "proofs/golden/kana_no/single.png": {
+      "sha256": "58de7348436a96f7535b025fe9452a1fb2061af17ce3e2e43dfaa6e12c19c4b1",
+      "text": "の",
+      "tag": "single"
+    },
+    "proofs/golden/kana_no/walk.png": {
+      "sha256": "39467169ec22802ecb120faf5565d481f458dc9c63e5126052f05887a33b4e20",
+      "text": "ののの",
+      "tag": "walk"
+    }
+  }
+}

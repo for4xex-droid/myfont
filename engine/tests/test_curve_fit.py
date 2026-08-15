@@ -15,6 +15,7 @@ def test_load_config_kana_mode_cubic_fit():
     assert cfg.kana_mode == "cubic_fit"
     assert cfg.mode == "rdp_polyline"  # 漢字は据え置き
     assert cfg.cubic_max_error_upm <= 0.5 + 1e-9
+    assert cfg.cubic_loop_max_error_upm >= cfg.cubic_max_error_upm
 
 
 def test_fit_smooth_oval_under_gates():
@@ -35,7 +36,8 @@ def test_fit_smooth_oval_under_gates():
 
 @pytest.mark.parametrize("gid", ["ku", "shi", "tsu"])
 def test_kana_simple_cubic_fit_dod(gid: str):
-    """単画仮名: Hausdorff≤0.5・anchors≤40・contour数1。"""
+    """単画仮名: Hausdorff≤yaml上限・anchors≤40・contour数1。"""
+    cfg = load_refit_config()
     gr = solve_to_font_contours(gid, PRODUCT_R1)
     assert gr.refit.get("mode") == "cubic_fit"
     assert gr.font_paths is not None
@@ -45,6 +47,18 @@ def test_kana_simple_cubic_fit_dod(gid: str):
     assert gr.refit.get("self_intersect") is False
 
 
+def test_no_loop_has_hole_and_cubic_fit():
+    """8c「の」: solve 穴1＋cubic_fit 通過。"""
+    cfg = load_refit_config()
+    gr = solve_to_font_contours("no", PRODUCT_R1)
+    assert gr.winding.get("n_holes") == 1
+    assert len(gr.font_contours) == 2
+    assert gr.refit.get("mode") == "cubic_fit"
+    assert gr.refit["max_error"] <= cfg.cubic_loop_max_error_upm + 1e-6
+    for pc in gr.refit["per_contour"]:
+        assert pc["anchor_count"] <= cfg.cubic_max_anchors
+
+
 @pytest.mark.parametrize("gid", ["to", "i"])
 def test_kana_join_cubic_fit_gates(gid: str):
     """接合字: 誤差ゲート＋角レポート＋アンカー上限（yaml）。"""
@@ -52,7 +66,7 @@ def test_kana_join_cubic_fit_gates(gid: str):
     gr = solve_to_font_contours(gid, PRODUCT_R1)
     assert gr.refit.get("mode") == "cubic_fit"
     assert gr.font_paths is not None
-    assert gr.refit["max_error"] <= cfg.cubic_max_error_upm + 1e-6
+    assert gr.refit["max_error"] <= 0.5 + 1e-6
     for pc in gr.refit["per_contour"]:
         assert pc["anchor_count"] <= cfg.cubic_max_anchors
         assert pc["n_corners"] >= 2

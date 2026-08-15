@@ -33,6 +33,7 @@ class RefitConfig:
     # Phase 1: 仮名専用モード（漢字の mode とは独立）
     kana_mode: KanaMode = "passthrough"
     cubic_max_error_upm: float = 0.5
+    cubic_loop_max_error_upm: float = 0.75
     cubic_corner_deg: float = 30.0
     cubic_max_anchors: int = 48
 
@@ -72,6 +73,9 @@ def load_refit_config(path: Path | None = None) -> RefitConfig:
         enabled=bool(raw.get("enabled", True)),
         kana_mode=kana_mode,  # type: ignore[arg-type]
         cubic_max_error_upm=float(raw.get("cubic_max_error_upm", 0.5)),
+        cubic_loop_max_error_upm=float(
+            raw.get("cubic_loop_max_error_upm", raw.get("cubic_max_error_upm", 0.75))
+        ),
         cubic_corner_deg=float(raw.get("cubic_corner_deg", 30.0)),
         cubic_max_anchors=int(raw.get("cubic_max_anchors", 48)),
     )
@@ -175,6 +179,8 @@ def max_deviation(
 def refit_contour(
     points: Sequence[Point],
     cfg: RefitConfig,
+    *,
+    cubic_error_upm: float | None = None,
 ) -> tuple[list[Point], dict[str, Any]]:
     src = _open_ring(points)
     before_n = len(src)
@@ -191,18 +197,21 @@ def refit_contour(
         # 単一輪郭 API では paths を meta に載せる（複数は refit_contours）
         from engine.curve_fit import fit_closed_contour
 
+        err_budget = (
+            cfg.cubic_max_error_upm if cubic_error_upm is None else cubic_error_upm
+        )
         path, cmeta = fit_closed_contour(
             src,
-            max_error_upm=cfg.cubic_max_error_upm,
+            max_error_upm=err_budget,
             corner_deg=cfg.cubic_corner_deg,
             max_anchors=cfg.cubic_max_anchors,
         )
         err = float(cmeta["max_error"])
         anchors = int(cmeta["anchor_count"])
-        if err > cfg.cubic_max_error_upm + 1e-6:
+        if err > err_budget + 1e-6:
             raise ValueError(
                 f"curve_refit cubic_fit gate failed: max_error={err:.4f} > "
-                f"cubic_max_error_upm={cfg.cubic_max_error_upm}"
+                f"cubic_max_error_upm={err_budget}"
             )
         if anchors > cfg.cubic_max_anchors:
             raise ValueError(
@@ -277,8 +286,15 @@ def refit_contours(
     out: list[list[Point]] = []
     per: list[dict[str, Any]] = []
     paths = []
+    # 穴がある字だけ loop 予算（単画仮名の 0.5 ゲートを緩めない）
+    cubic_budget = None
+    if cfg.mode == "cubic_fit" and cfg.enabled:
+        has_hole = any(_signed_area(c) < 0 for c in contours)
+        cubic_budget = (
+            cfg.cubic_loop_max_error_upm if has_hole else cfg.cubic_max_error_upm
+        )
     for c in contours:
-        simp, meta = refit_contour(c, cfg)
+        simp, meta = refit_contour(c, cfg, cubic_error_upm=cubic_budget)
         out.append(simp)
         per.append(meta)
         if "path" in meta:
@@ -320,7 +336,7 @@ def refit_contours(
             ),
             "max_error": worst,
             "max_error_upm": (
-                cfg.cubic_max_error_upm
+                (cubic_budget if cubic_budget is not None else cfg.cubic_max_error_upm)
                 if mode == "cubic_fit"
                 else cfg.max_error_upm
             ),

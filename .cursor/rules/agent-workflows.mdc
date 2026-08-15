@@ -1,0 +1,16 @@
+---
+description: tango-apps由来のスラッシュワークフロー（/plan /tdd /task 等）をこのリポジトリで実行する
+alwaysApply: true
+---
+
+# Agent workflows
+
+ユーザーが `/plan` `/tdd` `/task` `/ship` `/preflight` `/code-review` `/docs-sync` `/god-mode` など `.agent/workflows/` にあるコマンドを呼んだら、次をこの順で行う。
+
+1. `.agent/PROJECT_MAP.md` を読む（cargo/npm/Aiome は使わない）
+2. `.agent/workflows/<command>.md` を読む
+3. その手順を MyMincho 読み替えで実行する
+4. `GOLDENRULES.md` がワークフローより優先
+
+索引: `.agent/README.md` と `.agent/workflows/VIBE_WORKFLOW.md`。
+コミットとプッシュはユーザーが明示したときだけ。

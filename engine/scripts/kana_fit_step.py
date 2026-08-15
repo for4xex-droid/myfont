@@ -134,22 +134,14 @@ def main(argv: list[str] | None = None) -> int:
             [py, "scripts/kana_ref_compare.py", args.char, "--font", str(otf)]
         )
         record["ref_exit"] = code2
-        # parse OURS line
+        from engine.kana.band import parse_ours_line
+
         ours = None
         band: dict[str, str] = {}
         for line in out2.splitlines():
-            if line.startswith("OURS"):
-                parts = line.split()
-                # OURS aspect topL topR botCX centroid ink
-                if len(parts) >= 7:
-                    ours = {
-                        "aspect_w_over_h": float(parts[1]),
-                        "top_ink_left_frac": float(parts[2]),
-                        "top_ink_right_frac": float(parts[3]),
-                        "bottom_cx_frac": float(parts[4]),
-                        "centroid_y_frac": float(parts[5]),
-                        "ink_density": float(parts[6]),
-                    }
+            parsed = parse_ours_line(line)
+            if parsed is not None:
+                ours = parsed
             if line.strip().startswith("aspect_w_over_h:"):
                 band["aspect_w_over_h"] = line.split(":", 1)[1].strip()
             for key in (
@@ -163,9 +155,15 @@ def main(argv: list[str] | None = None) -> int:
                     band[key] = line.split(":", 1)[1].strip()
         record["ours"] = ours
         record["reference_band"] = band
+        from engine.kana.band import band_violations, interpret_band_ok
+
+        viol = band_violations(ours, band)
+        record["band_violations"] = viol
+        record["band_ok"] = interpret_band_ok(ours, band, viol)
     else:
         record["ref_exit"] = None
         record["ours"] = None
+        record["band_ok"] = None
         record["note"] = f"OTF missing: {otf} (pass --regen)"
 
     if args.render and otf.is_file():
@@ -176,6 +174,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # width sanity from YAML (prevent shi-style blowouts)
     from engine.kana import load_kana_skeleton, skeletons_dir
+    from engine.kana.band import width_keys_ok
 
     _gid, strokes, _meta = load_kana_skeleton(skeletons_dir() / f"{args.glyph_id}.yaml")
     hws = []
@@ -184,17 +183,16 @@ def main(argv: list[str] | None = None) -> int:
             hws.extend(float(w) for _, w in s.width_keys)
     record["width_hw_min"] = min(hws) if hws else None
     record["width_hw_max"] = max(hws) if hws else None
-    record["width_ok"] = (
-        bool(hws) and min(hws) >= 3.0 and max(hws) <= 40.0 and hws[0] <= 18.0
-        if hws
-        else False
-    )
+    record["width_ok"] = width_keys_ok(strokes)
 
     with log_path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     # human-readable summary
-    print(f"glyph={args.glyph_id} gate_ok={record['gate_ok']} width_ok={record['width_ok']}")
+    print(
+        f"glyph={args.glyph_id} gate_ok={record['gate_ok']} "
+        f"width_ok={record['width_ok']} band_ok={record.get('band_ok')}"
+    )
     if record.get("ours"):
         o = record["ours"]
         print(
@@ -207,10 +205,21 @@ def main(argv: list[str] | None = None) -> int:
         print("band:", record["reference_band"])
     print(f"log={log_path}")
 
-    # exit: 0=gate+width ok, 1=gate/width fail, 2=tool fail
-    if not record.get("gate_ok") or not record.get("width_ok"):
-        return 1
-    return 0
+    from engine.kana.band import fit_step_exit
+
+    # 帯は未凍結なので kana_gate には載せない。測れなければ 2（成功にしない）。
+    code = fit_step_exit(
+        gate_ok=bool(record.get("gate_ok")),
+        width_ok=bool(record.get("width_ok")),
+        band_ok=record.get("band_ok"),
+        ref_exit=record.get("ref_exit"),
+        otf_present=otf.is_file(),
+        ours_present=record.get("ours") is not None,
+        band_present=bool(record.get("reference_band")),
+    )
+    if code == 2:
+        print(f"status=measure_fail log={log_path}")
+    return code
 
 
 if __name__ == "__main__":
