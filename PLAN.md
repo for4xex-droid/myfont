@@ -375,7 +375,7 @@ spike7 の結合検証で判明した実態:
 
 ### 7.4 直近の優先順（次の一手）
 
-1. **P1（P1-B方式）: し・い・と・つ 到達＋レビューループ稼働**（`docs/kana_parametric_plan.md` / `docs/kana_review_loop_plan.md`）— Bゲート／`kana_ref_compare`／Grok委譲の型が通った。黄金 `proofs/golden/kana_{shi,i,to,tsu,ku,no}/` 凍結済み（の は G2）。**次は 8d「あ」**（hole≥1＋接合）。G3・盲検は字数が増えてから
+1. **P1（P1-B方式）: し・い・と・つ 到達＋レビューループ稼働**（`docs/kana_parametric_plan.md` / `docs/kana_review_loop_plan.md`）— Bゲート／`kana_ref_compare`／Grok委譲の型が通った。黄金 `proofs/golden/kana_{shi,i,to,tsu,ku,no,a}/` 凍結済み（の は G2、あ は G1）。**次は 8d「あ」G2**（参照帯＋字間 L/R）。G3・盲検は字数が増えてから
 2. ~~S4: 組見本ラッパ＋盲検手順書~~ — **骨組み完了**（盲検の実地実施は P1 字形後）
 3. ~~S1: 出荷ゲート骨組み~~ — **骨組み完了**（α OTF ができたら本適用）
 4. **S2a: 商標ざっくり調査＋GlyphWiki 販売時再確認** — 雛形あり。**調査実施が残作業**

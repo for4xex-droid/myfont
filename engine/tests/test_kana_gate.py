@@ -25,6 +25,43 @@ def pathops():
     return pytest.importorskip("pathops")
 
 
+def _with_element_end(yaml_name: str, element_id: str, xy: tuple[float, float]):
+    """指定 element の終点だけを動かした骨格を返す。"""
+    from engine.geometry import Vec2
+    from engine.strokes import SkeletonStroke
+
+    gid, strokes, meta = load_kana_skeleton(skeletons_dir() / yaml_name)
+    moved = []
+    for s in strokes:
+        if s.element_id == element_id:
+            pts = list(s.points)
+            pts[-1] = Vec2(*xy)
+            moved.append(
+                SkeletonStroke(
+                    kind=s.kind,
+                    points=pts,
+                    start_tag=s.start_tag,
+                    end_tag=s.end_tag,
+                    width_keys=s.width_keys,
+                    element_id=s.element_id,
+                    loop_closed=s.loop_closed,
+                    loop_overlap_upm=s.loop_overlap_upm,
+                    loop_join_angle_deg=s.loop_join_angle_deg,
+                )
+            )
+        else:
+            moved.append(s)
+    return gid, moved, meta
+
+
+def _assert_pierce_red_overshoot_green(report, pierce_name: str, overshoot_name: str):
+    assert not report.ok
+    pierces = [c for c in report.checks if c.name == pierce_name]
+    assert pierces and pierces[0].ok is False
+    overs = [c for c in report.checks if c.name == overshoot_name]
+    assert overs and overs[0].ok is True
+
+
 def test_schema_rejects_unknown_gate_key():
     with pytest.raises(ValueError, match="unknown keys"):
         parse_gate("x", {"expect_contours": 1, "nope": 1})
@@ -86,7 +123,7 @@ def test_loader_rejects_unknown_top_level(tmp_path: Path):
         load_kana_skeleton(p)
 
 
-@pytest.mark.parametrize("gid", ["shi", "i", "to", "tsu", "ku", "no"])
+@pytest.mark.parametrize("gid", ["shi", "i", "to", "tsu", "ku", "no", "a"])
 def test_current_glyphs_gate_green(gid: str, pathops):
     report = run_gate(gid, params="product_r1")
     assert report.ok, report.to_dict()
@@ -109,6 +146,53 @@ def test_fail_pierce(pathops):
     assert overs and overs[0].ok is False
 
 
+def test_a_no_positive_micro_islands(pathops):
+    """8d G1: 正面積の浮遊島は禁止。負スリットはリング abut の既知形（の と同型）。"""
+    from engine.join_solver import solve_glyph
+    from engine.kana import kana_characters
+    from engine.params import PARAM_SETS
+
+    r = solve_glyph(kana_characters()["a"], PARAM_SETS["product_r1"], apply_stage_a=False)
+    assert r.after_cleanup == 2
+    kept_pos = [
+        i for i in r.contour_infos if (not i.removed) and i.signed_area > 0
+    ]
+    assert len(kept_pos) == 1
+    for i in r.contour_infos:
+        if i.removed:
+            assert i.signed_area < 0, i
+            assert "micro" in i.reason
+
+
+def test_a_counter_pierce_clean(pathops):
+    """現行「あ」の横・右払いはリング本体上。穴内にいない。"""
+    report = run_gate("a", params="product_r1")
+    assert report.ok, report.to_dict()
+    pierces = [c for c in report.checks if c.name.startswith("counter_pierce:")]
+    assert len(pierces) == 2
+    assert all(c.ok and c.data.get("depth_upm") is None for c in pierces)
+
+
+@pytest.mark.parametrize(
+    "element_id,pierce,overshoot",
+    [
+        ("yoko", "counter_pierce:yoko->loop", "overshoot:yoko->loop"),
+        ("right", "counter_pierce:right->loop", "overshoot:right->loop"),
+    ],
+)
+def test_a_stroke_into_hole_fails_counter_pierce(
+    pathops, element_id, pierce, overshoot
+):
+    """着地をカウンターへ入れたら overshoot=0 でも counter_pierce が赤。"""
+    from engine.kana.gate import run_gate_on
+
+    gid, moved, meta = _with_element_end("a.yaml", element_id, (460.0, 580.0))
+    report = run_gate_on(
+        gid, moved, meta, PARAM_SETS["product_r1"], params_name="product_r1"
+    )
+    _assert_pierce_red_overshoot_green(report, pierce, overshoot)
+
+
 def test_no_counter_pierce_clean(pathops):
     """現行「の」テールはリング本体上。穴内にいない。"""
     report = run_gate("no", params="product_r1")
@@ -120,39 +204,15 @@ def test_no_counter_pierce_clean(pathops):
 
 def test_no_tail_into_hole_fails_counter_pierce(pathops):
     """テール先端をカウンターへ入れたら overshoot=0 でも counter_pierce が赤。"""
-    from engine.geometry import Vec2
     from engine.kana.gate import run_gate_on
-    from engine.strokes import SkeletonStroke
 
-    gid, strokes, meta = load_kana_skeleton(skeletons_dir() / "no.yaml")
-    moved = []
-    for s in strokes:
-        if s.element_id == "tail":
-            pts = list(s.points)
-            pts[-1] = Vec2(580.0, 560.0)
-            moved.append(
-                SkeletonStroke(
-                    kind=s.kind,
-                    points=pts,
-                    start_tag=s.start_tag,
-                    end_tag=s.end_tag,
-                    width_keys=s.width_keys,
-                    element_id=s.element_id,
-                    loop_closed=s.loop_closed,
-                    loop_overlap_upm=s.loop_overlap_upm,
-                    loop_join_angle_deg=s.loop_join_angle_deg,
-                )
-            )
-        else:
-            moved.append(s)
+    gid, moved, meta = _with_element_end("no.yaml", "tail", (580.0, 560.0))
     report = run_gate_on(
         gid, moved, meta, PARAM_SETS["product_r1"], params_name="product_r1"
     )
-    assert not report.ok
-    pierces = [c for c in report.checks if c.name.startswith("counter_pierce:")]
-    assert pierces and pierces[0].ok is False
-    overs = [c for c in report.checks if c.name.startswith("overshoot:")]
-    assert overs and overs[0].ok is True
+    _assert_pierce_red_overshoot_green(
+        report, "counter_pierce:tail->main", "overshoot:tail->main"
+    )
 
 
 def test_counter_pierce_scans_midline_not_just_tip():

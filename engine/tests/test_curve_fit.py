@@ -47,6 +47,18 @@ def test_kana_simple_cubic_fit_dod(gid: str):
     assert gr.refit.get("self_intersect") is False
 
 
+def test_a_loop_has_hole_and_cubic_fit():
+    """8d「あ」: 接合後穴1＋微小島なし＋cubic_fit 通過。"""
+    cfg = load_refit_config()
+    gr = solve_to_font_contours("a", PRODUCT_R1)
+    assert gr.winding.get("n_holes") == 1
+    assert len(gr.font_contours) == 2
+    assert gr.refit.get("mode") == "cubic_fit"
+    assert gr.refit["max_error"] <= cfg.cubic_loop_max_error_upm + 1e-6
+    for pc in gr.refit["per_contour"]:
+        assert pc["anchor_count"] <= cfg.cubic_max_anchors
+
+
 def test_no_loop_has_hole_and_cubic_fit():
     """8c「の」: solve 穴1＋cubic_fit 通過。"""
     cfg = load_refit_config()

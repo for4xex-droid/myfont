@@ -52,6 +52,9 @@ engine/output/
 proofs/out/
 proofs/review/
 
+# CLI ゲート報告（cwd に出る。engine/.gitignore と同名）
+gate_report.json
+
 # Local secrets / API keys (kana vision review etc.)
 .env
 .env.*

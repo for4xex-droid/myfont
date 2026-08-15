@@ -1,0 +1,95 @@
+# P1-B スパイク8d: ひらがな「あ」
+# 座標: svg_y_down_legacy（y 下向き）
+#
+# 構造: 閉じた左カウンター（のと同型の明示リング）＋天の横画（下りて着地）＋右払い。
+# G1: 接合後 hole=1・正面積の浮遊島0・counter_pierce 緑。帯合わせは G2。
+# リングへ abut すると負面積スリットが付く（の と同型）。cleanup で除去。エンジン閾値は触らない。
+# 参照帯（kana_ref_compare 256px/th64・座標トレースなし）:
+#   aspect 0.839–0.943 / topL 0.27–0.323 / topR 0.456–0.487
+#   botCX 0.583–0.613 / cy 0.525–0.543 / ink 0.259–0.283
+# G1 実測: aspect=0.912 topL=0.215 topR=0.533 botCX=0.621 cy=0.54 ink=0.261
+# G2 残り: topL / topR / botCX（帯は kana_gate に載せない・掟8）
+# 天は短い横画。右払いは着地規約のため先→リング向き。cubic 外形アンカーに余裕を残す。
+
+char: あ
+glyph_id: a
+unicode: 0x3042
+name: uni3042
+motif: loop_a
+
+elements:
+  - id: loop
+    spine:
+      - [460, 405]   # P0 top
+      - [560, 415]
+      - [625, 500]
+      - [635, 580]   # P3 right
+      - [620, 670]
+      - [545, 740]
+      - [460, 755]   # P6 bottom
+      - [370, 735]
+      - [300, 650]
+      - [290, 560]   # P9 left
+      - [310, 475]
+      - [370, 410]
+      - [460, 405]   # P12 = P0
+    width:
+      - {s: 0.0, hw: 16}
+      - {s: 0.08, hw: 30}
+      - {s: 0.25, hw: 34}
+      - {s: 0.45, hw: 30}
+      - {s: 0.70, hw: 24}
+      - {s: 1.0, hw: 16}
+    ends:
+      entry: none
+      exit: none
+    loop_closure:
+      overlap_upm: 4.0
+      join_angle: 0.0
+
+  - id: yoko
+    spine:
+      - [380, 268]   # P0 起筆（短く平坦。左に伸ばすと「の」化）
+      - [500, 250]
+      - [555, 275]
+      - [548, 418]   # P3 大半径で着地
+    width:
+      - {s: 0.0, hw: 14}
+      - {s: 0.40, hw: 26}
+      - {s: 0.80, hw: 18}
+      - {s: 1.0, hw: 16}
+    ends:
+      entry: karui_uchikomi
+      exit: none
+
+  - id: right
+    # 着地規約: from の終点が to に乗る（の tail / と ten と同型）。
+    # 見た目の払い先は P0。P3 でリング右肩に乗せる。
+    spine:
+      - [790, 820]   # P0 抜き（下げすぎると底が右先端だけになる）
+      - [750, 680]
+      - [685, 545]
+      - [628, 505]   # P3 リング右肩に着地
+    width:
+      - {s: 0.0, hw: 3}
+      - {s: 0.40, hw: 22}
+      - {s: 1.0, hw: 16}
+    ends:
+      entry: nuki
+      exit: none
+
+joins:
+  - {from: yoko, to: loop, mode: abut}
+  - {from: right, to: loop, mode: abut}
+
+gate:
+  expect_contours: 2
+  expect_holes: 1
+  max_overshoot_upm: 48
+  bbox:
+    width: [400, 750]
+    height: [500, 850]
+    aspect_w_over_h: [0.70, 1.15]
+  tips:
+    - {element: yoko, end: entry, bearing_deg: [-25, 40]}
+    - {element: right, end: entry, bearing_deg: [70, 140]}
