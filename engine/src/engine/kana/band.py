@@ -109,8 +109,14 @@ def fit_step_exit(
     return 0
 
 
-def width_keys_ok(strokes: Any) -> bool:
-    """各 element の入口 hw≤18、全キー∈[3, 40]。キー無し element は無視。"""
+def width_keys_ok(
+    strokes: Any,
+    *,
+    hw_min: float = 3.0,
+    hw_max: float = 40.0,
+    entry_max: float = 18.0,
+) -> bool:
+    """各 element の入口 hw≤entry_max、全キー∈[hw_min, hw_max]。キー無し element は無視。"""
     saw = False
     for s in strokes:
         keys = getattr(s, "width_keys", None)
@@ -118,8 +124,8 @@ def width_keys_ok(strokes: Any) -> bool:
             continue
         saw = True
         vals = [float(w) for _t, w in keys]
-        if min(vals) < 3.0 or max(vals) > 40.0:
+        if min(vals) < hw_min or max(vals) > hw_max:
             return False
-        if vals[0] > 18.0:
+        if vals[0] > entry_max:
             return False
     return saw

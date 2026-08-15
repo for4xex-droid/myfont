@@ -302,9 +302,62 @@ def normalize_fill_winding_paths(paths: Sequence[Any]) -> tuple[list[Any], dict[
     }
 
 
-def _kana_refit_config() -> RefitConfig:
+def normalize_fill_winding_overlay(
+    contours: Sequence[Sequence[tuple[float, float]]],
+) -> tuple[list[list[tuple[float, float]]], dict[str, Any]]:
+    """重ね塗り: 全輪郭を外形として扱う。入れ子=穴にしない。"""
+    opened = [_open_ring(c) for c in contours]
+    before = [shoelace(c) for c in opened]
+    out = [list(reversed(c)) if c else c for c in opened]
+    after = [shoelace(c) for c in out]
+    for i, area in enumerate(after):
+        if area <= 0:
+            raise ValueError(
+                f"winding overlay failed: contour[{i}] signed_area={area:.3f} "
+                "(expected fill >0)"
+            )
+    return out, {
+        "areas_before": before,
+        "areas_after": after,
+        "depths": [0] * len(out),
+        "reversed": [True] * len(out),
+        "strategy": "overlay-all-fill",
+        "n_holes": 0,
+    }
+
+
+def normalize_fill_winding_overlay_paths(
+    paths: Sequence[Any],
+) -> tuple[list[Any], dict[str, Any]]:
+    from engine.curve_fit import ContourPath
+
+    opened = [p if isinstance(p, ContourPath) else p for p in paths]
+    reversed_paths = [p.reversed() for p in opened]
+    font_like = [p.on_curve_points() for p in reversed_paths]
+    after = [shoelace(c) for c in font_like]
+    for i, area in enumerate(after):
+        if area <= 0:
+            raise ValueError(
+                f"winding overlay failed (path): contour[{i}] "
+                f"signed_area={area:.3f} (expected fill >0)"
+            )
+    return list(reversed_paths), {
+        "areas_before": [shoelace(p.on_curve_points()) for p in opened],
+        "areas_after": after,
+        "depths": [0] * len(reversed_paths),
+        "reversed": [True] * len(reversed_paths),
+        "strategy": "overlay-all-fill-path",
+        "n_holes": 0,
+    }
+
+
+def _kana_refit_config(glyph_id: str | None = None) -> RefitConfig:
     """仮名用: snapshot の kana_mode を mode に載せ替えた Config。"""
     base = load_refit_config()
+    # 「あ」の十＋輪は 48 では足りない。他字のフィット選択は 48 のまま。
+    anchors = 64 if glyph_id == "a" else base.cubic_max_anchors
+    # overlay「あ」は穴無しでも loop 予算。combined SI は重ね塗りで偽陽性。
+    a_overlay = glyph_id == "a"
     return RefitConfig(
         mode=base.kana_mode,
         epsilon_upm=base.epsilon_upm,
@@ -313,10 +366,13 @@ def _kana_refit_config() -> RefitConfig:
         min_points=base.min_points,
         enabled=base.enabled,
         kana_mode=base.kana_mode,
-        cubic_max_error_upm=base.cubic_max_error_upm,
+        cubic_max_error_upm=(
+            base.cubic_loop_max_error_upm if a_overlay else base.cubic_max_error_upm
+        ),
         cubic_loop_max_error_upm=base.cubic_loop_max_error_upm,
         cubic_corner_deg=base.cubic_corner_deg,
-        cubic_max_anchors=base.cubic_max_anchors,
+        cubic_max_anchors=anchors,
+        skip_combined_self_intersect=a_overlay,
     )
 
 
@@ -333,14 +389,20 @@ def solve_to_font_contours(
     labels = all_labels()
     # 仮名單画は Stage A 延長の対象外（検出ヒットもほぼ無いが明示）
     apply_a = not is_kana_glyph(glyph_id)
+    meta_pre = glyph_meta(glyph_id) or {}
+    compose = str(meta_pre.get("compose") or "union")
     result: SolveResult = solve_glyph(
-        chars[glyph_id], params, k=k, apply_stage_a=apply_a
+        chars[glyph_id],
+        params,
+        k=k,
+        apply_stage_a=apply_a,
+        compose=compose,
     )
     internal = extract_contours_xy(result.path)
     if refit_cfg is not None:
         cfg = refit_cfg
     elif is_kana_glyph(glyph_id):
-        cfg = _kana_refit_config()
+        cfg = _kana_refit_config(glyph_id)
     else:
         cfg = load_refit_config()
     refit_out = refit_contours(internal, cfg)
@@ -357,13 +419,33 @@ def solve_to_font_contours(
         flipped = [
             p.transform(lambda x, y: (x, y_for_font(y))) for p in refit_out.paths
         ]
-        font_paths, winding = normalize_fill_winding_paths(flipped)
+        if compose == "overlay":
+            font_paths, winding = normalize_fill_winding_overlay_paths(flipped)
+        else:
+            font_paths, winding = normalize_fill_winding_paths(flipped)
         font = [p.on_curve_points() for p in font_paths]
     else:
         font = to_font_contours(refit_out.contours)
-        font, winding = normalize_fill_winding(font)
+        if compose == "overlay":
+            font, winding = normalize_fill_winding_overlay(font)
+        else:
+            font, winding = normalize_fill_winding(font)
 
     meta = glyph_meta(glyph_id) or {}
+    em_fit = meta.get("em_fit")
+    if em_fit is not None:
+        from engine.kana.em_fit import (
+            apply_em_fit_contours,
+            em_fit_transform,
+            path_bounds,
+        )
+
+        if font_paths:
+            xf = em_fit_transform(em_fit, bounds=path_bounds(font_paths))
+            font_paths = [p.transform(lambda x, y: xf(x, y)) for p in font_paths]
+            font = [p.on_curve_points() for p in font_paths]
+        else:
+            font = apply_em_fit_contours(em_fit, font)
     return BridgeGlyphResult(
         glyph_id=glyph_id,
         char=str(meta.get("char") or labels.get(glyph_id, glyph_id)),
@@ -463,8 +545,13 @@ def build_ufo(
     return out_dir
 
 
-def compile_otf(ufo_dir: Path, otf_path: Path) -> Path:
-    """ufoLib2 UFO → OTF（fontmake）。"""
+def compile_otf(
+    ufo_dir: Path, otf_path: Path, *, remove_overlaps: bool = True
+) -> Path:
+    """ufoLib2 UFO → OTF（fontmake）。
+
+    overlay 字は重ね塗りを残すため remove_overlaps=False。
+    """
     from fontmake.font_project import FontProject
 
     otf_path = otf_path.resolve()
@@ -477,6 +564,7 @@ def compile_otf(ufo_dir: Path, otf_path: Path) -> Path:
         [str(ufo_dir)],
         output=["otf"],
         output_path=str(otf_path),
+        remove_overlaps=remove_overlaps,
     )
     if not otf_path.is_file():
         # fontmake がディレクトリ出力する場合のフォールバック
@@ -606,7 +694,11 @@ def build_temp_font(
 
     glyph_results = [solve_to_font_contours(gid, params) for gid in ids]
     build_ufo(glyph_results, family_name=fam, out_dir=ufo_dir)
-    compile_otf(ufo_dir, otf_path)
+    has_overlay = any(
+        (glyph_meta(g.glyph_id) or {}).get("compose") == "overlay"
+        for g in glyph_results
+    )
+    compile_otf(ufo_dir, otf_path, remove_overlaps=not has_overlay)
     # 十が無い仮名のみビルドでは juu 塗り検査をスキップ（fail-open にしない）
     if "juu" in ids:
         fill = check_fill_juu(otf_path)

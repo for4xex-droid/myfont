@@ -19,3 +19,5 @@ cubic_max_error_upm: 0.5
 cubic_loop_max_error_upm: 0.75
 cubic_corner_deg: 30.0
 cubic_max_anchors: 48       # 1輪郭あたり（複画「い」は輪郭ごと。yaml で調整可）
+# 「あ」は overlay 3塗り。bridge が glyph_id==a のとき
+# cubic_max_anchors=64・誤差は loop 予算・combined SI を見ない。

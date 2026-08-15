@@ -1,0 +1,30 @@
+{
+  "version": "kana_a_g1v4",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "8d「あ」方式A。出荷正本は fonts_out/MyMincho.ufo の uni3042（手描き3塗り）。エンジン a.yaml は実験用。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "params": "product_r1",
+  "otf_sha256": "2803a2cb3097f19a46247b4008ea1caf5fdd21df4699be791d2568f4c303572a",
+  "glif_sha256": "3a80d06a139326434fb45b9d1fbe6b58bb2886eaf3ed558ab1e63b7e67e86ed7",
+  "sidebearings_em1000": {
+    "lsb": 121,
+    "rsb": 117,
+    "target_lsb": [106, 146],
+    "target_rsb": [98, 138],
+    "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
+    "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_a/single.png": {
+      "sha256": "5e7dc2551d76b02a8ad6fd1f0dc31612e525ba7124d5022f55d78229771161b4",
+      "text": "あ",
+      "tag": "single"
+    },
+    "proofs/golden/kana_a/walk.png": {
+      "sha256": "06b24005bb6e891a34b9d0f72f2ef65aa59533994e02edc9d689dcf55446ff69",
+      "text": "あああ",
+      "tag": "walk"
+    }
+  }
+}

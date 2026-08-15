@@ -85,11 +85,16 @@ def test_make_proofs_renders(tmp_path: Path):
 
 
 def test_manual_glyphs_core20():
-    manual = ROOT / "fonts_out" / "manual_glyphs.txt"
+    text = (ROOT / "fonts_out" / "manual_glyphs.txt").read_text(encoding="utf-8")
     names = {
+        ln.strip().lstrip("#").strip()
+        for ln in text.splitlines()
+        if "uni" in ln
+    }
+    drawn = {
         ln.strip()
-        for ln in manual.read_text(encoding="utf-8").splitlines()
-        if ln.strip() and not ln.startswith("#")
+        for ln in text.splitlines()
+        if ln.strip() and not ln.strip().startswith("#")
     }
     core = [
         ln.strip()
@@ -99,3 +104,4 @@ def test_manual_glyphs_core20():
     assert len(core) == 20
     for ch in core:
         assert f"uni{ord(ch):04X}" in names
+    assert drawn == {"uni3042"}

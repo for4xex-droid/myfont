@@ -7,8 +7,20 @@ from typing import Any
 
 
 _TOP_KEYS = frozenset(
-    {"char", "glyph_id", "unicode", "name", "motif", "elements", "joins", "gate"}
+    {
+        "char",
+        "glyph_id",
+        "unicode",
+        "name",
+        "motif",
+        "elements",
+        "joins",
+        "gate",
+        "em_fit",
+        "compose",
+    }
 )
+_EM_FIT_KEYS = frozenset({"scale", "target_lsb"})
 _ELEMENT_KEYS = frozenset({"id", "spine", "width", "ends", "loop_closure"})
 _LOOP_KEYS = frozenset({"overlap_upm", "join_angle"})
 _JOIN_KEYS = frozenset({"from", "to", "mode"})
@@ -25,7 +37,8 @@ _GATE_KEYS = frozenset(
 _BBOX_KEYS = frozenset({"width", "height", "aspect_w_over_h"})
 _TIP_KEYS = frozenset({"element", "end", "bearing_deg"})
 _GAP_KEYS = frozenset({"a", "b", "min_upm", "max_upm"})
-_JOIN_MODES = frozenset({"abut", "separate"})
+_JOIN_MODES = frozenset({"abut", "separate", "cross", "overlap"})
+_COMPOSE_MODES = frozenset({"union", "overlay"})
 _TIP_ENDS = frozenset({"entry", "exit"})
 
 
@@ -50,7 +63,7 @@ def _pair_f(
 class JoinSpec:
     from_id: str
     to_id: str
-    mode: str  # abut | separate
+    mode: str  # abut | separate | cross | overlap
 
 
 @dataclass(frozen=True)
@@ -76,6 +89,14 @@ class GateBBoxSpec:
 
 
 @dataclass(frozen=True)
+class EmFitSpec:
+    """完成輪郭の等方スケール＋LSB 合わせ（計画§3の字面ボックス）。"""
+
+    scale: float
+    target_lsb: float
+
+
+@dataclass(frozen=True)
 class LoopClosureSpec:
     overlap_upm: float
     join_angle: float | None = None
@@ -89,6 +110,33 @@ class GateSpec:
     bbox: GateBBoxSpec | None = None
     tips: tuple[GateTipSpec, ...] = ()
     gaps: tuple[GateGapSpec, ...] = ()
+
+
+def parse_em_fit(path: str, raw: Any) -> EmFitSpec | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError(f"{path}: em_fit must be mapping")
+    _reject_unknown(path, raw, _EM_FIT_KEYS)
+    if "scale" not in raw or "target_lsb" not in raw:
+        raise ValueError(f"{path}: em_fit requires scale and target_lsb")
+    scale = float(raw["scale"])
+    if scale <= 0:
+        raise ValueError(f"{path}: em_fit.scale must be >0")
+    target_lsb = float(raw["target_lsb"])
+    if target_lsb < 0 or target_lsb > 400:
+        raise ValueError(f"{path}: em_fit.target_lsb must be in [0, 400]")
+    return EmFitSpec(scale=scale, target_lsb=target_lsb)
+
+
+def parse_compose(path: str, raw: Any) -> str:
+    """union=boolean（既定）。overlay=重ね塗り（あ：十と回りを溶かさない）。"""
+    if raw is None:
+        return "union"
+    mode = str(raw)
+    if mode not in _COMPOSE_MODES:
+        raise ValueError(f"{path}: compose must be union|overlay, got {mode!r}")
+    return mode
 
 
 def parse_loop_closure(path: str, raw: Any) -> LoopClosureSpec | None:
@@ -124,7 +172,9 @@ def parse_joins(path: str, raw: Any) -> tuple[JoinSpec, ...]:
                 raise ValueError(f"{p}: missing required key '{req}'")
         mode = str(item["mode"])
         if mode not in _JOIN_MODES:
-            raise ValueError(f"{p}: mode must be abut|separate, got {mode!r}")
+            raise ValueError(
+                f"{p}: mode must be abut|separate|cross|overlap, got {mode!r}"
+            )
         out.append(
             JoinSpec(from_id=str(item["from"]), to_id=str(item["to"]), mode=mode)
         )

@@ -49,6 +49,41 @@ def pathops_union(paths: Sequence[Path]) -> Path:
     return out
 
 
+def pathops_concat(paths: Sequence[Path]) -> Path:
+    """boolean せず輪郭を並べる（overlay。nonzero で重ね塗り）。"""
+    out = Path()
+    for src in paths:
+        for verb, pts in src:
+            if verb == PathVerb.MOVE:
+                out.moveTo(pts[0][0], pts[0][1])
+            elif verb == PathVerb.LINE:
+                out.lineTo(pts[0][0], pts[0][1])
+            elif verb == PathVerb.QUAD:
+                out.quadTo(pts[0][0], pts[0][1], pts[1][0], pts[1][1])
+            elif verb == PathVerb.CUBIC:
+                out.cubicTo(
+                    pts[0][0], pts[0][1],
+                    pts[1][0], pts[1][1],
+                    pts[2][0], pts[2][1],
+                )
+            elif verb == PathVerb.CLOSE:
+                out.close()
+    return out
+
+
+def force_positive_fill_path(path: Path) -> Path:
+    """各輪郭を y-down 外形（正面積）に揃える。overlay の穴誤認を防ぐ。"""
+    kept: list[Path] = []
+    for c in split_contours(path):
+        pts = contour_points(c)
+        if len(pts) >= 3 and polygon_signed_area(pts) < 0:
+            rev = list(reversed(pts))
+            kept.append(poly_to_path([Vec2(x, y) for x, y in rev]))
+        else:
+            kept.append(c)
+    return pathops_concat(kept) if kept else path
+
+
 def path_to_svg_d(path: Path, precision: int = 2) -> str:
     """フォント空間 Path → SVG d（Y 反転）。"""
     fmt = f"{{:.{precision}f}}"
@@ -464,6 +499,7 @@ def remove_micro_contours(
     proximity: float = 8.0,
     mode: str = "proximate",
     hole_keep_upm_area_ratio: float = HOLE_KEEP_UPM_AREA_RATIO,
+    compose: str = "union",
 ) -> tuple[Path, list[ContourInfo]]:
     """
     union 後の微小輪郭除去。
@@ -543,6 +579,8 @@ def remove_micro_contours(
 
     if len(keep) == 1:
         return keep[0], infos
+    if compose == "overlay":
+        return force_positive_fill_path(pathops_concat(keep)), infos
     merged = pathops_union(keep)
     try:
         merged = simplify(merged, fix_winding=True)
@@ -570,7 +608,12 @@ def solve_glyph(
     cleanup_mode: str = "proximate",
     apply_stage_a: bool = True,
     detect_scale: float = 1.0,
+    compose: str = "union",
 ) -> SolveResult:
+    if compose not in ("union", "overlay"):
+        raise ValueError(
+            f"unknown compose {compose!r} (expected 'union'|'overlay')"
+        )
     hits: list[JoinHit] = []
     overlap = 0.0
     work = list(strokes)
@@ -594,11 +637,14 @@ def solve_glyph(
             self_intersect_msg="empty input",
         )
 
-    united = pathops_union(paths)
-    try:
-        united = simplify(united, fix_winding=True)
-    except (ValueError, RuntimeError, TypeError) as e:
-        logger.debug("simplify after union skipped: %s", e)
+    if compose == "overlay":
+        united = force_positive_fill_path(pathops_concat(paths))
+    else:
+        united = pathops_union(paths)
+        try:
+            united = simplify(united, fix_winding=True)
+        except (ValueError, RuntimeError, TypeError) as e:
+            logger.debug("simplify after union skipped: %s", e)
     after_union = count_contours(united)
 
     cleaned, infos = remove_micro_contours(
@@ -607,9 +653,13 @@ def solve_glyph(
         upm_area_ratio=upm_area_ratio,
         proximity=proximity,
         mode=cleanup_mode,
+        compose=compose,
     )
     after_cleanup = count_contours(cleaned)
-    si, si_msg = check_self_intersect_heuristic(cleaned)
+    if compose == "overlay":
+        si, si_msg = False, "overlay: skip combined simplify heuristic"
+    else:
+        si, si_msg = check_self_intersect_heuristic(cleaned)
 
     return SolveResult(
         before_contours=before,

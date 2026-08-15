@@ -14,6 +14,8 @@ from engine.geometry import Vec2, parse_cubic_chain
 from engine.kana.schema import (
     GateSpec,
     JoinSpec,
+    parse_compose,
+    parse_em_fit,
     parse_gate,
     parse_joins,
     parse_loop_closure,
@@ -156,6 +158,7 @@ def load_kana_skeleton(path: Path) -> tuple[str, list[SkeletonStroke], dict[str,
 
     joins = parse_joins(label, raw.get("joins"))
     gate = parse_gate(label, raw.get("gate"))
+    em_fit = parse_em_fit(f"{label}:em_fit", raw.get("em_fit"))
     id_set = set(element_ids)
     for j in joins:
         if j.from_id not in id_set:
@@ -184,6 +187,8 @@ def load_kana_skeleton(path: Path) -> tuple[str, list[SkeletonStroke], dict[str,
         "element_ids": element_ids,
         "joins": joins,
         "gate": gate,
+        "em_fit": em_fit,
+        "compose": parse_compose(f"{label}:compose", raw.get("compose")),
         "coordinate_space": "svg_y_down_legacy",
     }
     return glyph_id, strokes, meta

@@ -29,11 +29,13 @@ def test_observe_all_registered_kana():
         assert outline.get("points_after", 0) >= 3, gid
         assert outline.get("anchor_count", 0) > 0, gid
         # cubic_fit の anchor は制御点込み。points_after は描画輪郭点数。同一視しない。
-        if gid in ("no", "a"):
+        if gid == "no":
             ratio = outline.get("hole_area_ratio")
             assert ratio is not None and 0.0 < ratio < 1.0, gid
             assert outline.get("n_holes") == 1
             assert outline.get("ink_area_upm2", 0) < outline.get("outer_area_upm2", 0)
+        if gid == "a":
+            assert outline.get("n_holes") == 0
 
 
 def test_spine_curvature_stats_on_loaded_strokes():

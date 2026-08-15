@@ -70,6 +70,12 @@ def main() -> int:
     out = args.out.resolve() / args.params
     out.mkdir(parents=True, exist_ok=True)
     ids = list(args.glyphs or CORE_GLYPHS.keys())
+    if "a" in ids:
+        print(
+            "note: glyph 'a' is engine experiment only; "
+            "shipping あ is fonts_out/MyMincho.ufo (方式A)",
+            file=sys.stderr,
+        )
     print(f"regen params={args.params} glyphs={ids} out={out}")
 
     result = build_temp_font(

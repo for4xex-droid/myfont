@@ -1,0 +1,30 @@
+{
+  "version": "kana_a_g1v2",
+  "superseded_by": "kana_a_g1v3",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "8d「あ」閉じ輪＋cross（縦が穴へ）。union すると参照の3塗りとトポロジが違い、点を動かしてもラテン a に見える。現行の正は FREEZE_g1v3.json（overlay）。",
+  "params": "product_r1",
+  "otf_sha256": "b9e04086d1865ae539d903a70a5823ffd2bd899aaa07b4ce9fa84e1b0fbe1beb",
+  "skeleton_yaml_sha256": "ab0bd5285a071ff2a5fee916869f38977a5d845013831d0f0ffad3df3f07417d",
+  "em_fit": {
+    "scale": 1.32,
+    "target_lsb": 126
+  },
+  "band": {
+    "note": "g1v2 時点の帯。いまの single/walk.png とは一致しない。"
+  },
+  "historical_files": {
+    "proofs/golden/kana_a/single.png": {
+      "sha256": "f67355eb44f6f2f50c7899926c8f98acf1aea1ea6e949d5a905558b14a960f39",
+      "text": "あ",
+      "tag": "single",
+      "at": "g1v2"
+    },
+    "proofs/golden/kana_a/walk.png": {
+      "sha256": "97ba90dfacac6690d56510e554b1fae955192db274805a68130e5732b53ee707",
+      "text": "あああ",
+      "tag": "walk",
+      "at": "g1v2"
+    }
+  }
+}

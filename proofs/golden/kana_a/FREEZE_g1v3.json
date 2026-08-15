@@ -1,0 +1,26 @@
+{
+  "version": "kana_a_g1v3",
+  "superseded_by": "kana_a_g1v4",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "8d「あ」エンジン overlay。顔が届かず方式Aへ退避。現行の正は FREEZE_g1v4.json。",
+  "params": "product_r1",
+  "otf_sha256": "7f1981a23ceabc89f250a9262cc2919d059b830c35834f664402a5fdb79a4b04",
+  "skeleton_yaml_sha256": "b3e3085d945e1bd00ec6a5e826a13c49b8001472e0daa54aad8bf958b37cd98d",
+  "band": {
+    "note": "g1v3 時点の帯。いまの single/walk.png とは一致しない。"
+  },
+  "historical_files": {
+    "proofs/golden/kana_a/single.png": {
+      "sha256": "9548d35cf19601f6acea360f1ce27fb0a455d2e7efe820562d4e29f37d1033c4",
+      "text": "あ",
+      "tag": "single",
+      "at": "g1v3"
+    },
+    "proofs/golden/kana_a/walk.png": {
+      "sha256": "1b16b500c1168004b2e83c3d1881e3b2b15c8c3b85f0b2737cccf352a4f2a7ae",
+      "text": "あああ",
+      "tag": "walk",
+      "at": "g1v3"
+    }
+  }
+}

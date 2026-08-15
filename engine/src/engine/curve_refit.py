@@ -36,6 +36,8 @@ class RefitConfig:
     cubic_loop_max_error_upm: float = 0.75
     cubic_corner_deg: float = 30.0
     cubic_max_anchors: int = 48
+    # overlay 重ね塗りは combined simplify が輪郭数を変えるので見ない
+    skip_combined_self_intersect: bool = False
 
 
 @dataclass
@@ -303,7 +305,11 @@ def refit_contours(
     if len(out) != len(contours):
         raise ValueError("curve_refit changed contour count (internal bug)")
 
-    if paths and _paths_self_intersect(paths):
+    if (
+        paths
+        and not cfg.skip_combined_self_intersect
+        and _paths_self_intersect(paths)
+    ):
         raise ValueError("curve_refit cubic_fit gate failed: self-intersect after fit")
 
     # 穴構造（面積符号）不変: オンカーブ shoelace 符号列

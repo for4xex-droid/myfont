@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from engine.bridge import solve_to_font_contours
@@ -47,16 +49,38 @@ def test_kana_simple_cubic_fit_dod(gid: str):
     assert gr.refit.get("self_intersect") is False
 
 
-def test_a_loop_has_hole_and_cubic_fit():
-    """8d「あ」: 接合後穴1＋微小島なし＋cubic_fit 通過。"""
+def test_a_overlay_three_fills_and_cubic_fit():
+    """8d「あ」: overlay 3塗り・穴0＋cubic_fit 通過。"""
     cfg = load_refit_config()
     gr = solve_to_font_contours("a", PRODUCT_R1)
-    assert gr.winding.get("n_holes") == 1
-    assert len(gr.font_contours) == 2
+    assert gr.winding.get("n_holes") == 0
+    assert gr.winding.get("strategy", "").startswith("overlay")
+    assert len(gr.font_contours) == 3
     assert gr.refit.get("mode") == "cubic_fit"
     assert gr.refit["max_error"] <= cfg.cubic_loop_max_error_upm + 1e-6
     for pc in gr.refit["per_contour"]:
-        assert pc["anchor_count"] <= cfg.cubic_max_anchors
+        assert pc["anchor_count"] <= 64
+
+
+def test_a_otf_keeps_three_overlay_contours(tmp_path: Path):
+    """fontmake が overlay の3塗りを union しない。"""
+    from fontTools.pens.recordingPen import RecordingPen
+    from fontTools.ttLib import TTFont
+
+    from engine.bridge import build_temp_font
+
+    result = build_temp_font(
+        "product_r1",
+        glyph_ids=["a"],
+        out_root=tmp_path,
+        keep_ufo=False,
+    )
+    tt = TTFont(str(result.otf_path))
+    name = tt.getBestCmap()[ord("あ")]
+    rec = RecordingPen()
+    tt.getGlyphSet()[name].draw(rec)
+    n_move = sum(1 for op, _ in rec.value if op == "moveTo")
+    assert n_move == 3
 
 
 def test_no_loop_has_hole_and_cubic_fit():

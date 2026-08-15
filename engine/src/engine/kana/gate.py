@@ -319,9 +319,14 @@ def run_gate_on(
     report.checks.append(CheckResult("curvature_or_build", True, "ok"))
 
     # --- solve ---
+    compose = str(meta.get("compose") or "union")
     try:
-        r1 = solve_glyph(strokes, params, apply_stage_a=False)
-        r2 = solve_glyph(list(strokes), params, apply_stage_a=False)
+        r1 = solve_glyph(
+            strokes, params, apply_stage_a=False, compose=compose
+        )
+        r2 = solve_glyph(
+            list(strokes), params, apply_stage_a=False, compose=compose
+        )
     except ValueError as e:
         report.ok = False
         report.checks.append(CheckResult("solve", False, str(e)))
@@ -406,6 +411,11 @@ def run_gate_on(
         if j.mode == "abut":
             ok_j = abut_ok
             msg = detail
+        elif j.mode in ("cross", "overlap"):
+            # 跡み越え / 重ね。出力は compose:overlay のとき union しない。
+            # overshoot / counter_pierce は見ない。
+            ok_j = abut_ok
+            msg = f"expected {j.mode}; {detail}"
         else:  # separate
             ok_j = not abut_ok
             msg = f"expected separate; {detail}"

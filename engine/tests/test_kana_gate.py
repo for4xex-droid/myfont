@@ -14,7 +14,13 @@ from engine.kana import (
     run_gate_path,
     skeletons_dir,
 )
-from engine.kana.schema import parse_gate, parse_joins, parse_loop_closure
+from engine.kana.schema import (
+    parse_compose,
+    parse_em_fit,
+    parse_gate,
+    parse_joins,
+    parse_loop_closure,
+)
 from engine.params import PARAM_SETS
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "kana_fail"
@@ -77,6 +83,17 @@ def test_schema_rejects_unknown_loop_key():
         parse_loop_closure("x", {"overlap_upm": 2, "nope": 1})
 
 
+def test_schema_rejects_bad_em_fit():
+    with pytest.raises(ValueError, match="unknown keys"):
+        parse_em_fit("x", {"scale": 1.2, "target_lsb": 100, "nope": 1})
+    with pytest.raises(ValueError, match="scale"):
+        parse_em_fit("x", {"scale": 0, "target_lsb": 100})
+    with pytest.raises(ValueError, match="target_lsb"):
+        parse_em_fit("x", {"scale": 1.2, "target_lsb": 500})
+    with pytest.raises(ValueError, match="requires"):
+        parse_em_fit("x", {"scale": 1.2})
+
+
 def test_schema_requires_expect_contours():
     with pytest.raises(ValueError, match="expect_contours"):
         parse_gate("x", {"bbox": {"width": [1, 2], "height": [1, 2]}})
@@ -85,6 +102,14 @@ def test_schema_requires_expect_contours():
 def test_schema_join_requires_mode():
     with pytest.raises(ValueError, match="mode"):
         parse_joins("x", [{"from": "a", "to": "b"}])
+
+
+def test_a_em_fit_is_loaded():
+    _, _, meta = load_kana_skeleton(skeletons_dir() / "a.yaml")
+    fit = meta["em_fit"]
+    assert fit is not None
+    assert fit.scale == 1.26
+    assert fit.target_lsb == 126
 
 
 def test_loader_keeps_element_id_and_gate():
@@ -147,50 +172,55 @@ def test_fail_pierce(pathops):
 
 
 def test_a_no_positive_micro_islands(pathops):
-    """8d G1: 正面積の浮遊島は禁止。負スリットはリング abut の既知形（の と同型）。"""
+    """overlay のあ: 正面積の塗り3つ。微小島なし。"""
     from engine.join_solver import solve_glyph
     from engine.kana import kana_characters
     from engine.params import PARAM_SETS
 
-    r = solve_glyph(kana_characters()["a"], PARAM_SETS["product_r1"], apply_stage_a=False)
-    assert r.after_cleanup == 2
+    r = solve_glyph(
+        kana_characters()["a"],
+        PARAM_SETS["product_r1"],
+        apply_stage_a=False,
+        compose="overlay",
+    )
+    assert r.after_cleanup == 3
     kept_pos = [
         i for i in r.contour_infos if (not i.removed) and i.signed_area > 0
     ]
-    assert len(kept_pos) == 1
+    assert len(kept_pos) == 3
     for i in r.contour_infos:
         if i.removed:
-            assert i.signed_area < 0, i
             assert "micro" in i.reason
 
 
+def test_a_overlay_three_fills_not_unioned():
+    """あは union しない。横・縦・回りの3塗り。"""
+    gid, strokes, meta = load_kana_skeleton(skeletons_dir() / "a.yaml")
+    assert gid == "a"
+    assert meta["compose"] == "overlay"
+    assert [s.element_id for s in strokes] == ["yoko", "tate", "mawari"]
+    assert not any(s.loop_closed for s in strokes)
+    modes = {(j.from_id, j.to_id): j.mode for j in meta["joins"]}
+    assert modes[("tate", "mawari")] == "overlap"
+    assert modes[("yoko", "tate")] == "abut"
+
+
+def test_schema_accepts_overlay_compose_and_join():
+    assert parse_compose("x", "overlay") == "overlay"
+    joins = parse_joins("x", [{"from": "tate", "to": "mawari", "mode": "overlap"}])
+    assert joins[0].mode == "overlap"
+
+
 def test_a_counter_pierce_clean(pathops):
-    """現行「あ」の横・右払いはリング本体上。穴内にいない。"""
+    """abut だけ pierce を見る。縦→回りは overlap。"""
     report = run_gate("a", params="product_r1")
     assert report.ok, report.to_dict()
     pierces = [c for c in report.checks if c.name.startswith("counter_pierce:")]
-    assert len(pierces) == 2
+    names = {c.name for c in pierces}
+    assert names == {"counter_pierce:yoko->tate"}
     assert all(c.ok and c.data.get("depth_upm") is None for c in pierces)
-
-
-@pytest.mark.parametrize(
-    "element_id,pierce,overshoot",
-    [
-        ("yoko", "counter_pierce:yoko->loop", "overshoot:yoko->loop"),
-        ("right", "counter_pierce:right->loop", "overshoot:right->loop"),
-    ],
-)
-def test_a_stroke_into_hole_fails_counter_pierce(
-    pathops, element_id, pierce, overshoot
-):
-    """着地をカウンターへ入れたら overshoot=0 でも counter_pierce が赤。"""
-    from engine.kana.gate import run_gate_on
-
-    gid, moved, meta = _with_element_end("a.yaml", element_id, (460.0, 580.0))
-    report = run_gate_on(
-        gid, moved, meta, PARAM_SETS["product_r1"], params_name="product_r1"
-    )
-    _assert_pierce_red_overshoot_green(report, pierce, overshoot)
+    ov = [c for c in report.checks if c.name == "join:tate->mawari:overlap"]
+    assert ov and ov[0].ok
 
 
 def test_no_counter_pierce_clean(pathops):

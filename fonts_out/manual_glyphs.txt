@@ -1,27 +1,27 @@
 # 手設計グリフ保護リスト（掟13）
-# エンジン／バッチ生成がこれらのグリフ名を上書きしてはならない。
-# 形式: 1行1グリフ名（uniXXXX または .notdef 等）。# はコメント。
-#
-# P1 着手時: Glyphs → UFO エクスポート後、ここに追加する。
-# ひらがな核心20字（data/glyphset_p1_kana_core20.txt）の uni 名:
+# コメントなしの行 = 出荷で手描き済み。エンジンは上書き禁止。
+# コメント行の uni 名 = 予約（P1-B エンジン正本。手描きしたらコメントを外す）。
+# ひらがな核心20字（data/glyphset_p1_kana_core20.txt）
 
+# 方式A 着手: 「あ」のみ
 uni3042
-uni3044
-uni3046
-uni3048
-uni304A
-uni304B
-uni304D
-uni304F
-uni3051
-uni3053
-uni3055
-uni3057
-uni3059
-uni305B
-uni305D
-uni305F
-uni3061
-uni3064
-uni3066
-uni3068
+
+# uni3044
+# uni3046
+# uni3048
+# uni304A
+# uni304B
+# uni304D
+# uni304F
+# uni3051
+# uni3053
+# uni3055
+# uni3057
+# uni3059
+# uni305B
+# uni305D
+# uni305F
+# uni3061
+# uni3064
+# uni3066
+# uni3068
