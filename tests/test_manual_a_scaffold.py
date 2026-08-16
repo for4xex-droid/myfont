@@ -243,8 +243,9 @@ def test_engine_workflow_regens_then_merges():
     assert "--glyphs juu ei" in text
     assert "tests/test_join_regression.py" not in text
     assert "engine/tests/test_regression_join.py" in text
-    assert "merge_manual_kana.py" in text
-    assert "set_manual_sidebearings.py" in text
+    assert "receive_manual.py" in text
+    assert "merge_manual_kana" in text
+    assert "set_manual_sidebearings" in text
 
 
 def test_compile_manual_otf_keeps_overlaps(tmp_path: Path, monkeypatch):

@@ -18,8 +18,9 @@
 5. 重ね塗りを残して OTF 化（素の fontmake は交差が溶ける）:
 
 ```bash
-engine/.venv/bin/python scripts/set_manual_sidebearings.py --out-of-band
-engine/.venv/bin/python scripts/compile_manual_otf.py
+engine/.venv/bin/python scripts/receive_manual.py せ
+# 字間だけ直すとき: scripts/set_manual_sidebearings.py --out-of-band
+# OTF だけ: scripts/compile_manual_otf.py
 ```
 6. `python scripts/make_proofs.py --font fonts_out/build/….otf` で UI/HUD 組見本
 7. `docs/blind_test.md` の盲検へ

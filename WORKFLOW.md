@@ -108,15 +108,14 @@ engine/.venv/bin/python scripts/check_manual_overwrite.py --ufo fonts_out/MyMinc
 
 **手順**
 ```bash
-# 1. ラフ（紙/iPad）→ Glyphs で清書
-# 2. 作業 UFO を正本へ（描済み dest は消さない）
-engine/.venv/bin/python scripts/merge_manual_kana.py う
-# 3. グリフ名を fonts_out/manual_glyphs.txt に追加（掟13）
-# 3b. 字間帯（輪郭は動かさず平行移動＋幅）
-engine/.venv/bin/python scripts/set_manual_sidebearings.py --out-of-band
+# 1. ラフ（紙/iPad）→ Glyphs で清書（作業 UFO のみ。正本は開かない）
+# 2. 受け入れ1コマンド（他字復元・ゴミ除去・字間・保護リスト・OTF・組見本）
+engine/.venv/bin/python scripts/receive_manual.py う
+#    dest に描済みなら作業 UFO は上書きしない。取り込むときだけ --force
+#    中で set_manual_sidebearings / compile_manual_otf を呼ぶ
+#    作業 UFO の単体コピーは merge_manual_kana.py（描済み dest は消さない）
 
-# 4. ビルド＋組見本（組見本の本体は uharfbuzz / hb-view を流用。自作は薄いラッパのみ）
-engine/.venv/bin/python scripts/compile_manual_otf.py
+# 3. 組見本の本体は uharfbuzz / hb-view。自作は薄いラッパのみ
 engine/.venv/bin/python scripts/make_proofs.py --font fonts_out/build/MyMincho.otf --out proofs/out
 #    仮名だけの G3 は proofs/golden/g3_kana/（あい／あと／核心20）
 #    P1 盲検パック（A/B・書体名なし）

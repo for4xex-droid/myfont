@@ -59,10 +59,10 @@
 
 終わったらパスは **2つ**。両方黒（Fill）。輪の中だけ白い。輪の中まで黒ならドーナツ塗りになっている。
 
+正本 `MyMincho.ufo` は開かない。描くのは作業 UFO だけ。受け入れは `scripts/receive_manual.py`。
+
 ## 描いたあと（こちらでやる）
 
 ```bash
-engine/.venv/bin/python scripts/merge_manual_kana.py う
-# manual_glyphs.txt の該当 uni のコメントを外す
-engine/.venv/bin/python scripts/compile_manual_otf.py
+engine/.venv/bin/python scripts/receive_manual.py う
 ```

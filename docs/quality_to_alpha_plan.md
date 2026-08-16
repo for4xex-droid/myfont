@@ -53,6 +53,7 @@ Grok 4.6 監査（リポジトリ実測＋既存計画との突合）を反映�
   6. UI サイズ（18–24px、hint off）で IPAex と横並び
 - **資産**: `kana_ref_compare.py`、`fontdb/src/fontdb/metrics/ink.py`、`probes/juu_contrast.py`、`scripts/make_proofs.py`
 - **DoD**: 37字×指標の表が1枚。「帯外」「節点過多」「小サイズで目立つ」の3群。`kana_targets.yaml` 未凍結のまま合否に使わない（掟8）
+- **実装**: `scripts/diagnose_manual_kana.py`（表は `proofs/q0_diagnosis.md`。合否ゲートではない）
 - **工数**: 6–10h
 - **依存**: なし
 
@@ -113,6 +114,7 @@ Grok 4.6 監査（リポジトリ実測＋既存計画との突合）を反映�
 - **作業**: 指定字以外の dirty glif / fontinfo / lib を HEAD から復元。微小輪郭除去（負面積の穴は残す）。`set_manual_sidebearings` → `manual_glyphs.txt` → compile → 組見本。レポートに輪郭数・点数・LSB/RSB・除去ゴミ
 - **資産**: `merge_manual_kana.py`、`set_manual_sidebearings.py`、`compile_manual_otf.py`、`check_manual_overwrite.py`
 - **DoD**: `receive_manual.py せ` 一発で他字 diff がゼロ、OTF と組見本が更新される
+- **実装**: `scripts/receive_manual.py`（dest 描済みなら作業 UFO はスキップ。取り込むとき `--force`。他字は HEAD 復元）
 - **工数**: 8–12h
 - **依存**: なし。Q0 と並走
 
