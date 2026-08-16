@@ -5,8 +5,8 @@
   "source": "shipping_ufo",
   "ufo": "fonts_out/MyMincho.ufo",
   "params": "product_r1",
-  "note": "共有UFOの OTF SHA は字追加で変わるため載せない。正本は PNG SHA。",
-  "files": {
+  "note": "現行の正は kana_g3_d1。",
+  "historical_files": {
     "proofs/golden/g3_kana/ai.png": {
       "sha256": "e34248bf142be60f33ff2b379fc9e9caad87ac45c510a97cb1c22111739f535d",
       "text": "あい",
@@ -27,5 +27,6 @@
       "text": "の",
       "tag": "no"
     }
-  }
+  },
+  "superseded_by": "kana_g3_d1"
 }

@@ -1,0 +1,38 @@
+{
+  "version": "kana_n_d1",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "P-D1 DNA A。IPAex骨格から離脱。つ系は幅維持×2。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni3093",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni3093.glif",
+  "params": "product_r1",
+  "glif_sha256": "ec21081e71cd4a039b0fbc22cdcc880d2177a4ad4ec152bdeec751505b93dd12",
+  "sidebearings_em1000": {
+    "lsb": 126.0,
+    "rsb": 118.3,
+    "ink": 804.7,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
+    "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_n/g3_single.png": {
+      "sha256": "98fbae16b61b9c3f5bc3290d219f236f9fc642e04e6cc6adc93ebc9d9e8fa4ce",
+      "text": "ん",
+      "tag": "single"
+    },
+    "proofs/golden/kana_n/g3_walk.png": {
+      "sha256": "874722a9b00ec8eb46d2e73d9d09486fe0a387a653f938286840f9756071d519",
+      "text": "んんん",
+      "tag": "walk"
+    }
+  }
+}

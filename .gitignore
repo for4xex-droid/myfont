@@ -48,6 +48,10 @@ fonts_out/build/
 engine/output/
 **/MyMinchoSpike*
 
+# DNA ワープ試作（本体へ入れない）
+_scratch_warp/
+proofs/dna/_tmp/
+
 # Proof renders (texts + golden stay tracked)
 proofs/out/
 proofs/review/

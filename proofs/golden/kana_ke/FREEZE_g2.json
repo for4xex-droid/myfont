@@ -23,7 +23,7 @@
     "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
     "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
   },
-  "files": {
+  "historical_files": {
     "proofs/golden/kana_ke/single.png": {
       "sha256": "c1edca6d8638e371ee8f3cfb63341a1ac288156c9d713d1850b809bf1a7b839f",
       "text": "け",
@@ -34,5 +34,7 @@
       "text": "けけけ",
       "tag": "walk"
     }
-  }
+  },
+  "superseded_by": "kana_ke_d1",
+  "note": "現行の正は kana_ke_d1。"
 }

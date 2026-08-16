@@ -5,8 +5,8 @@
   "source": "shipping_ufo",
   "ufo": "fonts_out/MyMincho.ufo",
   "params": "product_r1",
-  "note": "α 本盲検の ui.txt/hud.txt は漢字を含む。この文面は仮名縮小のまま。",
-  "files": {
+  "note": "現行の正は kana_g3_blind_d1。",
+  "historical_files": {
     "proofs/golden/g3_blind/ui_kana.png": {
       "sha256": "f34fec6c20ba6bc3ad1b2896e3fa86464a370dae006db404b747ffc7729e0928",
       "text_file": "proofs/texts/ui_kana.txt",
@@ -22,5 +22,6 @@
       "text_file": "proofs/texts/walk_kana.txt",
       "tag": "walk_kana"
     }
-  }
+  },
+  "superseded_by": "kana_g3_blind_d1"
 }

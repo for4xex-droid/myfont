@@ -6,5 +6,5 @@
 
 済（正本へマージ済み）: 核心20字＋の。
 済（追加）: は・ひ・ほ・ま・め・や・る・り・を・ん・っ・が・じ・づ・ぞ・ぼ。
-次（P-E1）: `data/glyphset_e1_hiragana.txt`。手順は `fonts_out/DRAW_E1.md`。
+済（P-D1）: DNA A。黄金 `kana_g3_blind_d1`。次は P-E1（`DRAW_E1.md`）。描いた字は `diverge_dna.py --apply` してから receive。
 デスクトップの画像は `~/Desktop/MyMincho手書き/`。

@@ -1,0 +1,31 @@
+{
+  "version": "kana_g3_d1",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "P-D1 DNA A。IPAex骨格から離脱。つ系は幅維持×2。",
+  "source": "shipping_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "params": "product_r1",
+  "note": "共有UFOの OTF SHA は字追加で変わるため載せない。正本は PNG SHA。",
+  "files": {
+    "proofs/golden/g3_kana/ai.png": {
+      "sha256": "c0685349cf59da2fb9d63f5ab28df7730e38e834c6c771843d318cc6142af1cc",
+      "text": "あい",
+      "tag": "ai"
+    },
+    "proofs/golden/g3_kana/ato.png": {
+      "sha256": "340710e9926e917440bee1e320d9c0611b6ae6fb292a0fed511d43a230dda713",
+      "text": "あと",
+      "tag": "ato"
+    },
+    "proofs/golden/g3_kana/core20.png": {
+      "sha256": "0ac4fab6a63b0f61dd2a68ce400db1deae7d13468efe50a291efa7aba6969fba",
+      "text": "あいうえおかきくけこさしすせそたちつてと",
+      "tag": "core20"
+    },
+    "proofs/golden/g3_kana/no.png": {
+      "sha256": "a2843a2e9b1eb59d782af9d7bc6e62eeca981c2e2cc22407110d87789cdb462e",
+      "text": "の",
+      "tag": "no"
+    }
+  }
+}

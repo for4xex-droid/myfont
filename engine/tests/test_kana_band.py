@@ -171,7 +171,7 @@ def test_current_kana_freeze_png_hashes():
     from engine.kana import load_kana_skeleton, skeletons_dir
 
     repo = Path(__file__).resolve().parents[2]
-    freezes = sorted((repo / "proofs" / "golden").glob("kana_*/FREEZE_g*.json"))
+    freezes = sorted((repo / "proofs" / "golden").glob("kana_*/FREEZE_*.json"))
     assert freezes, "expected kana freeze manifests"
     checked = 0
     for path in freezes:
@@ -238,7 +238,7 @@ def test_current_kana_live_render_matches_golden(tmp_path: Path):
     spec.loader.exec_module(render_mod)
     render_text_png = render_mod.render_text_png
 
-    freezes = sorted((repo / "proofs" / "golden").glob("kana_*/FREEZE_g*.json"))
+    freezes = sorted((repo / "proofs" / "golden").glob("kana_*/FREEZE_*.json"))
     saw = 0
     compiled_manual: dict[str, Path] = {}
     for path in freezes:

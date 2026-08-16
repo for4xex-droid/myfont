@@ -23,7 +23,7 @@
     "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
     "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
   },
-  "files": {
+  "historical_files": {
     "proofs/golden/kana_to/g3_single.png": {
       "sha256": "bfdf0012e362a6706a51d173cd2d820ef2c396f5d383631c514c98ff66fb29dc",
       "text": "と",
@@ -34,5 +34,7 @@
       "text": "ととと",
       "tag": "walk"
     }
-  }
+  },
+  "superseded_by": "kana_to_d1",
+  "note": "現行の正は kana_to_d1。"
 }

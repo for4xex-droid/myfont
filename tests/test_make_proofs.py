@@ -186,10 +186,11 @@ def test_g3_kana_freeze_png_hashes():
     import hashlib
     import json
 
-    path = ROOT / "proofs" / "golden" / "g3_kana" / "FREEZE_g3.json"
+    path = _g3_kana_current_freeze()
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["source"] == "shipping_ufo"
     assert "otf_sha256" not in data
+    assert not data.get("superseded_by")
     for rel, meta in data["files"].items():
         fp = ROOT / rel
         assert fp.is_file(), rel
@@ -203,7 +204,7 @@ def test_g3_kana_live_render_matches_golden(tmp_path: Path):
     pytest.importorskip("freetype")
     from engine.bridge import compile_otf
 
-    path = ROOT / "proofs" / "golden" / "g3_kana" / "FREEZE_g3.json"
+    path = _g3_kana_current_freeze()
     data = json.loads(path.read_text(encoding="utf-8"))
     otf = tmp_path / "g3.otf"
     compile_otf(ROOT / data["ufo"], otf, remove_overlaps=False)
@@ -223,7 +224,7 @@ def test_manual_a_glif_unchanged_after_engine_merge():
     import json
 
     freeze = json.loads(
-        (ROOT / "proofs" / "golden" / "kana_a" / "FREEZE_g1v4.json").read_text(
+        (ROOT / "proofs" / "golden" / "kana_a" / "FREEZE_d1.json").read_text(
             encoding="utf-8"
         )
     )
@@ -268,7 +269,17 @@ def test_blind_packet_writes_ab_without_font_names(tmp_path: Path):
     assert "MyMincho" not in (out / "ui_kana" / "A.png").name
 
 
+def _g3_kana_current_freeze() -> Path:
+    d1 = ROOT / "proofs" / "golden" / "g3_kana" / "FREEZE_d1.json"
+    if d1.is_file():
+        return d1
+    return ROOT / "proofs" / "golden" / "g3_kana" / "FREEZE_g3.json"
+
+
 def _g3_blind_current_freeze() -> Path:
+    d1 = ROOT / "proofs" / "golden" / "g3_blind" / "FREEZE_d1.json"
+    if d1.is_file():
+        return d1
     q5 = ROOT / "proofs" / "golden" / "g3_blind" / "FREEZE_q5.json"
     if q5.is_file():
         return q5

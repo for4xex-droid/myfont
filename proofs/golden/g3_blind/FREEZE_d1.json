@@ -1,0 +1,26 @@
+{
+  "version": "kana_g3_blind_d1",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "P-D1 DNA A。IPAex骨格から離脱。つ系は幅維持×2。 beforeは kana_g3_blind_q5。",
+  "source": "shipping_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "params": "product_r1",
+  "note": "α 本盲検の ui.txt/hud.txt は漢字を含む。この文面は仮名縮小のまま。",
+  "files": {
+    "proofs/golden/g3_blind/ui_kana.png": {
+      "sha256": "7054ea9f6982a56440112e15d985df70079764af9467a9af88e5a69f72c857a1",
+      "text_file": "proofs/texts/ui_kana.txt",
+      "tag": "ui_kana"
+    },
+    "proofs/golden/g3_blind/hud_kana.png": {
+      "sha256": "df18454f64bdd244966de2d1adaac27a854e1c37213cf552f62c81997069a129",
+      "text_file": "proofs/texts/hud_kana.txt",
+      "tag": "hud_kana"
+    },
+    "proofs/golden/g3_blind/walk_kana.png": {
+      "sha256": "a0b98116ab23bc53edf73b37b4c6c69a91b94d27f07fb69e0215577a02ff626c",
+      "text_file": "proofs/texts/walk_kana.txt",
+      "tag": "walk_kana"
+    }
+  }
+}

@@ -22,7 +22,7 @@
     ],
     "note": "G1は字形凍結のみ。字間帯は観測で CI 非拘束。kana_gate には載せない（掟8）。"
   },
-  "files": {
+  "historical_files": {
     "proofs/golden/kana_o/single.png": {
       "sha256": "5476cfa15f227138b46467dc682f2360ff0ba06cc606af1b4348632ccbd65eba",
       "text": "お",
@@ -33,5 +33,7 @@
       "text": "おおお",
       "tag": "walk"
     }
-  }
+  },
+  "superseded_by": "kana_o_d1",
+  "note": "現行の正は kana_o_d1。"
 }
