@@ -12,6 +12,8 @@
 
 **α Go = UI≥2/3 かつ HUD≥2/3。**
 
+P1（仮名縮小文面）実施: 2026-08-17。MyMincho は UI 3/3・HUD 3/3 で **α Go**。開封記録は `proofs/blind/RESULT_p1.txt`。評価者3名とも属性=ゲーム。コメントは「B（自作）が若干荒い」。
+
 ## 評価者
 
 - 人数: **3 名**
@@ -71,7 +73,7 @@ python scripts/make_proofs.py --font path/to/MyMincho-Regular.otf --compare-gold
 
 `proofs/texts/{ui,hud,literary}.txt` は α 本盲検の代表文。漢字・カタカナ・英数を含む。
 
-P1 核心20字＋の だけの今は、豆腐で落とさないために **仮名縮小文面** を使う。
+P1 は豆腐で落とさないため **仮名縮小文面** を使う（核心20字＋の＋UI16字）。
 
 | 面 | 文面 | 役割 |
 |---|---|---|
@@ -79,7 +81,8 @@ P1 核心20字＋の だけの今は、豆腐で落とさないために **仮�
 | HUD | `proofs/texts/hud_kana.txt` | P1 主 |
 | 歩行 | `proofs/texts/walk_kana.txt` | 内部目視。合否に使わない |
 
-収録字以外（ん・は・濁点・小書きつ など）は使っていない。α 本盲検に戻すときは `ui.txt` / `hud.txt` に戻す。
+評価者向け文面と記録用紙: `proofs/blind/EVALUATOR.txt` / `SHEET.txt`。
+対応表 `SEALED_order.json` は評価者に渡さない。α 本盲検に戻すときは `ui.txt` / `hud.txt` に戻す。欠字が埋まるまで本盲検は禁止。荒いクローズ後の内部再確認は外部3名の再実施をしない（`docs/quality_to_alpha_plan.md` P-Q5）。
 
 ```bash
 engine/.venv/bin/python scripts/compile_manual_otf.py

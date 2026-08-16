@@ -6,6 +6,7 @@
 関連文書:
 - `GOLDENRULES.md` — 実装の鉄の掟（全作業で遵守）
 - `docs/strategy.md` — 事業戦略の正本（ポジショニング・リリースフェーズ・マネタイズ階層・KPI）
+- `docs/quality_to_alpha_plan.md` — P1 盲検後の品位→α 正本（荒いクローズ → 字数 → 本盲検）
 - `WORKFLOW.md` — 日常の作業ループ3種の定義
 - `prototype/REPORT.md` — ストローク合成プロトタイプの検証結果
 - `spike/SPIKE_REPORT.md` — pathops union・freetype計測・ビルドチェーンの検証
@@ -290,11 +291,11 @@ spike7 の結合検証で判明した実態:
 8. **T7+: face 登録**: — **完了（2026-08-09）**。`fontdb.ingest.synthetic`＋`config/synthetic_faces.yaml`。classic/product_r1 を `face_kind=synthetic` で SQLite 登録（juu≈2.22/2.43、san_uroko ok）
 9. **P0完成**: — **完了（2026-08-09）**。`product_r1` を `status=frozen` で正式固定。`design_param_snapshot`＋`face_param_link`、字面規則 `docs/design_rules.md`、`engine/scripts/regen.py --params`
 10. 以下を実行（次フェーズ。優先順は §7.4 に従う）:
-   - **P1着手（最優先・唯一の Go/No-Go ゲート）**: ひらがな核心20字＋の＋UI16字 — **方式A 手描き済**。次は外部盲検
+   - **P1着手（最優先・唯一の Go/No-Go ゲート）**: ひらがな核心20字＋の＋UI16字 — **方式A 手描き済。P1 縮小盲検 α Go（2026-08-17）**。次は `docs/quality_to_alpha_plan.md`
    - **S4 組見本ラッパ＋盲検プロトコル**: — **骨組み完了（2026-08-10）**。`scripts/make_proofs.py`＋`proofs/texts/{ui,hud,literary}.txt`＋`docs/blind_test.md`（主＝UI/HUD）
    - **S1 出荷ゲートCLI の骨組み**: — **骨組み完了（2026-08-10）**。`data/glyphset_*.txt` 凍結済、`engine/scripts/ship_gate.py`＋`docs/ship_gate_rules.md`
    - **S2a ブランド前提確認**: — **雛形作成（2026-08-10）**。`docs/licenses/precheck.md`（商標調査・GlyphWiki再確認は未実施チェックリスト）
-   - **P4a本番は α Go 後**（§7.3。P1 物理待ちのみ例外）。cubic 再適合 opt-in は問題が出てから
+   - **P4a本番は P-Q5（荒いクローズ）後**（§7.3）。cubic 再適合 opt-in は問題が出てから
 11. 隔週レビュー（docs/weekly.md、3行のみ）
 
 ---
@@ -367,7 +368,7 @@ spike7 の結合検証で判明した実態:
 ### 7.3 既存計画への影響（差分のみ）
 
 - **P1 の位置づけを格上げ**: 「仮名完成＝事業の唯一の Go/No-Go ゲート」（`docs/strategy.md` 失敗シナリオ1）
-- **P4a は α Go 後に着手**: α は Glyphs 直出しで足り P4a（40〜80h）は β 前提。仮名不合格時に最大のサンクコストになるため、P1 と原則並走しない。例外は「P1 が物理待ち（乾燥・外部依頼待ち等）で完全に手が空くとき」のみ
+- **P4a は荒いクローズ後に着手**: P1 仮名縮小盲検は済（2026-08-17 α Go）。P4a（40〜80h）は漢字交じり本盲検の合格を待たず、`docs/quality_to_alpha_plan.md` の P-Q5 後に着手可。仮名の顔が弱い間の本格量産はしない
 - **P6 に S5/S2b を接続**: 出荷は「組見本サイクル＋メタデータ」に加えて「パッケージング＋ライセンス同梱」まで
 - **M5（β〜公開候補）の成功定義に追記**: 従来の品質定義に加え「S0〜S5 が揃い BOOTH で販売可能な状態」
 - **fsType（P6/S1⑦）**: 組込許可のビット設計はライセンス層（L1/L2）と矛盾しないよう S2b 確定後に最終化（αは Embeddable 方針を文書固定）
@@ -375,9 +376,12 @@ spike7 の結合検証で判明した実態:
 
 ### 7.4 直近の優先順（次の一手）
 
-1. **P1: 核心20字＋の＋UI16字** — 方式A 手描き済。G3 組見本・盲検パック済。**次は外部3名の盲検**（作者は評価者に入らない）
-2. ~~S4: 組見本ラッパ＋盲検手順書~~ — **骨組み完了**（盲検の実地実施は P1 字形後）
-3. ~~S1: 出荷ゲート骨組み~~ — **骨組み完了**（α OTF ができたら本適用）
-4. **S2a: 商標ざっくり調査＋GlyphWiki 販売時再確認** — 雛形あり。**調査実施が残作業**
+正本: `docs/quality_to_alpha_plan.md`。
 
-P4a は **α Go 後**。S0/S2b/S3/S5 は α 盲検合格後に着手（合格前に販売準備をしない＝失敗シナリオ2の回避）。
+1. **P-Q0＋P-R1**: 37字の「荒い」診断と `receive_manual.py`。字数拡張より先
+2. **P-Q1 / P-Q3**（必要なら点数上位だけ P-Q2）→ **P-Q5** 内部再確認
+3. ~~S4: 組見本ラッパ＋盲検手順書~~ — **骨組み完了**。P1 縮小盲検済（`proofs/blind/RESULT_p1.txt`）
+4. ~~S1: 出荷ゲート骨組み~~ — **骨組み完了**。P-G1 で P1 37字セットに本適用
+5. **S2a: 商標ざっくり調査＋GlyphWiki 販売時再確認** — 雛形あり。**調査実施が残作業**（並走）
+
+P4a は **P-Q5 後**。α 本盲検（`ui.txt` / `hud.txt`）は欠字埋め後。S0/S2b/S3/S5 は本盲検合格後（合格前に販売準備をしない＝失敗シナリオ2の回避）。
