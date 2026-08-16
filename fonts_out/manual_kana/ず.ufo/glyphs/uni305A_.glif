@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="uni305A" format="2">
+  <advance width="1000"/>
+  <unicode hex="305A"/>
+  <image fileName="ず_guide_ipaex.png" yOffset="-120"/>
+  <guideline x="126" y="0" angle="90" name="lsb"/>
+  <guideline x="874" y="0" angle="90" name="rsb_if_126"/>
+  <guideline x="0" y="0" angle="0" name="baseline"/>
+  <guideline x="0" y="880" angle="0" name="ascender"/>
+  <guideline x="0" y="-120" angle="0" name="descender"/>
+  <outline>
+  </outline>
+  <lib>
+    <dict>
+      <key>com.mymincho.manual</key>
+      <true/>
+    </dict>
+  </lib>
+</glyph>

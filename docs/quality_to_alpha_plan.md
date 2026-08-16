@@ -178,6 +178,8 @@ PLAN §3.5 の順（ひらがな残り → カタカナ → 約物 → 英数 �
 - **手描き / エンジン**: 手描き
 - **資産**: `prepare_manual_kana_batch.py`、`merge_manual_kana.py`、`receive_manual.py`（R1 後）
 - **DoD**: 現代ひらがなが OTF で組める。字間帯。保護リスト更新
+- **実装**: `scripts/prepare_e1_kana.py`（既存作業 UFO は消さない）。リスト `data/glyphset_e1_hiragana.txt`（44字。ゐゑゔ除外）
+- **下準備（2026-08-17）**: 作業 UFO と `DRAW_E1.md`。最初の波は だで に ゆ れ。濁点サイズは Q3
 - **工数**: 字あたり 0.5–2h × 約40字 ≒ 25–80h
 - **依存**: P-Q5
 

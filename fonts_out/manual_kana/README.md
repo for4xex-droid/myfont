@@ -6,4 +6,5 @@
 
 済（正本へマージ済み）: 核心20字＋の。
 済（追加）: は・ひ・ほ・ま・め・や・る・り・を・ん・っ・が・じ・づ・ぞ・ぼ。
+次（P-E1）: `data/glyphset_e1_hiragana.txt`。手順は `fonts_out/DRAW_E1.md`。
 デスクトップの画像は `~/Desktop/MyMincho手書き/`。

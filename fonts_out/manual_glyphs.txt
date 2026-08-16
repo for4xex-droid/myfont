@@ -2,6 +2,7 @@
 # コメントなしの行 = 出荷で手描き済み。エンジンは上書き禁止。
 # コメント行の uni 名 = 予約（P1-B エンジン正本。手描きしたらコメントを外す）。
 # ひらがな核心20字（data/glyphset_p1_kana_core20.txt）＋の＋UI追加16字
+# P-E1 予約（data/glyphset_e1_hiragana.txt）。描いたらコメントを外す。
 
 uni3042
 uni3044
@@ -40,3 +41,47 @@ uni308A
 uni308B
 uni3092
 uni3093
+# uni3041
+# uni3043
+# uni3045
+# uni3047
+# uni3049
+# uni304E
+# uni3050
+# uni3052
+# uni3054
+# uni3056
+# uni305A
+# uni305C
+# uni3060
+# uni3062
+# uni3067
+# uni3069
+# uni306A
+# uni306B
+# uni306C
+# uni306D
+# uni3070
+# uni3071
+# uni3073
+# uni3074
+# uni3075
+# uni3076
+# uni3077
+# uni3078
+# uni3079
+# uni307A
+# uni307D
+# uni307F
+# uni3080
+# uni3082
+# uni3083
+# uni3085
+# uni3086
+# uni3087
+# uni3088
+# uni3089
+# uni308C
+# uni308D
+# uni308E
+# uni308F
