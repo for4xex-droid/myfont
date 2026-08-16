@@ -1,11 +1,12 @@
 {
   "version": "kana_g3_blind_v2",
+  "superseded_by": "kana_g3_blind_q5",
   "frozen_at": "2026-08-16T00:00:00Z",
   "reason": "P1 UI/HUD/歩行。核心20字＋の＋追加16字を手描き。出荷 UFO を overlay コンパイル。",
   "source": "shipping_ufo",
   "ufo": "fonts_out/MyMincho.ufo",
   "params": "product_r1",
-  "note": "α 本盲検の ui.txt/hud.txt は漢字を含む。P1 ではこの文面を使う。",
+  "note": "P1 時点の SHA。現行 PNG の正は FREEZE_q5.json。",
   "files": {
     "proofs/golden/g3_blind/ui_kana.png": {
       "sha256": "32b96b4783b911b33bd324d482df324813204132720fb7558b4e841239c718cf",

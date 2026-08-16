@@ -51,6 +51,9 @@ engine/output/
 # Proof renders (texts + golden stay tracked)
 proofs/out/
 proofs/review/
+proofs/q5/SEALED_order.json
+proofs/q5/_after/
+proofs/q5/walk_after.png
 
 # CLI ゲート報告（cwd に出る。engine/.gitignore と同名）
 gate_report.json

@@ -1,0 +1,26 @@
+{
+  "version": "kana_g3_blind_q5",
+  "frozen_at": "2026-08-17T00:00:00Z",
+  "reason": "Q5内部再確認後。Q1–Q3の手直しを入れた出荷UFO。beforeは kana_g3_blind_v2。",
+  "source": "shipping_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "params": "product_r1",
+  "note": "α 本盲検の ui.txt/hud.txt は漢字を含む。この文面は仮名縮小のまま。",
+  "files": {
+    "proofs/golden/g3_blind/ui_kana.png": {
+      "sha256": "f34fec6c20ba6bc3ad1b2896e3fa86464a370dae006db404b747ffc7729e0928",
+      "text_file": "proofs/texts/ui_kana.txt",
+      "tag": "ui_kana"
+    },
+    "proofs/golden/g3_blind/hud_kana.png": {
+      "sha256": "d8cea208b29753dc2201349ba3f7db804dfebe8603e14d5ec97b4f5c0c2244f5",
+      "text_file": "proofs/texts/hud_kana.txt",
+      "tag": "hud_kana"
+    },
+    "proofs/golden/g3_blind/walk_kana.png": {
+      "sha256": "4860ca4901fc466cc532df71982a946ae40940da7c43d3e31f4738ca424ed099",
+      "text_file": "proofs/texts/walk_kana.txt",
+      "tag": "walk_kana"
+    }
+  }
+}

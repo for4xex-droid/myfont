@@ -268,12 +268,24 @@ def test_blind_packet_writes_ab_without_font_names(tmp_path: Path):
     assert "MyMincho" not in (out / "ui_kana" / "A.png").name
 
 
+def _g3_blind_current_freeze() -> Path:
+    q5 = ROOT / "proofs" / "golden" / "g3_blind" / "FREEZE_q5.json"
+    if q5.is_file():
+        return q5
+    return ROOT / "proofs" / "golden" / "g3_blind" / "FREEZE_g3.json"
+
+
 def test_g3_blind_freeze_png_hashes():
-    path = ROOT / "proofs" / "golden" / "g3_blind" / "FREEZE_g3.json"
+    old = json.loads(
+        (ROOT / "proofs" / "golden" / "g3_blind" / "FREEZE_g3.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    if old.get("superseded_by"):
+        assert old["superseded_by"] == "kana_g3_blind_q5"
+    path = _g3_blind_current_freeze()
     data = json.loads(path.read_text(encoding="utf-8"))
-    if data.get("superseded_by"):
-        assert "files" not in data or not data["files"]
-        return
+    assert not data.get("superseded_by")
     assert data["source"] == "shipping_ufo"
     assert "otf_sha256" not in data
     for rel, meta in data["files"].items():
@@ -286,7 +298,7 @@ def test_g3_blind_live_render_matches_golden(tmp_path: Path):
     pytest.importorskip("freetype")
     from engine.bridge import compile_otf
 
-    path = ROOT / "proofs" / "golden" / "g3_blind" / "FREEZE_g3.json"
+    path = _g3_blind_current_freeze()
     data = json.loads(path.read_text(encoding="utf-8"))
     if data.get("superseded_by"):
         pytest.skip(f"g3_blind superseded by {data['superseded_by']}")

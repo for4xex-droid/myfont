@@ -82,7 +82,7 @@ P1 は豆腐で落とさないため **仮名縮小文面** を使う（核心20
 | 歩行 | `proofs/texts/walk_kana.txt` | 内部目視。合否に使わない |
 
 評価者向け文面と記録用紙: `proofs/blind/EVALUATOR.txt` / `SHEET.txt`。
-対応表 `SEALED_order.json` は評価者に渡さない。α 本盲検に戻すときは `ui.txt` / `hud.txt` に戻す。欠字が埋まるまで本盲検は禁止。荒いクローズ後の内部再確認は外部3名の再実施をしない（`docs/quality_to_alpha_plan.md` P-Q5）。
+対応表 `SEALED_order.json` は評価者に渡さない。α 本盲検に戻すときは `ui.txt` / `hud.txt` に戻す。欠字が埋まるまで本盲検は禁止。荒いクローズ後の内部再確認は外部3名の再実施をしない（`docs/quality_to_alpha_plan.md` P-Q5）。Q5パックは `scripts/make_q5_packet.py` → `proofs/q5/`（before=g3_blind、after=現行）。
 
 ```bash
 engine/.venv/bin/python scripts/compile_manual_otf.py

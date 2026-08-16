@@ -1,0 +1,22 @@
+Q5 内部再確認 集計（2026-08-17）
+seed=20260817 compare=g3_blind_before_vs_current_after
+提示: ui  A=after / B=before
+      hud A=before / B=after
+after=Q1–Q3後の現行。before=P1黄金 kana_g3_blind_v2。
+
+評価者1 ID=0001 属性=同人
+  ui  A=はい B=はい  粗いのは=B  コメント:ところどころBの荒さが目立つ
+  hud A=はい B=はい  粗いのは=A  コメント:ところどころAの荒さが目立つ
+評価者2 ID=0002 属性=ゲーム
+  ui  A=はい B=はい  粗いのは=B  コメント:Bが荒い
+  hud A=はい B=はい  粗いのは=A  コメント:わずかにAが荒い
+評価者3 ID=0003 属性=ゲーム
+  ui  A=はい B=はい  粗いのは=B  コメント:Bが少し荒い
+  hud A=はい B=はい  粗いのは=A  コメント:ほぼ同じ
+
+開封: 粗い側は3名とも before。after が粗いと指名された面は0。
+現行 Yes: UI 3/3、HUD 3/3
+判定: Q5 通過（前より粗くない／使える）。黄金 kana_g3_blind_q5。
+
+用紙: proofs/q5/SHEET１.txt SHEET２.txt SHEET３.txt
+α 本盲検（ui.txt/hud.txt）は欠字が埋まるまで禁止。

@@ -142,6 +142,7 @@ P1（ひらがな核心20字）を「Glyphs で人が描く」代わりに、**�
 | 方式A「と」 | **手描き済**。`kana_to/FREEZE_g3.json`。エンジン PNG は上書きしていない |
 | 方式A UI16字 | **手描き済**。`kana_{ha,hi,ho,ma,me,ya,ru,ri,wo,n,small_tsu,ga,ji,dzu,zo,bo}/FREEZE_g3.json` |
 | G3 組見本 | **済（v3）**。核心20字＋のは手描き。黄金 `g3_kana/FREEZE_g3.json`（あい／あと／核心20／の） |
-| P1 盲検文面 | **済（v2）**。UI 追加16字を手描き。黄金 `g3_blind/FREEZE_g3.json` |
+| P1 盲検文面 | **済（v2→q5）**。現行黄金 `g3_blind/FREEZE_q5.json` |
 | P1 盲検 | **済（α Go）**。UI 3/3・HUD 3/3。3名とも「Bが若干荒い」。`proofs/blind/RESULT_p1.txt` |
-| 次 | 字数拡張より先に荒いクローズ。正本 `docs/quality_to_alpha_plan.md` |
+| Q5 内部再確認 | **済**。粗い側は3名とも before。`proofs/q5/RESULT.txt` |
+| 次 | 荒いクローズ済。字数拡張は `docs/quality_to_alpha_plan.md` P-E1 |
