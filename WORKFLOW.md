@@ -59,21 +59,25 @@ pytest tests/
 
 **手順**
 ```bash
-# 1. 目視確認（実験）
-python engine/generate.py --params classic --chars 十永 --out /tmp/check/
+# 1. 目視確認（十・永）。engine/generate.py は無い。--glyphs は空白区切り。
+engine/.venv/bin/python engine/scripts/regen.py --params product_r1 --glyphs juu ei
+# 出力: engine/output/regen/product_r1/
 
 # 2. コード変更（strokes / join / skeletons）
 
 # 3. 回帰テスト（着手前に regression_join20.yaml が存在すること。掟14）
-pytest tests/test_join_regression.py           # contour数・自己交差ゼロ・pathops validate
+engine/.venv/bin/python -m pytest engine/tests/test_regression_join.py -q
 
-# 4. UFO ビルド → OTF
-python -m engine.build_ufo --params product_r1 --out fonts_out/MyMincho.ufo
-fontmake -u fonts_out/MyMincho.ufo -o otf --output-dir fonts_out/build/
+# 4. エンジンUFOは dest 以外へ出す（掟13）。出荷へ足すときだけマージ。
+engine/.venv/bin/python engine/scripts/regen.py --params product_r1 --glyphs shi
+engine/.venv/bin/python scripts/merge_engine_ufo.py \
+  --engine engine/output/regen/product_r1/MyMincho-product_r1.ufo \
+  --dest fonts_out/MyMincho.ufo
+engine/.venv/bin/python scripts/compile_manual_otf.py
 
 # 5. 検証
 fontbakery check-universal fonts_out/build/*.otf   # サブセットでよい
-python scripts/check_manual_overwrite.py           # manual_glyphs 差分ゼロ（掟13）
+engine/.venv/bin/python scripts/check_manual_overwrite.py --ufo fonts_out/MyMincho.ufo
 
 # 6. params を変えた場合は snapshot 登録 → ループ①へ
 ```
@@ -105,18 +109,19 @@ python scripts/check_manual_overwrite.py           # manual_glyphs 差分ゼロ�
 **手順**
 ```bash
 # 1. ラフ（紙/iPad）→ Glyphs で清書
-# 2. UFO エクスポート → fonts_out/MyMincho.ufo にマージ
+# 2. 作業 UFO を正本へ（描済み dest は消さない）
+engine/.venv/bin/python scripts/merge_manual_kana.py う
 # 3. グリフ名を fonts_out/manual_glyphs.txt に追加（掟13）
 
 # 4. ビルド＋組見本（組見本の本体は uharfbuzz / hb-view を流用。自作は薄いラッパのみ）
-fontmake -u fonts_out/MyMincho.ufo -o otf --output-dir fonts_out/build/
-python scripts/make_proofs.py --otf fonts_out/build/MyMincho.otf -o proofs/
+engine/.venv/bin/python scripts/compile_manual_otf.py
+engine/.venv/bin/python scripts/make_proofs.py --font fonts_out/build/MyMincho.otf --out proofs/
 #    → 内部で uharfbuzz / hb-view を呼ぶ（spike3で動作実証済み）
 #    → diffenator2 は Python 3.14 で失敗実績あり。使うなら 3.12 系の別 venv で
 #    → 仮名本文（青空文庫固定文面）/ 漢字交じり / ストレス字羅列 の3種
 
-# 5. 黒みチェック
-python scripts/density_report.py --top 50
+# 5. 黒みは fontdb/scripts/05_probes.py。重ね塗り字は掟5で low_confidence。
+#    scripts/density_report.py は無い。
 
 # 6. 手設計字からうろこ角度・打ち込み深さを逆計測 → params 更新 → ループ①②へ
 

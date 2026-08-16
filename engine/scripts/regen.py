@@ -73,7 +73,7 @@ def main() -> int:
     if "a" in ids:
         print(
             "note: glyph 'a' is engine experiment only; "
-            "shipping あ is fonts_out/MyMincho.ufo (方式A)",
+            "shipping あ・き・さ・た・ち are fonts_out/MyMincho.ufo (方式A)",
             file=sys.stderr,
         )
     print(f"regen params={args.params} glyphs={ids} out={out}")

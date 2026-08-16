@@ -5,8 +5,8 @@
   "source": "manual_ufo",
   "ufo": "fonts_out/MyMincho.ufo",
   "params": "product_r1",
-  "otf_sha256": "2803a2cb3097f19a46247b4008ea1caf5fdd21df4699be791d2568f4c303572a",
   "glif_sha256": "3a80d06a139326434fb45b9d1fbe6b58bb2886eaf3ed558ab1e63b7e67e86ed7",
+  "note": "共有UFOの OTF SHA は字追加で変わるため現行凍結には載せない。正本は glif_sha256 と PNG。",
   "sidebearings_em1000": {
     "lsb": 121,
     "rsb": 117,

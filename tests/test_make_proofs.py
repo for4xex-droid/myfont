@@ -104,4 +104,4 @@ def test_manual_glyphs_core20():
     assert len(core) == 20
     for ch in core:
         assert f"uni{ord(ch):04X}" in names
-    assert drawn == {"uni3042"}
+    assert drawn == {"uni3042", "uni304D", "uni3055", "uni305F", "uni3061"}

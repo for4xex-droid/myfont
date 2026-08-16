@@ -13,9 +13,13 @@
 方式A（Glyphs 手描き）退避時:
 1. `engine/.venv/bin/python scripts/prepare_manual_a.py` で空の `MyMincho.ufo` と参照ラスタ背景を作る（済: 「あ」）
 2. `DRAW_A.md` のとおり Glyphs で `uni3042` を3塗りする（なぞり禁止）
-3. `manual_glyphs.txt` のコメントなし行が手描き済み（いま `uni3042` のみ）
+3. `manual_glyphs.txt` のコメントなし行が手描き済み（いま あ・き・さ・た・ち）
 4. エンジン字を足すとき: `scripts/merge_engine_ufo.py`（手描きはスキップ）
-5. `fontmake -u fonts_out/MyMincho.ufo -o otf --output-dir fonts_out/build/`
+5. 重ね塗りを残して OTF 化（素の fontmake は交差が溶ける）:
+
+```bash
+engine/.venv/bin/python scripts/compile_manual_otf.py
+```
 6. `python scripts/make_proofs.py --font fonts_out/build/….otf` で UI/HUD 組見本
 7. `docs/blind_test.md` の盲検へ
 

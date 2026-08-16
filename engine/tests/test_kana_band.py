@@ -190,11 +190,17 @@ def test_current_kana_freeze_png_hashes():
             checked += 1
         gid = path.parent.name.removeprefix("kana_")
         if data.get("source") == "manual_ufo":
-            glif = repo / data["ufo"] / "glyphs" / f"uni{ord('あ'):04X}.glif"
-            if gid != "a":
-                glif = repo / data["ufo"] / "glyphs" / f"{gid}.glif"
+            if data.get("glif"):
+                glif = (repo / data["glif"]).resolve()
+            else:
+                glyph = data.get("glyph", f"uni{ord('あ'):04X}")
+                glif = (repo / data["ufo"] / "glyphs" / f"{glyph}.glif").resolve()
+            assert glif.is_relative_to(repo.resolve()), data.get("glif")
             assert glif.is_file(), glif
             assert hashlib.sha256(glif.read_bytes()).hexdigest() == data["glif_sha256"]
+            assert "otf_sha256" not in data, (
+                f"{path.name}: shared-UFO OTF hash is not a per-glyph freeze"
+            )
             continue
         yaml_path = skeletons_dir() / f"{gid}.yaml"
         assert yaml_path.is_file(), yaml_path
@@ -234,6 +240,7 @@ def test_current_kana_live_render_matches_golden(tmp_path: Path):
 
     freezes = sorted((repo / "proofs" / "golden").glob("kana_*/FREEZE_g*.json"))
     saw = 0
+    compiled_manual: dict[str, Path] = {}
     for path in freezes:
         data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("superseded_by"):
@@ -242,8 +249,14 @@ def test_current_kana_live_render_matches_golden(tmp_path: Path):
         if data.get("source") == "manual_ufo":
             from engine.bridge import compile_otf
 
-            otf_path = tmp_path / gid / "manual.otf"
-            compile_otf(repo / data["ufo"], otf_path, remove_overlaps=False)
+            ufo_rel = data["ufo"]
+            ufo_dir = (repo / ufo_rel).resolve()
+            assert ufo_dir.is_relative_to(repo.resolve()), ufo_rel
+            otf_path = compiled_manual.get(ufo_rel)
+            if otf_path is None:
+                otf_path = tmp_path / "manual_ufo" / Path(ufo_rel).name / "manual.otf"
+                compile_otf(ufo_dir, otf_path, remove_overlaps=False)
+                compiled_manual[ufo_rel] = otf_path
         else:
             result = build_temp_font(
                 "product_r1",
