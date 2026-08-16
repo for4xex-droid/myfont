@@ -121,3 +121,69 @@ def test_manual_glyphs_core20():
         "uni3061",
         "uni3066",
     }
+
+
+def test_shipping_ufo_has_core20_and_no():
+    from ufoLib2 import Font
+
+    font = Font.open(ROOT / "fonts_out" / "MyMincho.ufo")
+    core = [
+        ln.strip()
+        for ln in (ROOT / "data" / "glyphset_p1_kana_core20.txt")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if ln.strip()
+    ]
+    for ch in (*core, "の"):
+        name = f"uni{ord(ch):04X}"
+        assert name in font, name
+        assert len(font[name]) > 0, name
+
+
+def test_g3_kana_freeze_png_hashes():
+    import hashlib
+    import json
+
+    path = ROOT / "proofs" / "golden" / "g3_kana" / "FREEZE_g3.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    assert data["source"] == "shipping_ufo"
+    assert "otf_sha256" not in data
+    for rel, meta in data["files"].items():
+        fp = ROOT / rel
+        assert fp.is_file(), rel
+        assert hashlib.sha256(fp.read_bytes()).hexdigest() == meta["sha256"]
+
+
+def test_g3_kana_live_render_matches_golden(tmp_path: Path):
+    import importlib.util
+    import json
+
+    pytest.importorskip("freetype")
+    from engine.bridge import compile_otf
+
+    path = ROOT / "proofs" / "golden" / "g3_kana" / "FREEZE_g3.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    otf = tmp_path / "g3.otf"
+    compile_otf(ROOT / data["ufo"], otf, remove_overlaps=False)
+    spec = importlib.util.spec_from_file_location(
+        "kana_render_g3", ROOT / "engine" / "scripts" / "kana_render.py"
+    )
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    for rel, meta in data["files"].items():
+        rendered = mod.render_text_png(otf, meta["text"], tmp_path / f"{meta['tag']}.png")
+        assert rendered["png_sha256"] == meta["sha256"], rel
+
+
+def test_manual_a_glif_unchanged_after_engine_merge():
+    import hashlib
+    import json
+
+    freeze = json.loads(
+        (ROOT / "proofs" / "golden" / "kana_a" / "FREEZE_g1v4.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    glif = ROOT / "fonts_out" / "MyMincho.ufo" / "glyphs" / "uni3042.glif"
+    assert hashlib.sha256(glif.read_bytes()).hexdigest() == freeze["glif_sha256"]

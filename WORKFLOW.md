@@ -117,7 +117,8 @@ engine/.venv/bin/python scripts/set_manual_sidebearings.py --out-of-band
 
 # 4. ビルド＋組見本（組見本の本体は uharfbuzz / hb-view を流用。自作は薄いラッパのみ）
 engine/.venv/bin/python scripts/compile_manual_otf.py
-engine/.venv/bin/python scripts/make_proofs.py --font fonts_out/build/MyMincho.otf --out proofs/
+engine/.venv/bin/python scripts/make_proofs.py --font fonts_out/build/MyMincho.otf --out proofs/out
+#    仮名だけの G3 は proofs/golden/g3_kana/（あい／あと／核心20）
 #    → 内部で uharfbuzz / hb-view を呼ぶ（spike3で動作実証済み）
 #    → diffenator2 は Python 3.14 で失敗実績あり。使うなら 3.12 系の別 venv で
 #    → 仮名本文（青空文庫固定文面）/ 漢字交じり / ストレス字羅列 の3種

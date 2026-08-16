@@ -6,6 +6,8 @@
     <string>_notdef.glif</string>
     <key>uni3042</key>
     <string>uni3042.glif</string>
+    <key>uni3044</key>
+    <string>uni3044.glif</string>
     <key>uni3046</key>
     <string>uni3046.glif</string>
     <key>uni3048</key>
@@ -16,12 +18,16 @@
     <string>uni304B_.glif</string>
     <key>uni304D</key>
     <string>uni304D_.glif</string>
+    <key>uni304F</key>
+    <string>uni304F_.glif</string>
     <key>uni3051</key>
     <string>uni3051.glif</string>
     <key>uni3053</key>
     <string>uni3053.glif</string>
     <key>uni3055</key>
     <string>uni3055.glif</string>
+    <key>uni3057</key>
+    <string>uni3057.glif</string>
     <key>uni3059</key>
     <string>uni3059.glif</string>
     <key>uni305B</key>
@@ -32,7 +38,13 @@
     <string>uni305F_.glif</string>
     <key>uni3061</key>
     <string>uni3061.glif</string>
+    <key>uni3064</key>
+    <string>uni3064.glif</string>
     <key>uni3066</key>
     <string>uni3066.glif</string>
+    <key>uni3068</key>
+    <string>uni3068.glif</string>
+    <key>uni306E</key>
+    <string>uni306E_.glif</string>
   </dict>
 </plist>
