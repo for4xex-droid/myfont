@@ -1,0 +1,37 @@
+{
+  "version": "kana_su_g1",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「す」。出荷正本は fonts_out/MyMincho.ufo の uni3059（手描き重ね塗り）。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni3059",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni3059.glif",
+  "params": "product_r1",
+  "glif_sha256": "20c8fd76ac0bb2e06cddd2513cedd1ebba8f21c1f82f85367290b51c1263d36d",
+  "sidebearings_em1000": {
+    "lsb": 78,
+    "rsb": 75,
+    "ink": 847,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "note": "G1は字形凍結のみ。字間帯は観測で CI 非拘束。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_su/single.png": {
+      "sha256": "3b2e673fe2b09edd14712557fa9227006b157c27cea06ffca1d0d1f065d6fc41",
+      "text": "す",
+      "tag": "single"
+    },
+    "proofs/golden/kana_su/walk.png": {
+      "sha256": "4aeeb082299280fc378edc2ac2fedec112626b83e4e2ad3df0fb24d555c728d1",
+      "text": "すすす",
+      "tag": "walk"
+    }
+  }
+}

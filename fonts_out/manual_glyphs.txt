@@ -3,25 +3,25 @@
 # コメント行の uni 名 = 予約（P1-B エンジン正本。手描きしたらコメントを外す）。
 # ひらがな核心20字（data/glyphset_p1_kana_core20.txt）
 
-# 方式A: あ・き・さ・た・ち 済
+# 方式A: あ・う・え・お・か・き・け・こ・さ・す・せ・そ・た・ち・て 済
 uni3042
+uni3046
+uni3048
+uni304A
+uni304B
 uni304D
+uni3051
+uni3053
 uni3055
+uni3059
+uni305B
+uni305D
 uni305F
 uni3061
+uni3066
 
 # uni3044
-# uni3046
-# uni3048
-# uni304A
-# uni304B
 # uni304F
-# uni3051
-# uni3053
 # uni3057
-# uni3059
-# uni305B
-# uni305D
 # uni3064
-# uni3066
 # uni3068

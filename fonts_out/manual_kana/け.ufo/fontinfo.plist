@@ -12,10 +12,24 @@
     <string>MyMincho-け</string>
     <key>note</key>
     <string>方式A足場。け (uni3051) を3塗りで描く。なぞらない。</string>
+    <key>openTypeHeadCreated</key>
+    <string>2026/08/16 12:12:30</string>
+    <key>openTypeOS2WeightClass</key>
+    <integer>400</integer>
+    <key>openTypeOS2WidthClass</key>
+    <integer>5</integer>
+    <key>postscriptFontName</key>
+    <string>MyMincho-Regular</string>
+    <key>styleMapStyleName</key>
+    <string>regular</string>
     <key>styleName</key>
     <string>Regular</string>
     <key>unitsPerEm</key>
     <integer>1000</integer>
+    <key>versionMajor</key>
+    <integer>1</integer>
+    <key>versionMinor</key>
+    <integer>0</integer>
     <key>xHeight</key>
     <integer>500</integer>
   </dict>

@@ -1,0 +1,37 @@
+{
+  "version": "kana_so_g1",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「そ」。出荷正本は fonts_out/MyMincho.ufo の uni305D（手描き重ね塗り）。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni305D",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni305D_.glif",
+  "params": "product_r1",
+  "glif_sha256": "8dbed4081be0e1430610504444a559711746b788d523ab4468947b1fc32b0cd6",
+  "sidebearings_em1000": {
+    "lsb": 103,
+    "rsb": 126,
+    "ink": 771,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "note": "G1は字形凍結のみ。字間帯は観測で CI 非拘束。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_so/single.png": {
+      "sha256": "f03afd95eb0e60a3ebb9ebc1310d7c2464a5dd762e19ca197047e05fcba25f97",
+      "text": "そ",
+      "tag": "single"
+    },
+    "proofs/golden/kana_so/walk.png": {
+      "sha256": "b24ce7ea7bc56b2b72577c3402bbda19ed9eb1039b246ab7caa5b129f52b7e83",
+      "text": "そそそ",
+      "tag": "walk"
+    }
+  }
+}

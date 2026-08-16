@@ -29,10 +29,20 @@ def test_manual_ufo_has_three_drawn_fills():
 def test_manual_ufo_has_drawn_ki_sa_ta_chi():
     ufo = ROOT / "fonts_out" / "MyMincho.ufo" / "glyphs"
     expected = {
+        "uni3046.glif": 2,
+        "uni3048.glif": 2,
+        "uni304A_.glif": 3,
+        "uni304B_.glif": 3,
         "uni304D_.glif": 3,
+        "uni3051.glif": 3,
+        "uni3053.glif": 2,
         "uni3055.glif": 2,
+        "uni3059.glif": 2,
+        "uni305B_.glif": 3,
+        "uni305D_.glif": 1,
         "uni305F_.glif": 4,
         "uni3061.glif": 2,
+        "uni3066.glif": 1,
     }
     for name, n in expected.items():
         glif = (ufo / name).read_text(encoding="utf-8")
@@ -48,7 +58,23 @@ def test_manual_drawn_fills_are_positive_area():
     from engine.bridge import shoelace
 
     font = Font.open(ROOT / "fonts_out" / "MyMincho.ufo")
-    for name in ("uni3042", "uni304D", "uni3055", "uni305F", "uni3061"):
+    for name in (
+        "uni3042",
+        "uni3046",
+        "uni3048",
+        "uni304A",
+        "uni304B",
+        "uni304D",
+        "uni3051",
+        "uni3053",
+        "uni3055",
+        "uni3059",
+        "uni305B",
+        "uni305D",
+        "uni305F",
+        "uni3061",
+        "uni3066",
+    ):
         glyph = font[name]
         assert len(glyph) > 0, name
         for i, contour in enumerate(glyph):

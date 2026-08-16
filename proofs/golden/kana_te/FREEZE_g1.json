@@ -1,0 +1,37 @@
+{
+  "version": "kana_te_g1",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「て」。出荷正本は fonts_out/MyMincho.ufo の uni3066（手描き重ね塗り）。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni3066",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni3066.glif",
+  "params": "product_r1",
+  "glif_sha256": "0396a8c105b3288e6d6f8feb528dc9347a8c59d0a701740cb7286cedcdb17298",
+  "sidebearings_em1000": {
+    "lsb": 89,
+    "rsb": 136,
+    "ink": 775,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "note": "G1は字形凍結のみ。字間帯は観測で CI 非拘束。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_te/single.png": {
+      "sha256": "e3301ebbe932b9ef492ff99c52c22bc0892ceb97409a3a122f7bac7837c11170",
+      "text": "て",
+      "tag": "single"
+    },
+    "proofs/golden/kana_te/walk.png": {
+      "sha256": "501c55cc1c37bdc5df9d14eaace53caa4eb4813f3723e84137823d2a74300ce0",
+      "text": "ててて",
+      "tag": "walk"
+    }
+  }
+}
