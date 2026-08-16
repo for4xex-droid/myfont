@@ -3,6 +3,14 @@
 正本は `fonts_out/MyMincho.ufo`（空グリフ＋IPAex ガイド済み）。
 作業 UFO も `fonts_out/manual_kana/{字}.ufo` にある。描き方は `DRAW_REST.md` と同じ。合体しない。穴パスを作らない。
 
+## Q3 手直し（いまここ）
+
+正本を Glyphs で開かない。濁点は `が.ufo` `じ.ufo` `づ.ufo` `ぞ.ufo` `ぼ.ufo` だけ。
+シート: `proofs/q3_dakuten.png` / `q3_dakuten_crop.png` / `q3_terminals.png`。
+終わったら（既受付字を全部並べる）:
+
+`engine/.venv/bin/python scripts/receive_manual.py が じ づ ぞ ぼ`
+
 の は手描き済（`kana_no/FREEZE_g3.json`）。次は下表の追加16字。
 
 ## 新規（文面に必要）
