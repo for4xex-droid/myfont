@@ -290,7 +290,7 @@ spike7 の結合検証で判明した実態:
 8. **T7+: face 登録**: — **完了（2026-08-09）**。`fontdb.ingest.synthetic`＋`config/synthetic_faces.yaml`。classic/product_r1 を `face_kind=synthetic` で SQLite 登録（juu≈2.22/2.43、san_uroko ok）
 9. **P0完成**: — **完了（2026-08-09）**。`product_r1` を `status=frozen` で正式固定。`design_param_snapshot`＋`face_param_link`、字面規則 `docs/design_rules.md`、`engine/scripts/regen.py --params`
 10. 以下を実行（次フェーズ。優先順は §7.4 に従う）:
-   - **P1着手（最優先・唯一の Go/No-Go ゲート）**: ひらがな核心20字のラフ → Glyphs → UFO — **足場済（2026-08-10）**（`fonts_out/manual_glyphs.txt`・`data/glyphset_p1_kana_core20.txt`）。**字形の手設計は未着手**
+   - **P1着手（最優先・唯一の Go/No-Go ゲート）**: ひらがな核心20字＋の＋UI16字 — **方式A 手描き済**。次は外部盲検
    - **S4 組見本ラッパ＋盲検プロトコル**: — **骨組み完了（2026-08-10）**。`scripts/make_proofs.py`＋`proofs/texts/{ui,hud,literary}.txt`＋`docs/blind_test.md`（主＝UI/HUD）
    - **S1 出荷ゲートCLI の骨組み**: — **骨組み完了（2026-08-10）**。`data/glyphset_*.txt` 凍結済、`engine/scripts/ship_gate.py`＋`docs/ship_gate_rules.md`
    - **S2a ブランド前提確認**: — **雛形作成（2026-08-10）**。`docs/licenses/precheck.md`（商標調査・GlyphWiki再確認は未実施チェックリスト）
@@ -375,7 +375,7 @@ spike7 の結合検証で判明した実態:
 
 ### 7.4 直近の優先順（次の一手）
 
-1. **P1（P1-B方式）: し・い・と・つ 到達＋レビューループ稼働**（`docs/kana_parametric_plan.md` / `docs/kana_review_loop_plan.md`）— 核心20字＋のが出荷 UFO。G3 組見本 `proofs/golden/g3_kana/`。**次は内部目視と外部盲検（漢字・カタカナは未収録）**
+1. **P1: 核心20字＋の＋UI16字** — 方式A 手描き済。G3 組見本・盲検パック済。**次は外部3名の盲検**（作者は評価者に入らない）
 2. ~~S4: 組見本ラッパ＋盲検手順書~~ — **骨組み完了**（盲検の実地実施は P1 字形後）
 3. ~~S1: 出荷ゲート骨組み~~ — **骨組み完了**（α OTF ができたら本適用）
 4. **S2a: 商標ざっくり調査＋GlyphWiki 販売時再確認** — 雛形あり。**調査実施が残作業**

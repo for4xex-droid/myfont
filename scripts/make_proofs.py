@@ -22,8 +22,8 @@ OUT_DIR = ROOT / "proofs" / "out"
 GOLDEN_DIR = ROOT / "proofs" / "golden"
 
 # PLAN §7.1 S4: 主＝ui/hud、副＝literary（参考観測）
-FACE_ORDER = ("ui", "hud", "literary")
-PRIMARY_FACES = frozenset({"ui", "hud"})
+FACE_ORDER = ("ui", "hud", "literary", "ui_kana", "hud_kana", "walk_kana")
+PRIMARY_FACES = frozenset({"ui", "hud", "ui_kana", "hud_kana"})
 
 
 def _load_text(face: str) -> str:

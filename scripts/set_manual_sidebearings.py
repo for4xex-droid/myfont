@@ -18,7 +18,7 @@ TARGET_LSB = 126.0
 TARGET_RSB = 118.0
 LSB_BAND = (106.0, 146.0)
 RSB_BAND = (98.0, 138.0)
-ENGINE_CANONICAL = frozenset("いしとつくの")
+ENGINE_CANONICAL = frozenset()
 
 
 def ink_bounds(glyph) -> tuple[float, float, float, float]:

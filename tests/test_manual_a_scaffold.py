@@ -43,6 +43,28 @@ def test_manual_ufo_has_drawn_ki_sa_ta_chi():
         "uni305F_.glif": 4,
         "uni3061.glif": 2,
         "uni3066.glif": 1,
+        "uni3044.glif": 2,
+        "uni304F_.glif": 1,
+        "uni3057.glif": 1,
+        "uni3064.glif": 1,
+        "uni306E_.glif": 1,
+        "uni3068.glif": 2,
+        "uni306F_.glif": 3,
+        "uni3072.glif": 1,
+        "uni307B_.glif": 4,
+        "uni307E_.glif": 3,
+        "uni3081.glif": 2,
+        "uni3084.glif": 3,
+        "uni308B_.glif": 1,
+        "uni308A_.glif": 1,
+        "uni3092.glif": 3,
+        "uni3093.glif": 1,
+        "uni3063.glif": 1,
+        "uni304C_.glif": 5,
+        "uni3058.glif": 3,
+        "uni3065.glif": 3,
+        "uni305E_.glif": 3,
+        "uni307C_.glif": 6,
     }
     for name, n in expected.items():
         glif = (ufo / name).read_text(encoding="utf-8")
@@ -56,7 +78,7 @@ def test_manual_ufo_sidebearings_in_band():
 
     mod = _load("set_manual_sidebearings")
     font = Font.open(ROOT / "fonts_out" / "MyMincho.ufo")
-    for ch in "あうえおかきけこさすせそたちて":
+    for ch in "あいうえおかきくけこさしすせそたちつてとのはひほまめやるりをんっがじづぞぼ":
         lsb, rsb, _ink = mod.sidebearings(font[f"uni{ord(ch):04X}"])
         assert mod.in_band(lsb, rsb), (ch, lsb, rsb)
 
@@ -84,12 +106,63 @@ def test_manual_drawn_fills_are_positive_area():
         "uni305F",
         "uni3061",
         "uni3066",
+        "uni3044",
+        "uni304F",
+        "uni3057",
+        "uni3064",
+        "uni306E",
+        "uni3068",
+        "uni306F",
+        "uni3072",
+        "uni307B",
+        "uni307E",
+        "uni3081",
+        "uni3084",
+        "uni308B",
+        "uni308A",
+        "uni3092",
+        "uni3093",
+        "uni3063",
+        "uni304C",
+        "uni3058",
+        "uni3065",
+        "uni305E",
+        "uni307C",
     ):
         glyph = font[name]
         assert len(glyph) > 0, name
         for i, contour in enumerate(glyph):
             pts = [(pt.x, pt.y) for pt in contour]
             assert shoelace(pts) > 0, f"{name} contour {i}"
+
+
+def test_shipping_ufo_has_empty_ui_extra_scaffolds():
+    from ufoLib2 import Font
+
+    extra = [
+        ln.strip()
+        for ln in (ROOT / "data" / "glyphset_p1_kana_ui_extra.txt")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if ln.strip()
+    ]
+    assert set(extra) == set("はひほまめやるりをんっがじづぞぼ")
+    drawn = {
+        ln.strip()
+        for ln in (ROOT / "fonts_out" / "manual_glyphs.txt").read_text(encoding="utf-8").splitlines()
+        if ln.strip() and not ln.strip().startswith("#")
+    }
+    font = Font.open(ROOT / "fonts_out" / "MyMincho.ufo")
+    for ch in extra:
+        name = f"uni{ord(ch):04X}"
+        glyph = font[name]
+        assert glyph.lib.get("com.mymincho.manual") is True
+        if name in drawn:
+            assert len(glyph) > 0, name
+        else:
+            assert len(glyph) == 0, name
+            assert glyph.image is not None
+            assert glyph.image.fileName.endswith("_guide_ipaex.png")
 
 
 def test_guide_pngs_are_raster_only():
@@ -280,10 +353,47 @@ def test_merge_manual_kana_copies_empty_dest(tmp_path: Path):
     assert out["uni3055"].lib.get("com.mymincho.manual") is True
 
 
-def test_merge_manual_kana_refuses_engine_canonical():
+def test_engine_canonical_is_empty():
+    assert _load("merge_manual_kana").ENGINE_CANONICAL == frozenset()
+    assert _load("set_manual_sidebearings").ENGINE_CANONICAL == frozenset()
+
+
+def test_merge_manual_kana_force_replaces_drawn_dest(tmp_path: Path):
+    from ufoLib2 import Font
+
+    dest = Font()
+    g = dest.newGlyph("uni3057")
+    g.width = 1000
+    pen = g.getPen()
+    pen.moveTo((1, 1))
+    pen.lineTo((2, 1))
+    pen.lineTo((2, 2))
+    pen.closePath()
+    dest_dir = tmp_path / "dest.ufo"
+    dest.save(dest_dir)
+
+    src = Font()
+    sg = src.newGlyph("uni3057")
+    sg.width = 1000
+    pen = sg.getPen()
+    pen.moveTo((10, 10))
+    pen.lineTo((20, 10))
+    pen.lineTo((20, 20))
+    pen.closePath()
+    src_root = tmp_path / "manual_kana"
+    src_root.mkdir()
+    src.save(src_root / "し.ufo")
+
     mod = _load("merge_manual_kana")
-    assert mod.main(["し"]) == 2
-    assert mod.main(["の"]) == 2
+    assert (
+        mod.main(
+            ["し", "--dest", str(dest_dir), "--src-root", str(src_root), "--force"]
+        )
+        == 0
+    )
+    out = Font.open(dest_dir)
+    pts = [(p.x, p.y) for p in out["uni3057"][0]]
+    assert (10, 10) in pts
 
 
 def test_set_sidebearings_preserves_relative_geometry(tmp_path: Path):
@@ -315,11 +425,6 @@ def test_set_sidebearings_preserves_relative_geometry(tmp_path: Path):
     assert xmin == 126
     assert glyph.width - xmax == 118
     assert xmax - xmin == 200
-
-
-def test_set_sidebearings_refuses_engine_canonical():
-    mod = _load("set_manual_sidebearings")
-    assert mod.main(["し"]) == 2
 
 
 def test_set_sidebearings_missing_ufo(tmp_path: Path):

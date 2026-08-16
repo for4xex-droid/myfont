@@ -1,0 +1,38 @@
+{
+  "version": "kana_ru_g3",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「る」手描き。出荷正本 fonts_out/MyMincho.ufo の uni308B。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni308B",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni308B_.glif",
+  "params": "product_r1",
+  "glif_sha256": "433ef0fb0dd99b5af6f1ee0e1ba7cfecbf1e9ba871e9c03b41eb7532812f5af2",
+  "sidebearings_em1000": {
+    "lsb": 126.0,
+    "rsb": 118.1,
+    "ink": 674.9,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
+    "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_ru/g3_single.png": {
+      "sha256": "36c55c6eca8db513ffb1c67b190381bc118cebefad9eff3eb456e971379d9492",
+      "text": "る",
+      "tag": "single"
+    },
+    "proofs/golden/kana_ru/g3_walk.png": {
+      "sha256": "9da4a03cddabd877766ec1af6f2364303fe5992ab5c18dee1b43d1910bc91aea",
+      "text": "るるる",
+      "tag": "walk"
+    }
+  }
+}

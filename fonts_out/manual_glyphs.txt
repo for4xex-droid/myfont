@@ -1,27 +1,42 @@
 # 手設計グリフ保護リスト（掟13）
 # コメントなしの行 = 出荷で手描き済み。エンジンは上書き禁止。
 # コメント行の uni 名 = 予約（P1-B エンジン正本。手描きしたらコメントを外す）。
-# ひらがな核心20字（data/glyphset_p1_kana_core20.txt）
+# ひらがな核心20字（data/glyphset_p1_kana_core20.txt）＋の＋UI追加16字
 
-# 方式A: あ・う・え・お・か・き・け・こ・さ・す・せ・そ・た・ち・て 済
 uni3042
+uni3044
 uni3046
 uni3048
 uni304A
 uni304B
+uni304C
 uni304D
+uni304F
 uni3051
 uni3053
 uni3055
+uni3057
+uni3058
 uni3059
 uni305B
 uni305D
+uni305E
 uni305F
 uni3061
+uni3063
+uni3064
+uni3065
 uni3066
-
-# uni3044
-# uni304F
-# uni3057
-# uni3064
-# uni3068
+uni3068
+uni306E
+uni306F
+uni3072
+uni307B
+uni307C
+uni307E
+uni3081
+uni3084
+uni308A
+uni308B
+uni3092
+uni3093

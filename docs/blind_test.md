@@ -69,4 +69,28 @@ python scripts/make_proofs.py --font path/to/MyMincho-Regular.otf --compare-gold
 
 ## 文面と収録字の注意
 
-`proofs/texts/*.txt` は UI/HUD 用途の**代表文**であり、α の全収録字（`data/glyphset_alpha.txt`）をカバーしない。P1 核心20字だけの段階では、文面を核心字のみに一時縮小するか、未収録字が `.notdef` 豆腐になることを評価者に事前説明してから盲検する（豆腐だらけの HUD で不合格にするのは字形評価ではない）。
+`proofs/texts/{ui,hud,literary}.txt` は α 本盲検の代表文。漢字・カタカナ・英数を含む。
+
+P1 核心20字＋の だけの今は、豆腐で落とさないために **仮名縮小文面** を使う。
+
+| 面 | 文面 | 役割 |
+|---|---|---|
+| UI | `proofs/texts/ui_kana.txt` | P1 主 |
+| HUD | `proofs/texts/hud_kana.txt` | P1 主 |
+| 歩行 | `proofs/texts/walk_kana.txt` | 内部目視。合否に使わない |
+
+収録字以外（ん・は・濁点・小書きつ など）は使っていない。α 本盲検に戻すときは `ui.txt` / `hud.txt` に戻す。
+
+```bash
+engine/.venv/bin/python scripts/compile_manual_otf.py
+engine/.venv/bin/python scripts/make_proofs.py \
+  --font fonts_out/build/MyMincho.otf \
+  --faces ui_kana,hud_kana,walk_kana \
+  --out proofs/out
+engine/.venv/bin/python scripts/make_blind_packet.py \
+  --font fonts_out/build/MyMincho.otf --seed 20260816
+# → proofs/out/blind/{ui_kana,hud_kana}/{A,B}.png
+# 対応表は proofs/out/blind/SEALED_order.json（評価者に見せない）
+```
+
+黄金: `proofs/golden/g3_blind/`（MyMincho 側のみ。比較書体の画像は凍結しない）。

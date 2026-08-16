@@ -1,29 +1,29 @@
 {
-  "version": "kana_g3_v1",
+  "version": "kana_g3_v3",
   "frozen_at": "2026-08-16T00:00:00Z",
-  "reason": "G3 組見本。出荷 fonts_out/MyMincho.ufo を remove_overlaps=False でコンパイル。手描き15＋エンジン し・い・と・つ・く・の。漢字・カタカナは未収録。参照座標はコピーしていない（掟9）。",
+  "reason": "G3 組見本。出荷 fonts_out/MyMincho.ufo を remove_overlaps=False でコンパイル。核心20字＋のは手描き。漢字・カタカナは未収録。参照座標はコピーしていない（掟9）。",
   "source": "shipping_ufo",
   "ufo": "fonts_out/MyMincho.ufo",
   "params": "product_r1",
   "note": "共有UFOの OTF SHA は字追加で変わるため載せない。正本は PNG SHA。",
   "files": {
     "proofs/golden/g3_kana/ai.png": {
-      "sha256": "785d3debcb7d6f2f0b7aa7ce5dff44adf0492f0949630219500765022915dc25",
+      "sha256": "e34248bf142be60f33ff2b379fc9e9caad87ac45c510a97cb1c22111739f535d",
       "text": "あい",
       "tag": "ai"
     },
     "proofs/golden/g3_kana/ato.png": {
-      "sha256": "87645ffecea7d7f9af64c3c9aea0bea6543950a1f1b4ce6d89af9f6e94962cdf",
+      "sha256": "e4f55e8822a7f99fb1daf4ceb53b8350687756d73841fb9087b96c1862766814",
       "text": "あと",
       "tag": "ato"
     },
     "proofs/golden/g3_kana/core20.png": {
-      "sha256": "ccaa2f1130acc7f49f50ee8c3e16dbac92015db06049924105290e3b543bcc48",
+      "sha256": "477191ec53de3f4e5e8e581a105c7060fe0c5ac4529b61938524fa651b713b65",
       "text": "あいうえおかきくけこさしすせそたちつてと",
       "tag": "core20"
     },
     "proofs/golden/g3_kana/no.png": {
-      "sha256": "58de7348436a96f7535b025fe9452a1fb2061af17ce3e2e43dfaa6e12c19c4b1",
+      "sha256": "32f17a50aecdbadee9c90cf8e709eb9745d468576f210cc6208fee8e1b277e77",
       "text": "の",
       "tag": "no"
     }

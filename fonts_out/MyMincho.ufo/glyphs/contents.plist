@@ -16,6 +16,8 @@
     <string>uni304A_.glif</string>
     <key>uni304B</key>
     <string>uni304B_.glif</string>
+    <key>uni304C</key>
+    <string>uni304C_.glif</string>
     <key>uni304D</key>
     <string>uni304D_.glif</string>
     <key>uni304F</key>
@@ -28,23 +30,53 @@
     <string>uni3055.glif</string>
     <key>uni3057</key>
     <string>uni3057.glif</string>
+    <key>uni3058</key>
+    <string>uni3058.glif</string>
     <key>uni3059</key>
     <string>uni3059.glif</string>
     <key>uni305B</key>
     <string>uni305B_.glif</string>
     <key>uni305D</key>
     <string>uni305D_.glif</string>
+    <key>uni305E</key>
+    <string>uni305E_.glif</string>
     <key>uni305F</key>
     <string>uni305F_.glif</string>
     <key>uni3061</key>
     <string>uni3061.glif</string>
+    <key>uni3063</key>
+    <string>uni3063.glif</string>
     <key>uni3064</key>
     <string>uni3064.glif</string>
+    <key>uni3065</key>
+    <string>uni3065.glif</string>
     <key>uni3066</key>
     <string>uni3066.glif</string>
     <key>uni3068</key>
     <string>uni3068.glif</string>
     <key>uni306E</key>
     <string>uni306E_.glif</string>
+    <key>uni306F</key>
+    <string>uni306F_.glif</string>
+    <key>uni3072</key>
+    <string>uni3072.glif</string>
+    <key>uni307B</key>
+    <string>uni307B_.glif</string>
+    <key>uni307C</key>
+    <string>uni307C_.glif</string>
+    <key>uni307E</key>
+    <string>uni307E_.glif</string>
+    <key>uni3081</key>
+    <string>uni3081.glif</string>
+    <key>uni3084</key>
+    <string>uni3084.glif</string>
+    <key>uni308A</key>
+    <string>uni308A_.glif</string>
+    <key>uni308B</key>
+    <string>uni308B_.glif</string>
+    <key>uni3092</key>
+    <string>uni3092.glif</string>
+    <key>uni3093</key>
+    <string>uni3093.glif</string>
   </dict>
 </plist>

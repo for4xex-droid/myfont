@@ -1,0 +1,26 @@
+{
+  "version": "kana_g3_blind_v2",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "P1 UI/HUD/歩行。核心20字＋の＋追加16字を手描き。出荷 UFO を overlay コンパイル。",
+  "source": "shipping_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "params": "product_r1",
+  "note": "α 本盲検の ui.txt/hud.txt は漢字を含む。P1 ではこの文面を使う。",
+  "files": {
+    "proofs/golden/g3_blind/ui_kana.png": {
+      "sha256": "32b96b4783b911b33bd324d482df324813204132720fb7558b4e841239c718cf",
+      "text_file": "proofs/texts/ui_kana.txt",
+      "tag": "ui_kana"
+    },
+    "proofs/golden/g3_blind/hud_kana.png": {
+      "sha256": "c006d7dbb99ff064bd86e0f003c347c142678541df1ee21aa09c637e0db784c2",
+      "text_file": "proofs/texts/hud_kana.txt",
+      "tag": "hud_kana"
+    },
+    "proofs/golden/g3_blind/walk_kana.png": {
+      "sha256": "8b40c1b8649f5c7a7761789ece523e585fd39115fd7954dc2cdf6f0aac3b7ffd",
+      "text_file": "proofs/texts/walk_kana.txt",
+      "tag": "walk_kana"
+    }
+  }
+}

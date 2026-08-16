@@ -1,0 +1,38 @@
+{
+  "version": "kana_ku_g3",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「く」手描き。出荷正本 fonts_out/MyMincho.ufo の uni304F。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni304F",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni304F_.glif",
+  "params": "product_r1",
+  "glif_sha256": "1b7ad89276c9d0ebf403b691ced96d253deaa5d9db623dd41bf53251691cc9bf",
+  "sidebearings_em1000": {
+    "lsb": 126.0,
+    "rsb": 117.9,
+    "ink": 454.1,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
+    "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_ku/g3_single.png": {
+      "sha256": "86de042d92effa7fbd9ccf0939f4269f9af5c301ded824e00dc972f8544f8409",
+      "text": "く",
+      "tag": "single"
+    },
+    "proofs/golden/kana_ku/g3_walk.png": {
+      "sha256": "d2701aec35fe879365f4782d276eb9be68070e45426226aaf0fcc433c0929cdb",
+      "text": "くくく",
+      "tag": "walk"
+    }
+  }
+}

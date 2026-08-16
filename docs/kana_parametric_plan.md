@@ -134,9 +134,13 @@ P1（ひらがな核心20字）を「Glyphs で人が描く」代わりに、**�
 | 「し」内部合格（向き・識別・釣り針） | **済**（2026-08-12。明朝端物の本格追求は後回し） |
 | G2 字面/重心帯・`kana_targets.yaml` | 未（20字並び後でも可） |
 | G3 組見本・端物テンプレ幾何 | 組見本 **済**（`g3_kana`。端物テンプレ幾何は未） |
-| 8c「の」`loop_closure`＋`expect_holes` | **G2 済**（穴=1・テール abut・参照帯内・黄金 `kana_no` / `FREEZE_g2.json`）。穴面積比は観測のみ（参照帯未凍結・掟8）。G3 カウンター涙型は未 |
+| 8c「の」`loop_closure`＋`expect_holes` | エンジン G2 は `FREEZE_g2.json`（superseded）。**現行は方式A手描き** `kana_no/FREEZE_g3.json`。ソーセージ1輪郭。G3 カウンター涙型は未 |
 | 8d「あ」横＋縦＋回り | **方式A G1**。現行 `FREEZE_g1v4.json`。G3「あい」「あと」は `proofs/golden/g3_kana/` |
 | 方式A「き・さ・た・ち」 | **G2 字間**。`kana_{ki,sa,ta,chi}/FREEZE_g2.json`。輪郭は G1 のまま平行移動＋幅。LSB/RSB∈中央±20U |
 | 方式A「う・え・お・か・け・こ・す・せ・そ・て」 | **G2 字間**（え・おは G1 から帯内で未移動）。帯外12字は `FREEZE_g2.json`。`scripts/set_manual_sidebearings.py` |
-| G3 組見本 | **済**。出荷にエンジン し・い・と・つ・く・のをマージ。黄金 `g3_kana/FREEZE_g3.json`（あい／あと／核心20／の） |
-| 次 | 内部目視（歩行）→ `docs/blind_test.md` の外部盲検。UI/HUD 文面の漢字・カタカナは欠字 |
+| 方式A「し・い・く・つ・の」 | **手描き済**。`kana_{shi,i,ku,tsu,no}/FREEZE_g3.json`。エンジン PNG（single/walk）は上書きしていない |
+| 方式A「と」 | **手描き済**。`kana_to/FREEZE_g3.json`。エンジン PNG は上書きしていない |
+| 方式A UI16字 | **手描き済**。`kana_{ha,hi,ho,ma,me,ya,ru,ri,wo,n,small_tsu,ga,ji,dzu,zo,bo}/FREEZE_g3.json` |
+| G3 組見本 | **済（v3）**。核心20字＋のは手描き。黄金 `g3_kana/FREEZE_g3.json`（あい／あと／核心20／の） |
+| P1 盲検文面 | **済（v2）**。UI 追加16字を手描き。黄金 `g3_blind/FREEZE_g3.json` |
+| 次 | 外部3名で UI/HUD 盲検。作者は評価者に入らない |

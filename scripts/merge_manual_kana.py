@@ -15,8 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DEST = ROOT / "fonts_out" / "MyMincho.ufo"
 DEFAULT_SRC_ROOT = ROOT / "fonts_out" / "manual_kana"
 MANUAL_LIB = "com.mymincho.manual"
-# P1-B 正本。作業UFOから出荷へ入れない。
-ENGINE_CANONICAL = frozenset("いしとつくの")
+# エンジンのまま残す字。空 = 核心字は手描きに切替済み。
+ENGINE_CANONICAL = frozenset()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -24,6 +24,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("char", help="one hiragana character, e.g. さ")
     ap.add_argument("--dest", type=Path, default=DEFAULT_DEST)
     ap.add_argument("--src-root", type=Path, default=DEFAULT_SRC_ROOT)
+    ap.add_argument(
+        "--force",
+        action="store_true",
+        help="replace dest even if it already has contours",
+    )
     args = ap.parse_args(argv)
 
     if len(args.char) != 1:
@@ -52,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
         if name not in work or len(work[name]) == 0:
             print(f"error: {src} has no contours for {name}", file=sys.stderr)
             return 2
-        if name in dest and len(dest[name]) > 0:
+        if name in dest and len(dest[name]) > 0 and not args.force:
             print(f"skip {name}: dest already drawn ({len(dest[name])} contours)")
             return 0
         dest[name] = work[name].copy()
