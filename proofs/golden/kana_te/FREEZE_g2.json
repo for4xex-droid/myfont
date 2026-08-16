@@ -1,0 +1,38 @@
+{
+  "version": "kana_te_g2",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「て」G2 字間。出荷正本は fonts_out/MyMincho.ufo の uni3066。輪郭は G1 のまま平行移動＋幅のみ。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni3066",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni3066.glif",
+  "params": "product_r1",
+  "glif_sha256": "cecbdda6a0c2e355268b4cee65e9830033414b74017e229c9b2951eefb0bccf1",
+  "sidebearings_em1000": {
+    "lsb": 126,
+    "rsb": 118,
+    "ink": 775,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
+    "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_te/single.png": {
+      "sha256": "81bf8cef38fbd62cddd1e440553287be319a81596e6093830954841bc4436e63",
+      "text": "て",
+      "tag": "single"
+    },
+    "proofs/golden/kana_te/walk.png": {
+      "sha256": "7a128506025925f463c4baf51724216e73557dee043894b5d1754087f652b9be",
+      "text": "ててて",
+      "tag": "walk"
+    }
+  }
+}

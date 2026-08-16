@@ -51,6 +51,16 @@ def test_manual_ufo_has_drawn_ki_sa_ta_chi():
         assert "com.mymincho.manual" in glif
 
 
+def test_manual_ufo_sidebearings_in_band():
+    from ufoLib2 import Font
+
+    mod = _load("set_manual_sidebearings")
+    font = Font.open(ROOT / "fonts_out" / "MyMincho.ufo")
+    for ch in "あうえおかきけこさすせそたちて":
+        lsb, rsb, _ink = mod.sidebearings(font[f"uni{ord(ch):04X}"])
+        assert mod.in_band(lsb, rsb), (ch, lsb, rsb)
+
+
 def test_manual_drawn_fills_are_positive_area():
     """重ね塗りの交差が穴にならないこと（あで白抜けした境界）。"""
     from ufoLib2 import Font
@@ -161,6 +171,7 @@ def test_engine_workflow_regens_then_merges():
     assert "tests/test_join_regression.py" not in text
     assert "engine/tests/test_regression_join.py" in text
     assert "merge_manual_kana.py" in text
+    assert "set_manual_sidebearings.py" in text
 
 
 def test_compile_manual_otf_keeps_overlaps(tmp_path: Path, monkeypatch):
@@ -273,6 +284,69 @@ def test_merge_manual_kana_refuses_engine_canonical():
     mod = _load("merge_manual_kana")
     assert mod.main(["し"]) == 2
     assert mod.main(["の"]) == 2
+
+
+def test_set_sidebearings_preserves_relative_geometry(tmp_path: Path):
+    from fontTools.pens.boundsPen import BoundsPen
+    from ufoLib2 import Font
+
+    dest = Font()
+    g = dest.newGlyph("uni305B")
+    g.width = 1000
+    pen = g.getPen()
+    pen.moveTo((200, 100))
+    pen.lineTo((400, 100))
+    pen.lineTo((400, 300))
+    pen.closePath()
+    dest_dir = tmp_path / "dest.ufo"
+    dest.save(dest_dir)
+
+    mod = _load("set_manual_sidebearings")
+    assert (
+        mod.main(["せ", "--dest", str(dest_dir), "--lsb", "126", "--rsb", "118"]) == 0
+    )
+    out = Font.open(dest_dir)
+    glyph = out["uni305B"]
+    pts = [(p.x, p.y) for p in glyph[0]]
+    assert pts == [(126, 100), (326, 100), (326, 300)]
+    bp = BoundsPen(None)
+    glyph.draw(bp)
+    xmin, _ymin, xmax, _ymax = bp.bounds
+    assert xmin == 126
+    assert glyph.width - xmax == 118
+    assert xmax - xmin == 200
+
+
+def test_set_sidebearings_refuses_engine_canonical():
+    mod = _load("set_manual_sidebearings")
+    assert mod.main(["し"]) == 2
+
+
+def test_set_sidebearings_missing_ufo(tmp_path: Path):
+    mod = _load("set_manual_sidebearings")
+    assert mod.main(["せ", "--dest", str(tmp_path / "nope.ufo")]) == 2
+
+
+def test_set_sidebearings_out_of_band_skips_in_band(tmp_path: Path):
+    from ufoLib2 import Font
+
+    dest = Font()
+    g = dest.newGlyph("uni3042")
+    g.width = 874
+    g.lib["com.mymincho.manual"] = True
+    pen = g.getPen()
+    pen.moveTo((126, 100))
+    pen.lineTo((756, 100))
+    pen.lineTo((756, 300))
+    pen.closePath()
+    dest_dir = tmp_path / "dest.ufo"
+    dest.save(dest_dir)
+
+    mod = _load("set_manual_sidebearings")
+    assert mod.main(["--dest", str(dest_dir), "--out-of-band"]) == 0
+    out = Font.open(dest_dir)
+    assert [(p.x, p.y) for p in out["uni3042"][0]][0] == (126, 100)
+    assert out["uni3042"].width == 874
 
 
 def test_merge_manual_kana_refuses_empty_source(tmp_path: Path):

@@ -112,6 +112,8 @@ engine/.venv/bin/python scripts/check_manual_overwrite.py --ufo fonts_out/MyMinc
 # 2. 作業 UFO を正本へ（描済み dest は消さない）
 engine/.venv/bin/python scripts/merge_manual_kana.py う
 # 3. グリフ名を fonts_out/manual_glyphs.txt に追加（掟13）
+# 3b. 字間帯（輪郭は動かさず平行移動＋幅）
+engine/.venv/bin/python scripts/set_manual_sidebearings.py --out-of-band
 
 # 4. ビルド＋組見本（組見本の本体は uharfbuzz / hb-view を流用。自作は薄いラッパのみ）
 engine/.venv/bin/python scripts/compile_manual_otf.py

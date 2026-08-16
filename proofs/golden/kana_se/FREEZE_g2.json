@@ -1,0 +1,38 @@
+{
+  "version": "kana_se_g2",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「せ」G2 字間。出荷正本は fonts_out/MyMincho.ufo の uni305B。輪郭は G1 のまま平行移動＋幅のみ。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni305B",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni305B_.glif",
+  "params": "product_r1",
+  "glif_sha256": "54c42e3afbd9cbc294752ee26b2cbf48bb5c37025feb1c51ff9c951554838fb5",
+  "sidebearings_em1000": {
+    "lsb": 126,
+    "rsb": 118,
+    "ink": 915,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
+    "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_se/single.png": {
+      "sha256": "d5b6256f69f5ee1998b63d9c2fb6421ab92c761066e3ad07a28619cbe02c4af0",
+      "text": "せ",
+      "tag": "single"
+    },
+    "proofs/golden/kana_se/walk.png": {
+      "sha256": "8d6c8a39262dca2fada965b793fc4abba5c902386402c449cba246fadac9c2c8",
+      "text": "せせせ",
+      "tag": "walk"
+    }
+  }
+}

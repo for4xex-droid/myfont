@@ -1,6 +1,6 @@
 # 「き」を Glyphs で描く
 
-**済（G1）**。正本: `fonts_out/MyMincho.ufo` の `uni304D`。黄金 `proofs/golden/kana_ki/FREEZE_g1.json`。
+**済（G1 字形＋G2 字間）**。正本: `fonts_out/MyMincho.ufo` の `uni304D`。現行黄金 `proofs/golden/kana_ki/FREEZE_g2.json`。
 「あ」は触らない。
 
 参照4書体の「き」は出荷では 1〜2 輪郭（union 済み）だが、**描くときは分けたまま**にする。合体しない。

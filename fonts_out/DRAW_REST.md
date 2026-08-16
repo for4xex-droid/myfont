@@ -1,6 +1,6 @@
 # 残り10字を Glyphs で描く
 
-**済（G1）**。正本: `fonts_out/MyMincho.ufo`。黄金 `proofs/golden/kana_{u,e,o,ka,ke,ko,su,se,so,te}/FREEZE_g1.json`。
+**済（G1 字形＋G2 字間）**。正本: `fonts_out/MyMincho.ufo`。帯外だった字は `FREEZE_g2.json`。え・おは G1 のまま帯内。
 
 対象: **う・え・お・か・け・こ・す・せ・そ・て**
 

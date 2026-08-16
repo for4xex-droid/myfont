@@ -1,0 +1,38 @@
+{
+  "version": "kana_u_g2",
+  "frozen_at": "2026-08-16T00:00:00Z",
+  "reason": "方式A「う」G2 字間。出荷正本は fonts_out/MyMincho.ufo の uni3046。輪郭は G1 のまま平行移動＋幅のみ。参照はラスタガイドのみ（掟9）。fontmake remove_overlaps=False。",
+  "source": "manual_ufo",
+  "ufo": "fonts_out/MyMincho.ufo",
+  "glyph": "uni3046",
+  "glif": "fonts_out/MyMincho.ufo/glyphs/uni3046.glif",
+  "params": "product_r1",
+  "glif_sha256": "aeb1e4c5e41183f801f1ad08433439e3e4a735c06ec6c3d6f0048e916bb24282",
+  "sidebearings_em1000": {
+    "lsb": 126,
+    "rsb": 118,
+    "ink": 536,
+    "target_lsb": [
+      106,
+      146
+    ],
+    "target_rsb": [
+      98,
+      138
+    ],
+    "ci": "engine/tests/test_kana_band.py::test_current_kana_live_render_matches_golden",
+    "note": "参照4書体中央±20U。kana_gate には載せない（掟8）。"
+  },
+  "files": {
+    "proofs/golden/kana_u/single.png": {
+      "sha256": "d996a46c1f9ff7b4688802ec696cb52ee7932dc341964ce9b4cfff56c835803a",
+      "text": "う",
+      "tag": "single"
+    },
+    "proofs/golden/kana_u/walk.png": {
+      "sha256": "783a05221a1aeb88a8a1adf097df280361f8e7854fd5d21caa08593e8e20689f",
+      "text": "ううう",
+      "tag": "walk"
+    }
+  }
+}

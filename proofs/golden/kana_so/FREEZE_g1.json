@@ -22,16 +22,6 @@
     ],
     "note": "G1は字形凍結のみ。字間帯は観測で CI 非拘束。kana_gate には載せない（掟8）。"
   },
-  "files": {
-    "proofs/golden/kana_so/single.png": {
-      "sha256": "f03afd95eb0e60a3ebb9ebc1310d7c2464a5dd762e19ca197047e05fcba25f97",
-      "text": "そ",
-      "tag": "single"
-    },
-    "proofs/golden/kana_so/walk.png": {
-      "sha256": "b24ce7ea7bc56b2b72577c3402bbda19ed9eb1039b246ab7caa5b129f52b7e83",
-      "text": "そそそ",
-      "tag": "walk"
-    }
-  }
+  "superseded_by": "kana_so_g2",
+  "note": "G1 字形。字間は FREEZE_g2.json。"
 }

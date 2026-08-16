@@ -273,9 +273,18 @@ def test_current_kana_live_render_matches_golden(tmp_path: Path):
             )
             assert rendered["png_sha256"] == meta["sha256"], rel
             saw += 1
-        if gid == "a":
+        if data.get("source") == "manual_ufo":
             tt = TTFont(str(otf_path))
-            name = tt.getBestCmap()[ord("あ")]
+            single = next(
+                (
+                    m["text"]
+                    for m in (data.get("files") or {}).values()
+                    if m.get("tag") == "single"
+                ),
+                None,
+            )
+            ch = single[0] if single else "あ"
+            name = tt.getBestCmap()[ord(ch)]
             aw, lsb = tt["hmtx"][name]
             gs = tt.getGlyphSet()
             bp = BoundsPen(gs)
@@ -283,6 +292,6 @@ def test_current_kana_live_render_matches_golden(tmp_path: Path):
             xmin, _ymin, xmax, _ymax = bp.bounds
             rsb = aw - (xmax - xmin) - lsb
             scale = UPM / tt["head"].unitsPerEm
-            assert 106.0 <= lsb * scale <= 146.0, lsb
-            assert 98.0 <= rsb * scale <= 138.0, rsb
+            assert 106.0 <= lsb * scale <= 146.0, (gid, ch, lsb * scale)
+            assert 98.0 <= rsb * scale <= 138.0, (gid, ch, rsb * scale)
     assert saw >= 4
