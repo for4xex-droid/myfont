@@ -158,8 +158,8 @@ def _copy_work_glyph(dest_font, work_path: Path, name: str, char: str) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Receive one hand-drawn kana into dest UFO")
-    ap.add_argument("char", help="one hiragana character, e.g. せ")
+    ap = argparse.ArgumentParser(description="Receive hand-drawn kana into dest UFO")
+    ap.add_argument("chars", nargs="+", help="hiragana, e.g. せ る")
     ap.add_argument("--dest", type=Path, default=DEFAULT_DEST)
     ap.add_argument("--src-root", type=Path, default=DEFAULT_SRC_ROOT)
     ap.add_argument("--manual", type=Path, default=DEFAULT_MANUAL)
@@ -175,15 +175,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = ap.parse_args(argv)
 
-    if len(args.char) != 1:
-        print(f"error: expected one char, got {args.char!r}", file=sys.stderr)
-        return 2
-    if args.char in merge_manual_kana.ENGINE_CANONICAL:
-        print(
-            f"error: {args.char} is engine-canonical; refuse receive",
-            file=sys.stderr,
-        )
-        return 2
+    chars: list[str] = []
+    for raw in args.chars:
+        if len(raw) != 1:
+            print(f"error: expected one char, got {raw!r}", file=sys.stderr)
+            return 2
+        if raw in merge_manual_kana.ENGINE_CANONICAL:
+            print(
+                f"error: {raw} is engine-canonical; refuse receive",
+                file=sys.stderr,
+            )
+            return 2
+        if raw not in chars:
+            chars.append(raw)
     if not args.dest.is_dir():
         print(f"error: missing dest UFO {args.dest}", file=sys.stderr)
         return 2
@@ -194,49 +198,53 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    name = uni_name(args.char)
-    work = args.src_root / f"{args.char}.ufo"
+    if not args.manual.is_file():
+        print(f"error: missing {args.manual}", file=sys.stderr)
+        return 2
+
     from ufoLib2 import Font
 
     try:
         dest = Font.open(args.dest)
-        if work.is_dir():
-            dest_drawn = name in dest and len(dest[name]) > 0
-            if dest_drawn and not args.force:
-                print(
-                    f"skip work {work}: dest already drawn "
-                    f"({len(dest[name])} contours); pass --force to replace"
-                )
-            else:
-                _copy_work_glyph(dest, work, name, args.char)
-        if name not in dest or len(dest[name]) == 0:
-            print(f"error: {name} has no contours (need work UFO or dest)", file=sys.stderr)
-            return 2
-        dest[name].lib[MANUAL_LIB] = True
-        dest[name].unicodes = [ord(args.char)]
-        removed = remove_junk_contours(dest[name])
-        sidebearings.set_sidebearings(
-            dest[name],
-            lsb=sidebearings.TARGET_LSB,
-            rsb=sidebearings.TARGET_RSB,
-        )
+        keep = {"contents.plist"}
+        for char in chars:
+            name = uni_name(char)
+            work = args.src_root / f"{char}.ufo"
+            if work.is_dir():
+                dest_drawn = name in dest and len(dest[name]) > 0
+                if dest_drawn and not args.force:
+                    print(
+                        f"skip work {work}: dest already drawn "
+                        f"({len(dest[name])} contours); pass --force to replace"
+                    )
+                else:
+                    _copy_work_glyph(dest, work, name, char)
+            if name not in dest or len(dest[name]) == 0:
+                print(f"error: {name} has no contours (need work UFO or dest)", file=sys.stderr)
+                return 2
+            dest[name].lib[MANUAL_LIB] = True
+            dest[name].unicodes = [ord(char)]
+            removed = remove_junk_contours(dest[name])
+            sidebearings.set_sidebearings(
+                dest[name],
+                lsb=sidebearings.TARGET_LSB,
+                rsb=sidebearings.TARGET_RSB,
+            )
+            listed = ensure_manual_listed(args.manual, name)
+            glyph = dest[name]
+            lsb, rsb, _ink = sidebearings.sidebearings(glyph)
+            print(
+                f"{char} {name} contours={len(glyph)} oncurve={oncurve_count(glyph)} "
+                f"lsb={lsb:.1f} rsb={rsb:.1f} junk_removed={len(removed)} "
+                f"manual={listed}"
+            )
+            if removed:
+                print(f"  junk_areas={removed}")
         dest.save()
-        keep = {"contents.plist", glif_relpath(args.dest, name)}
+        for char in chars:
+            keep.add(glif_relpath(args.dest, uni_name(char)))
         restored = restore_other_from_head(args.repo, args.dest, keep)
-        if not args.manual.is_file():
-            print(f"error: missing {args.manual}", file=sys.stderr)
-            return 2
-        listed = ensure_manual_listed(args.manual, name)
-        dest = Font.open(args.dest)
-        glyph = dest[name]
-        lsb, rsb, _ink = sidebearings.sidebearings(glyph)
-        print(
-            f"{args.char} {name} contours={len(glyph)} oncurve={oncurve_count(glyph)} "
-            f"lsb={lsb:.1f} rsb={rsb:.1f} junk_removed={len(removed)} "
-            f"restored={len(restored)} manual={listed}"
-        )
-        if removed:
-            print(f"  junk_areas={removed}")
+        print(f"restored={len(restored)}")
     except Exception as e:
         print(f"error: receive failed: {e}", file=sys.stderr)
         return 1

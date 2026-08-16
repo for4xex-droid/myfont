@@ -169,6 +169,48 @@ def test_receive_missing_char():
     assert mod.main(["せせ"]) == 2
 
 
+def test_receive_keeps_all_named_chars(tmp_path: Path, monkeypatch):
+    from ufoLib2 import Font
+
+    dest = tmp_path / "MyMincho.ufo"
+    font = Font()
+    for name, origin in (("uni3065", (50, 50)), ("uni3093", (80, 80))):
+        g = font.newGlyph(name)
+        g.width = 1000
+        g.lib["com.mymincho.manual"] = True
+        _square(g, origin, 100)
+    font.save(dest)
+    manual = tmp_path / "manual_glyphs.txt"
+    manual.write_text("uni3065\nuni3093\n", encoding="utf-8")
+    mod = _load("receive_manual")
+    seen: dict[str, set[str]] = {}
+
+    def fake_restore(repo, ufo, keep):
+        seen["keep"] = set(keep)
+        return []
+
+    monkeypatch.setattr(mod, "restore_other_from_head", fake_restore)
+    assert (
+        mod.main(
+            [
+                "づ",
+                "ん",
+                "--dest",
+                str(dest),
+                "--src-root",
+                str(tmp_path / "none"),
+                "--manual",
+                str(manual),
+                "--no-compile",
+                "--no-proofs",
+            ]
+        )
+        == 0
+    )
+    assert any("uni3065" in p for p in seen["keep"])
+    assert any("uni3093" in p for p in seen["keep"])
+
+
 def test_receive_refuses_non_ufo(tmp_path: Path):
     dest = tmp_path / "not_ufo"
     dest.mkdir()
@@ -296,3 +338,21 @@ def test_diagnose_groups_band_and_points(tmp_path: Path):
     assert "kana_targets" not in text.lower() or "未凍結" in text
     assert "low_confidence" in text
     assert "stemVem" in text
+
+
+def test_diagnose_ru_is_known_exception():
+    mod = _load("diagnose_manual_kana")
+    row = {
+        "char": "る",
+        "oncurve": 65,
+        "contours": 1,
+        "in_band": True,
+        "small_flag": False,
+    }
+    assert mod.classify(row) == ["既知例外"]
+    row["char"] = "そ"
+    row["oncurve"] = 57
+    assert mod.classify(row) == ["既知例外"]
+    row["char"] = "ん"
+    row["oncurve"] = 50
+    assert "節点過多" in mod.classify(row)

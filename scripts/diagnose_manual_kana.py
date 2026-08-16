@@ -21,6 +21,8 @@ DEFAULT_OTF = ROOT / "fonts_out" / "build" / "MyMincho.otf"
 DEFAULT_OUT = ROOT / "proofs" / "q0_diagnosis.md"
 P1_DRAWN = "あいうえおかきくけこさしすせそたちつてとのはひほまめやるりをんっがじづぞぼ"
 POINT_HEAVY_PER_CONTOUR = 48.0
+# 形状上これ以上減らせない（作者判断。合否ではない）
+POINT_EXCEPTIONS = frozenset("るそ")
 SMALL_DENSITY_FRAC = 0.15
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -50,7 +52,9 @@ def classify(row: dict) -> list[str]:
     if not row["in_band"]:
         groups.append("帯外")
     per = row["oncurve"] / max(1, row["contours"])
-    if per > POINT_HEAVY_PER_CONTOUR:
+    if row.get("char") in POINT_EXCEPTIONS and per > POINT_HEAVY_PER_CONTOUR:
+        groups.append("既知例外")
+    elif per > POINT_HEAVY_PER_CONTOUR:
         groups.append("節点過多")
     if row.get("small_flag"):
         groups.append("小サイズで目立つ")
@@ -226,7 +230,8 @@ def render_table(rows: list[dict]) -> str:
         "",
         f"- 帯外: {''.join(_group('帯外')) or 'なし'}",
         f"- 節点過多: {''.join(_group('節点過多')) or 'なし'}",
-        f"- 小サイズで目立つ: {''.join(_group('小サイズで目立つ')) or 'なし（OTF未計測）'}",
+        f"- 既知例外: {''.join(_group('既知例外')) or 'なし'}",
+        f"- 小サイズで目立つ: {''.join(_group('小サイズで目立つ')) or ('なし' if any(r.get('ink_density_20') is not None for r in rows) else 'なし（OTF未計測）')}",
         f"- 欠字: {''.join(_group('欠字')) or 'なし'}",
         "",
     ]
