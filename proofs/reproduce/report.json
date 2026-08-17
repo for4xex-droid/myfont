@@ -1,0 +1,15 @@
+{
+  "mode": "exact",
+  "ref": "/Users/motista/Desktop/antigravity/myfont/fontdb/data/fonts/ipaex_mincho-Regular.ttf",
+  "shipping_ufo_written": false,
+  "mean_iou": 1.0,
+  "glyphs": [
+    {
+      "char": "十",
+      "iou": 1.0,
+      "src_name": "aj2375",
+      "unicode": 21313
+    }
+  ],
+  "png": "/Users/motista/Desktop/antigravity/myfont/proofs/reproduce/compare.png"
+}

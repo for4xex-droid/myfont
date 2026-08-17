@@ -51,6 +51,8 @@ engine/output/
 # DNA ワープ試作（本体へ入れない）
 _scratch_warp/
 proofs/dna/_tmp/
+proofs/mix/_scratch/
+proofs/reproduce/_scratch/
 
 # Proof renders (texts + golden stay tracked)
 proofs/out/

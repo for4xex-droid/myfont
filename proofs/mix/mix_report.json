@@ -1,0 +1,66 @@
+{
+  "throwaway": true,
+  "shipping_ufo_written": false,
+  "params": "mix_k1",
+  "kanji_ids": [
+    "juu",
+    "ni",
+    "san",
+    "ei",
+    "kuchi",
+    "nichi",
+    "ta",
+    "naka"
+  ],
+  "engine_ufo": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/_scratch/regen/MyMincho-mix-engine.ufo",
+  "scratch_ufo": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/_scratch/MyMincho-mix.ufo",
+  "scratch_otf": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/_scratch/MyMincho-mix.otf",
+  "fill_check": {
+    "ok": true,
+    "ink_ratio": 0.20076969974089315,
+    "inverted_suspect": false,
+    "em_px": 256,
+    "glyph_bitmap": [
+      162,
+      162
+    ]
+  },
+  "measure_juu": {
+    "status": "ok",
+    "value": 1.3,
+    "value_secondary": 60.0,
+    "vert_thickness_px": 78.0,
+    "horiz_thickness_px": 60.0,
+    "contrast_v_over_h": 1.3,
+    "vert_cands": [
+      78,
+      78,
+      78,
+      78
+    ],
+    "horiz_cands": [
+      60,
+      60,
+      60,
+      60
+    ],
+    "reason": "ok",
+    "profile": "ft_1024_nohint_gray_v1"
+  },
+  "renders": [
+    {
+      "size": 20,
+      "png": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/mix_20.png",
+      "backend": "hb-view+stitch",
+      "sha256": "581fc883a5805ff02cf713b2d714ca20c07817d24da078fdeb14092b8d798345"
+    },
+    {
+      "size": 48,
+      "png": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/mix_48.png",
+      "backend": "hb-view+stitch",
+      "sha256": "f1d28e64075b847ead28220585d599172625d1f57bc35776497b004382b68d20"
+    }
+  ],
+  "verdict": null,
+  "note": "作者が mix_20.png / mix_48.png を見て proofs/mix/NOTE.md に記入"
+}

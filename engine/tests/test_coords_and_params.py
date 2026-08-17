@@ -57,6 +57,14 @@ def test_product_r1_loads_from_yaml():
     assert loaded.v_thickness == 110.0
 
 
+def test_mix_k1_is_lighter_than_product_r1():
+    k1 = load_params_snapshot("mix_k1")
+    assert k1.v_thickness < PRODUCT_R1.v_thickness
+    assert k1.h_thickness > PRODUCT_R1.h_thickness
+    assert k1.uroko_height < PRODUCT_R1.uroko_height
+    assert k1.v_thickness / k1.h_thickness < 1.5
+
+
 def test_product_r1_repo_and_package_snapshots_match():
     """engine/params とパッケージ内 snapshots の二重配備がズレないこと。"""
     from pathlib import Path

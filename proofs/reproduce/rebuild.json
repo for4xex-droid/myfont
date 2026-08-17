@@ -1,0 +1,2459 @@
+{
+  "ref": "/Users/motista/Desktop/antigravity/myfont/fontdb/data/fonts/ipaex_mincho-Regular.ttf",
+  "shipping_ufo_written": false,
+  "method": "stems-plus-templates",
+  "uroko_family": {
+    "bottom_frac": 0.91,
+    "tip_y_frac": 0.2,
+    "peak_x_frac": 0.43
+  },
+  "glyphs": [
+    {
+      "char": "十",
+      "unicode": "U+5341",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 145.0,
+          "y0": 836.0,
+          "x1": 1661.0,
+          "y1": 887.0,
+          "thickness": 51.0,
+          "length": 1516.0
+        },
+        {
+          "kind": "v",
+          "x0": 950.0,
+          "y0": -125.0,
+          "x1": 1079.0,
+          "y1": 1536.0,
+          "thickness": 129.0,
+          "length": 1661.0
+        }
+      ],
+      "junctions": 1,
+      "templates": [
+        "bar_uroko",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.8351,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 56271.0,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.962271
+    },
+    {
+      "char": "二",
+      "unicode": "U+4E8C",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 162.0,
+          "y0": 168.0,
+          "x1": 1622.0,
+          "y1": 223.0,
+          "thickness": 55.0,
+          "length": 1460.0
+        },
+        {
+          "kind": "h",
+          "x0": 332.0,
+          "y0": 1231.0,
+          "x1": 1417.0,
+          "y1": 1286.0,
+          "thickness": 55.0,
+          "length": 1085.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.6694,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 69134.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "三",
+      "unicode": "U+4E09",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 189.0,
+          "y0": 53.0,
+          "x1": 1616.0,
+          "y1": 104.0,
+          "thickness": 51.0,
+          "length": 1427.0
+        },
+        {
+          "kind": "h",
+          "x0": 295.0,
+          "y0": 1337.0,
+          "x1": 1495.0,
+          "y1": 1389.0,
+          "thickness": 52.0,
+          "length": 1200.0
+        },
+        {
+          "kind": "h",
+          "x0": 416.0,
+          "y0": 731.0,
+          "x1": 1393.0,
+          "y1": 782.0,
+          "thickness": 51.0,
+          "length": 977.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "bar_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.6458,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 101460.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "口",
+      "unicode": "U+53E3",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 338.0,
+          "y0": 147.0,
+          "x1": 1694.0,
+          "y1": 199.0,
+          "thickness": 52.0,
+          "length": 1356.0
+        },
+        {
+          "kind": "h",
+          "x0": 338.0,
+          "y0": 1337.0,
+          "x1": 1545.0,
+          "y1": 1389.0,
+          "thickness": 52.0,
+          "length": 1207.0
+        },
+        {
+          "kind": "v",
+          "x0": 338.0,
+          "y0": -64.0,
+          "x1": 469.0,
+          "y1": 1389.0,
+          "thickness": 131.0,
+          "length": 1453.0
+        },
+        {
+          "kind": "v",
+          "x0": 1563.0,
+          "y0": -48.0,
+          "x1": 1694.0,
+          "y1": 1288.0,
+          "thickness": 131.0,
+          "length": 1336.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "box_uroko",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.9325,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 34610.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "日",
+      "unicode": "U+65E5",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 416.0,
+          "y0": 90.0,
+          "x1": 1608.0,
+          "y1": 141.0,
+          "thickness": 51.0,
+          "length": 1192.0
+        },
+        {
+          "kind": "h",
+          "x0": 416.0,
+          "y0": 784.0,
+          "x1": 1608.0,
+          "y1": 836.0,
+          "thickness": 52.0,
+          "length": 1192.0
+        },
+        {
+          "kind": "h",
+          "x0": 416.0,
+          "y0": 1436.0,
+          "x1": 1460.0,
+          "y1": 1487.0,
+          "thickness": 51.0,
+          "length": 1044.0
+        },
+        {
+          "kind": "v",
+          "x0": 416.0,
+          "y0": -86.0,
+          "x1": 545.0,
+          "y1": 1487.0,
+          "thickness": 129.0,
+          "length": 1573.0
+        },
+        {
+          "kind": "v",
+          "x0": 1481.0,
+          "y0": -66.0,
+          "x1": 1608.0,
+          "y1": 1391.0,
+          "thickness": 127.0,
+          "length": 1457.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "box_uroko",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.9386,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 34741.2,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.998346
+    },
+    {
+      "char": "田",
+      "unicode": "U+7530",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 276.0,
+          "y0": 94.0,
+          "x1": 1746.0,
+          "y1": 145.0,
+          "thickness": 51.0,
+          "length": 1470.0
+        },
+        {
+          "kind": "h",
+          "x0": 276.0,
+          "y0": 768.0,
+          "x1": 1746.0,
+          "y1": 819.0,
+          "thickness": 51.0,
+          "length": 1470.0
+        },
+        {
+          "kind": "h",
+          "x0": 276.0,
+          "y0": 1399.0,
+          "x1": 1609.0,
+          "y1": 1450.0,
+          "thickness": 51.0,
+          "length": 1333.0
+        },
+        {
+          "kind": "v",
+          "x0": 276.0,
+          "y0": -90.0,
+          "x1": 399.0,
+          "y1": 1450.0,
+          "thickness": 123.0,
+          "length": 1540.0
+        },
+        {
+          "kind": "v",
+          "x0": 942.0,
+          "y0": 94.0,
+          "x1": 1061.0,
+          "y1": 1450.0,
+          "thickness": 119.0,
+          "length": 1356.0
+        },
+        {
+          "kind": "v",
+          "x0": 1625.0,
+          "y0": -70.0,
+          "x1": 1746.0,
+          "y1": 1362.0,
+          "thickness": 121.0,
+          "length": 1432.0
+        }
+      ],
+      "junctions": 6,
+      "templates": [
+        "box_uroko",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.9572,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 30942.0,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.946845
+    },
+    {
+      "char": "中",
+      "unicode": "U+4E2D",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 266.0,
+          "y0": 535.0,
+          "x1": 1761.0,
+          "y1": 586.0,
+          "thickness": 51.0,
+          "length": 1495.0
+        },
+        {
+          "kind": "h",
+          "x0": 266.0,
+          "y0": 1149.0,
+          "x1": 1620.0,
+          "y1": 1200.0,
+          "thickness": 51.0,
+          "length": 1354.0
+        },
+        {
+          "kind": "v",
+          "x0": 940.0,
+          "y0": -147.0,
+          "x1": 1065.0,
+          "y1": 1548.0,
+          "thickness": 125.0,
+          "length": 1695.0
+        },
+        {
+          "kind": "v",
+          "x0": 266.0,
+          "y0": 367.0,
+          "x1": 389.0,
+          "y1": 1200.0,
+          "thickness": 123.0,
+          "length": 833.0
+        },
+        {
+          "kind": "v",
+          "x0": 1638.0,
+          "y0": 396.0,
+          "x1": 1761.0,
+          "y1": 1108.0,
+          "thickness": 123.0,
+          "length": 712.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "box_uroko",
+        "top_cap",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.9062,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 53359.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.976029
+    },
+    {
+      "char": "永",
+      "unicode": "U+6C38",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 410.0,
+          "y0": 1206.0,
+          "x1": 1082.0,
+          "y1": 1257.0,
+          "thickness": 51.0,
+          "length": 672.0
+        },
+        {
+          "kind": "h",
+          "x0": 191.0,
+          "y0": 846.0,
+          "x1": 646.0,
+          "y1": 897.0,
+          "thickness": 51.0,
+          "length": 455.0
+        },
+        {
+          "kind": "v",
+          "x0": 967.0,
+          "y0": 98.0,
+          "x1": 1082.0,
+          "y1": 1257.0,
+          "thickness": 115.0,
+          "length": 1159.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "right_hara",
+        "left_hara",
+        "ten",
+        "hane",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.2773,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 481916.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.977583
+    },
+    {
+      "char": "八",
+      "unicode": "U+516B",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 774.0,
+          "y0": 1432.0,
+          "x1": 1177.0,
+          "y1": 1483.0,
+          "thickness": 51.0,
+          "length": 403.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "right_hara",
+        "left_hara",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.0553,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 350882.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.999834
+    },
+    {
+      "char": "人",
+      "unicode": "U+4EBA",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [],
+      "junctions": 0,
+      "templates": [
+        "hara_pair"
+      ],
+      "vector_iou_stems": 0.0,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 391539.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "入",
+      "unicode": "U+5165",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 501.0,
+          "y0": 1434.0,
+          "x1": 1059.0,
+          "y1": 1485.0,
+          "thickness": 51.0,
+          "length": 558.0,
+          "x1_paired": 966.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "uchikomi",
+        "roof_shoulder"
+      ],
+      "vector_iou_stems": 0.0728,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 362506.0,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.999842
+    },
+    {
+      "char": "木",
+      "unicode": "U+6728",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 178.0,
+          "y0": 1075.0,
+          "x1": 1622.0,
+          "y1": 1126.0,
+          "thickness": 51.0,
+          "length": 1444.0
+        },
+        {
+          "kind": "v",
+          "x0": 954.0,
+          "y0": -148.0,
+          "x1": 1077.0,
+          "y1": 1538.0,
+          "thickness": 123.0,
+          "length": 1686.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.4707,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 308915.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "本",
+      "unicode": "U+672C",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 176.0,
+          "y0": 1180.0,
+          "x1": 1636.0,
+          "y1": 1231.0,
+          "thickness": 51.0,
+          "length": 1460.0
+        },
+        {
+          "kind": "h",
+          "x0": 583.0,
+          "y0": 289.0,
+          "x1": 1077.0,
+          "y1": 340.0,
+          "thickness": 51.0,
+          "length": 494.0
+        },
+        {
+          "kind": "v",
+          "x0": 952.0,
+          "y0": -147.0,
+          "x1": 1077.0,
+          "y1": 1542.0,
+          "thickness": 125.0,
+          "length": 1689.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "other",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.4597,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 350352.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "大",
+      "unicode": "U+5927",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 174.0,
+          "y0": 1012.0,
+          "x1": 1640.0,
+          "y1": 1063.0,
+          "thickness": 51.0,
+          "length": 1466.0
+        },
+        {
+          "kind": "v",
+          "x0": 940.0,
+          "y0": 1012.0,
+          "x1": 1065.0,
+          "y1": 1520.0,
+          "thickness": 125.0,
+          "length": 508.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.2668,
+      "vector_iou_templates": 0.9995,
+      "xor_stems": 361836.2,
+      "xor_templates": 226.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "天",
+      "unicode": "U+5929",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 192.0,
+          "y0": 1409.0,
+          "x1": 1599.0,
+          "y1": 1460.0,
+          "thickness": 51.0,
+          "length": 1407.0
+        },
+        {
+          "kind": "h",
+          "x0": 254.0,
+          "y0": 846.0,
+          "x1": 944.0,
+          "y1": 897.0,
+          "thickness": 51.0,
+          "length": 690.0
+        },
+        {
+          "kind": "h",
+          "x0": 1099.0,
+          "y0": 846.0,
+          "x1": 1546.0,
+          "y1": 897.0,
+          "thickness": 51.0,
+          "length": 447.0
+        },
+        {
+          "kind": "v",
+          "x0": 954.0,
+          "y0": 1014.0,
+          "x1": 1081.0,
+          "y1": 1460.0,
+          "thickness": 127.0,
+          "length": 446.0
+        }
+      ],
+      "junctions": 1,
+      "templates": [
+        "hara_pair",
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.3347,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 357563.8,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.980588
+    },
+    {
+      "char": "又",
+      "unicode": "U+53C8",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 561.0,
+          "y0": 1423.0,
+          "x1": 1424.0,
+          "y1": 1475.0,
+          "thickness": 52.0,
+          "length": 863.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair"
+      ],
+      "vector_iou_stems": 0.0817,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 504262.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "文",
+      "unicode": "U+6587",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 188.0,
+          "y0": 1212.0,
+          "x1": 1077.0,
+          "y1": 1264.0,
+          "thickness": 52.0,
+          "length": 889.0
+        },
+        {
+          "kind": "v",
+          "x0": 956.0,
+          "y0": 1212.0,
+          "x1": 1077.0,
+          "y1": 1555.0,
+          "thickness": 121.0,
+          "length": 343.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.1444,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 482378.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "火",
+      "unicode": "U+706B",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "v",
+          "x0": 955.0,
+          "y0": 1270.0,
+          "x1": 1082.0,
+          "y1": 1546.0,
+          "thickness": 127.0,
+          "length": 276.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "hane",
+        "hane",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.0636,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 515713.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.995977
+    },
+    {
+      "char": "矢",
+      "unicode": "U+77E2",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 180.0,
+          "y0": 709.0,
+          "x1": 1608.0,
+          "y1": 760.0,
+          "thickness": 51.0,
+          "length": 1428.0
+        },
+        {
+          "kind": "h",
+          "x0": 623.0,
+          "y0": 1290.0,
+          "x1": 1466.0,
+          "y1": 1341.0,
+          "thickness": 51.0,
+          "length": 843.0
+        },
+        {
+          "kind": "v",
+          "x0": 961.0,
+          "y0": 709.0,
+          "x1": 1090.0,
+          "y1": 1341.0,
+          "thickness": 129.0,
+          "length": 632.0
+        }
+      ],
+      "junctions": 1,
+      "templates": [
+        "hara_pair",
+        "left_hara",
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.2964,
+      "vector_iou_templates": 0.9987,
+      "xor_stems": 435348.3,
+      "xor_templates": 793.0,
+      "pixel_iou": 0.995249
+    },
+    {
+      "char": "川",
+      "unicode": "U+5DDD",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "v",
+          "x0": 1603.0,
+          "y0": -94.0,
+          "x1": 1728.0,
+          "y1": 1505.0,
+          "thickness": 125.0,
+          "length": 1599.0
+        },
+        {
+          "kind": "v",
+          "x0": 966.0,
+          "y0": 104.0,
+          "x1": 1087.0,
+          "y1": 1364.0,
+          "thickness": 121.0,
+          "length": 1260.0
+        },
+        {
+          "kind": "v",
+          "x0": 352.0,
+          "y0": 907.0,
+          "x1": 481.0,
+          "y1": 1477.0,
+          "thickness": 129.0,
+          "length": 570.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "left_hara",
+        "top_cap",
+        "top_cap",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.7051,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 178139.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.982359
+    },
+    {
+      "char": "水",
+      "unicode": "U+6C34",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 199.0,
+          "y0": 1069.0,
+          "x1": 684.0,
+          "y1": 1120.0,
+          "thickness": 51.0,
+          "length": 485.0
+        },
+        {
+          "kind": "v",
+          "x0": 981.0,
+          "y0": 121.0,
+          "x1": 1102.0,
+          "y1": 1260.0,
+          "thickness": 121.0,
+          "length": 1139.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "right_hara",
+        "left_hara",
+        "hane",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.2549,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 475162.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.999808
+    },
+    {
+      "char": "手",
+      "unicode": "U+624B",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 131.0,
+          "y0": 571.0,
+          "x1": 1682.0,
+          "y1": 623.0,
+          "thickness": 52.0,
+          "length": 1551.0
+        },
+        {
+          "kind": "h",
+          "x0": 248.0,
+          "y0": 979.0,
+          "x1": 1567.0,
+          "y1": 1030.0,
+          "thickness": 51.0,
+          "length": 1319.0
+        },
+        {
+          "kind": "v",
+          "x0": 969.0,
+          "y0": 135.0,
+          "x1": 1094.0,
+          "y1": 1394.0,
+          "thickness": 125.0,
+          "length": 1259.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "top_cap",
+        "hane",
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.5286,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 260743.8,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.99989
+    },
+    {
+      "char": "上",
+      "unicode": "U+4E0A",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 151.0,
+          "y0": 18.0,
+          "x1": 1636.0,
+          "y1": 70.0,
+          "thickness": 52.0,
+          "length": 1485.0
+        },
+        {
+          "kind": "h",
+          "x0": 901.0,
+          "y0": 864.0,
+          "x1": 1517.0,
+          "y1": 915.0,
+          "thickness": 51.0,
+          "length": 616.0
+        },
+        {
+          "kind": "v",
+          "x0": 901.0,
+          "y0": 18.0,
+          "x1": 1030.0,
+          "y1": 1470.0,
+          "thickness": 129.0,
+          "length": 1452.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "bar_uroko",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.7521,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 93187.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "土",
+      "unicode": "U+571F",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 179.0,
+          "y0": 25.0,
+          "x1": 1622.0,
+          "y1": 76.0,
+          "thickness": 51.0,
+          "length": 1443.0
+        },
+        {
+          "kind": "h",
+          "x0": 293.0,
+          "y0": 944.0,
+          "x1": 1522.0,
+          "y1": 995.0,
+          "thickness": 51.0,
+          "length": 1229.0
+        },
+        {
+          "kind": "v",
+          "x0": 953.0,
+          "y0": 25.0,
+          "x1": 1082.0,
+          "y1": 1513.0,
+          "thickness": 129.0,
+          "length": 1488.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "bar_uroko",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.7861,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 85726.8,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.974116
+    },
+    {
+      "char": "王",
+      "unicode": "U+738B",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 162.0,
+          "y0": 16.0,
+          "x1": 1635.0,
+          "y1": 68.0,
+          "thickness": 52.0,
+          "length": 1473.0
+        },
+        {
+          "kind": "h",
+          "x0": 230.0,
+          "y0": 1368.0,
+          "x1": 1563.0,
+          "y1": 1419.0,
+          "thickness": 51.0,
+          "length": 1333.0
+        },
+        {
+          "kind": "h",
+          "x0": 341.0,
+          "y0": 725.0,
+          "x1": 1465.0,
+          "y1": 776.0,
+          "thickness": 51.0,
+          "length": 1124.0
+        },
+        {
+          "kind": "v",
+          "x0": 953.0,
+          "y0": 16.0,
+          "x1": 1082.0,
+          "y1": 1419.0,
+          "thickness": 129.0,
+          "length": 1403.0
+        }
+      ],
+      "junctions": 3,
+      "templates": [
+        "bar_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.7775,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 103893.0,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.980023
+    },
+    {
+      "char": "玉",
+      "unicode": "U+7389",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 160.0,
+          "y0": -14.0,
+          "x1": 1665.0,
+          "y1": 37.0,
+          "thickness": 51.0,
+          "length": 1505.0
+        },
+        {
+          "kind": "h",
+          "x0": 231.0,
+          "y0": 1384.0,
+          "x1": 1575.0,
+          "y1": 1436.0,
+          "thickness": 52.0,
+          "length": 1344.0
+        },
+        {
+          "kind": "h",
+          "x0": 336.0,
+          "y0": 739.0,
+          "x1": 1476.0,
+          "y1": 791.0,
+          "thickness": 52.0,
+          "length": 1140.0
+        },
+        {
+          "kind": "v",
+          "x0": 944.0,
+          "y0": -14.0,
+          "x1": 1073.0,
+          "y1": 1436.0,
+          "thickness": 129.0,
+          "length": 1450.0
+        }
+      ],
+      "junctions": 3,
+      "templates": [
+        "other",
+        "bar_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.7058,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 155495.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "力",
+      "unicode": "U+529B",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 215.0,
+          "y0": 1094.0,
+          "x1": 840.0,
+          "y1": 1145.0,
+          "thickness": 51.0,
+          "length": 625.0
+        },
+        {
+          "kind": "h",
+          "x0": 975.0,
+          "y0": 1104.0,
+          "x1": 1589.0,
+          "y1": 1155.0,
+          "thickness": 51.0,
+          "length": 614.0
+        },
+        {
+          "kind": "v",
+          "x0": 844.0,
+          "y0": 1104.0,
+          "x1": 977.0,
+          "y1": 1524.0,
+          "thickness": 133.0,
+          "length": 420.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "right_hara",
+        "left_hara",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.2209,
+      "vector_iou_templates": 0.9999,
+      "xor_stems": 419217.0,
+      "xor_templates": 53.3,
+      "pixel_iou": 0.990953
+    },
+    {
+      "char": "刀",
+      "unicode": "U+5200",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 232.0,
+          "y0": 1372.0,
+          "x1": 1588.0,
+          "y1": 1423.0,
+          "thickness": 51.0,
+          "length": 1356.0
+        },
+        {
+          "kind": "v",
+          "x0": 1604.98,
+          "y0": 1141.0,
+          "x1": 1730.02,
+          "y1": 1325.0,
+          "thickness": 125.04,
+          "length": 184.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "left_hara",
+        "right_hara",
+        "ten",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.1719,
+      "vector_iou_templates": 0.9999,
+      "xor_stems": 443811.6,
+      "xor_templates": 58.2,
+      "pixel_iou": 0.998853
+    },
+    {
+      "char": "月",
+      "unicode": "U+6708",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 619.0,
+          "y0": 580.0,
+          "x1": 1606.0,
+          "y1": 631.0,
+          "thickness": 51.0,
+          "length": 987.0
+        },
+        {
+          "kind": "h",
+          "x0": 498.0,
+          "y0": 1036.0,
+          "x1": 1606.0,
+          "y1": 1087.0,
+          "thickness": 51.0,
+          "length": 1108.0
+        },
+        {
+          "kind": "h",
+          "x0": 498.0,
+          "y0": 1462.0,
+          "x1": 1465.0,
+          "y1": 1513.0,
+          "thickness": 51.0,
+          "length": 967.0
+        },
+        {
+          "kind": "v",
+          "x0": 1483.0,
+          "y0": 136.0,
+          "x1": 1606.0,
+          "y1": 1421.0,
+          "thickness": 123.0,
+          "length": 1285.0
+        },
+        {
+          "kind": "v",
+          "x0": 498.0,
+          "y0": 580.0,
+          "x1": 623.0,
+          "y1": 1513.0,
+          "thickness": 125.0,
+          "length": 933.0
+        }
+      ],
+      "junctions": 3,
+      "templates": [
+        "left_hara",
+        "hane",
+        "box_uroko",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.6802,
+      "vector_iou_templates": 0.9997,
+      "xor_stems": 190503.2,
+      "xor_templates": 199.3,
+      "pixel_iou": 0.989023
+    },
+    {
+      "char": "用",
+      "unicode": "U+7528",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 469.0,
+          "y0": 559.0,
+          "x1": 1755.0,
+          "y1": 610.0,
+          "thickness": 51.0,
+          "length": 1286.0
+        },
+        {
+          "kind": "h",
+          "x0": 350.0,
+          "y0": 1018.0,
+          "x1": 1755.0,
+          "y1": 1069.0,
+          "thickness": 51.0,
+          "length": 1405.0
+        },
+        {
+          "kind": "h",
+          "x0": 350.0,
+          "y0": 1460.0,
+          "x1": 1611.0,
+          "y1": 1511.0,
+          "thickness": 51.0,
+          "length": 1261.0
+        },
+        {
+          "kind": "v",
+          "x0": 964.0,
+          "y0": -23.0,
+          "x1": 1081.0,
+          "y1": 1511.0,
+          "thickness": 117.0,
+          "length": 1534.0
+        },
+        {
+          "kind": "v",
+          "x0": 1632.0,
+          "y0": 115.0,
+          "x1": 1755.0,
+          "y1": 1419.0,
+          "thickness": 123.0,
+          "length": 1304.0
+        },
+        {
+          "kind": "v",
+          "x0": 350.0,
+          "y0": 559.0,
+          "x1": 471.0,
+          "y1": 1511.0,
+          "thickness": 121.0,
+          "length": 952.0
+        }
+      ],
+      "junctions": 6,
+      "templates": [
+        "hane",
+        "hane",
+        "box_uroko",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.7853,
+      "vector_iou_templates": 0.9999,
+      "xor_stems": 167750.5,
+      "xor_templates": 50.0,
+      "pixel_iou": 0.981369
+    },
+    {
+      "char": "小",
+      "unicode": "U+5C0F",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "v",
+          "x0": 961.0,
+          "y0": 123.0,
+          "x1": 1086.0,
+          "y1": 1518.0,
+          "thickness": 125.0,
+          "length": 1395.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "right_hara",
+        "left_hara",
+        "hane",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.3413,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 336530.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.999271
+    },
+    {
+      "char": "心",
+      "unicode": "U+5FC3",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "v",
+          "x0": 696.0,
+          "y0": 143.0,
+          "x1": 821.0,
+          "y1": 1087.0,
+          "thickness": 125.0,
+          "length": 944.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "other",
+        "other",
+        "left_hara",
+        "other",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.218,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 423280.0,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "少",
+      "unicode": "U+5C11",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "v",
+          "x0": 971.0,
+          "y0": 590.0,
+          "x1": 1092.0,
+          "y1": 1524.0,
+          "thickness": 121.0,
+          "length": 934.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "left_hara",
+        "other",
+        "hane",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.2002,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 451379.8,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.99913
+    },
+    {
+      "char": "耳",
+      "unicode": "U+8033",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 503.0,
+          "y0": 692.0,
+          "x1": 1490.0,
+          "y1": 743.0,
+          "thickness": 51.0,
+          "length": 987.0
+        },
+        {
+          "kind": "h",
+          "x0": 503.0,
+          "y0": 1094.0,
+          "x1": 1490.0,
+          "y1": 1145.0,
+          "thickness": 51.0,
+          "length": 987.0
+        },
+        {
+          "kind": "h",
+          "x0": 159.0,
+          "y0": 1460.0,
+          "x1": 1490.0,
+          "y1": 1511.0,
+          "thickness": 51.0,
+          "length": 1331.0
+        },
+        {
+          "kind": "v",
+          "x0": 1361.0,
+          "y0": -148.0,
+          "x1": 1490.0,
+          "y1": 1511.0,
+          "thickness": 129.0,
+          "length": 1659.0
+        },
+        {
+          "kind": "v",
+          "x0": 503.0,
+          "y0": 305.0,
+          "x1": 630.0,
+          "y1": 1511.0,
+          "thickness": 127.0,
+          "length": 1206.0
+        }
+      ],
+      "junctions": 4,
+      "templates": [
+        "other",
+        "bar_uroko"
+      ],
+      "vector_iou_stems": 0.7093,
+      "vector_iou_templates": 0.9993,
+      "xor_stems": 203294.2,
+      "xor_templates": 510.0,
+      "pixel_iou": 0.974766
+    },
+    {
+      "char": "言",
+      "unicode": "U+8A00",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 181.0,
+          "y0": 1194.0,
+          "x1": 1602.0,
+          "y1": 1245.0,
+          "thickness": 51.0,
+          "length": 1421.0
+        },
+        {
+          "kind": "h",
+          "x0": 418.0,
+          "y0": -20.0,
+          "x1": 1620.0,
+          "y1": 31.0,
+          "thickness": 51.0,
+          "length": 1202.0
+        },
+        {
+          "kind": "h",
+          "x0": 418.0,
+          "y0": 393.0,
+          "x1": 1477.0,
+          "y1": 444.0,
+          "thickness": 51.0,
+          "length": 1059.0
+        },
+        {
+          "kind": "h",
+          "x0": 463.0,
+          "y0": 930.0,
+          "x1": 1379.0,
+          "y1": 981.0,
+          "thickness": 51.0,
+          "length": 916.0
+        },
+        {
+          "kind": "h",
+          "x0": 463.0,
+          "y0": 666.0,
+          "x1": 1375.0,
+          "y1": 717.0,
+          "thickness": 51.0,
+          "length": 912.0
+        },
+        {
+          "kind": "h",
+          "x0": 488.0,
+          "y0": 1464.0,
+          "x1": 1346.0,
+          "y1": 1516.0,
+          "thickness": 52.0,
+          "length": 858.0
+        },
+        {
+          "kind": "v",
+          "x0": 418.0,
+          "y0": -147.0,
+          "x1": 543.0,
+          "y1": 444.0,
+          "thickness": 125.0,
+          "length": 591.0
+        },
+        {
+          "kind": "v",
+          "x0": 1495.0,
+          "y0": -147.0,
+          "x1": 1620.0,
+          "y1": 352.0,
+          "thickness": 125.0,
+          "length": 499.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "bar_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "box_uroko",
+        "top_cap",
+        "uchikomi",
+        "uchikomi",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.736,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 158807.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "古",
+      "unicode": "U+53E4",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 397.0,
+          "y0": 14.0,
+          "x1": 1632.0,
+          "y1": 66.0,
+          "thickness": 52.0,
+          "length": 1235.0
+        },
+        {
+          "kind": "h",
+          "x0": 147.0,
+          "y0": 1180.0,
+          "x1": 1644.0,
+          "y1": 1231.0,
+          "thickness": 51.0,
+          "length": 1497.0
+        },
+        {
+          "kind": "h",
+          "x0": 397.0,
+          "y0": 651.0,
+          "x1": 1491.0,
+          "y1": 702.0,
+          "thickness": 51.0,
+          "length": 1094.0
+        },
+        {
+          "kind": "v",
+          "x0": 397.0,
+          "y0": -117.0,
+          "x1": 518.0,
+          "y1": 702.0,
+          "thickness": 121.0,
+          "length": 819.0
+        },
+        {
+          "kind": "v",
+          "x0": 1511.0,
+          "y0": -117.0,
+          "x1": 1632.0,
+          "y1": 612.0,
+          "thickness": 121.0,
+          "length": 729.0
+        },
+        {
+          "kind": "v",
+          "x0": 954.0,
+          "y0": 651.0,
+          "x1": 1079.0,
+          "y1": 1548.0,
+          "thickness": 125.0,
+          "length": 897.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "bar_uroko",
+        "box_uroko",
+        "top_cap",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.8434,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 86224.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.973118
+    },
+    {
+      "char": "石",
+      "unicode": "U+77F3",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 564.0,
+          "y0": 45.0,
+          "x1": 1717.0,
+          "y1": 96.0,
+          "thickness": 51.0,
+          "length": 1153.0
+        },
+        {
+          "kind": "h",
+          "x0": 701.0,
+          "y0": 748.0,
+          "x1": 1573.0,
+          "y1": 799.0,
+          "thickness": 51.0,
+          "length": 872.0
+        },
+        {
+          "kind": "h",
+          "x0": 158.0,
+          "y0": 1409.0,
+          "x1": 1649.0,
+          "y1": 1460.0,
+          "thickness": 51.0,
+          "length": 1491.0
+        },
+        {
+          "kind": "v",
+          "x0": 1596.0,
+          "y0": -119.0,
+          "x1": 1717.0,
+          "y1": 707.0,
+          "thickness": 121.0,
+          "length": 826.0
+        },
+        {
+          "kind": "v",
+          "x0": 564.0,
+          "y0": -119.0,
+          "x1": 685.0,
+          "y1": 701.0,
+          "thickness": 121.0,
+          "length": 820.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "left_hara",
+        "bar_uroko",
+        "box_uroko",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.6353,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 210202.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "見",
+      "unicode": "U+898B",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 447.0,
+          "y0": 891.0,
+          "x1": 1581.0,
+          "y1": 942.0,
+          "thickness": 51.0,
+          "length": 1134.0
+        },
+        {
+          "kind": "h",
+          "x0": 447.0,
+          "y0": 1196.0,
+          "x1": 1581.0,
+          "y1": 1247.0,
+          "thickness": 51.0,
+          "length": 1134.0
+        },
+        {
+          "kind": "h",
+          "x0": 447.0,
+          "y0": 1491.0,
+          "x1": 1441.0,
+          "y1": 1542.0,
+          "thickness": 51.0,
+          "length": 994.0
+        },
+        {
+          "kind": "v",
+          "x0": 1116.0,
+          "y0": 90.0,
+          "x1": 1235.0,
+          "y1": 569.0,
+          "thickness": 119.0,
+          "length": 479.0
+        },
+        {
+          "kind": "v",
+          "x0": 447.0,
+          "y0": 621.0,
+          "x1": 566.0,
+          "y1": 1542.0,
+          "thickness": 119.0,
+          "length": 921.0
+        },
+        {
+          "kind": "v",
+          "x0": 1462.0,
+          "y0": 621.0,
+          "x1": 1581.0,
+          "y1": 1450.0,
+          "thickness": 119.0,
+          "length": 829.0
+        }
+      ],
+      "junctions": 4,
+      "templates": [
+        "hara_pair",
+        "other",
+        "box_uroko",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.5321,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 352830.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.990889
+    },
+    {
+      "char": "雨",
+      "unicode": "U+96E8",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 145.0,
+          "y0": 1438.0,
+          "x1": 1662.0,
+          "y1": 1489.0,
+          "thickness": 51.0,
+          "length": 1517.0
+        },
+        {
+          "kind": "h",
+          "x0": 285.0,
+          "y0": 1083.0,
+          "x1": 1629.0,
+          "y1": 1135.0,
+          "thickness": 52.0,
+          "length": 1344.0
+        },
+        {
+          "kind": "v",
+          "x0": 285.0,
+          "y0": -145.0,
+          "x1": 404.0,
+          "y1": 1135.0,
+          "thickness": 119.0,
+          "length": 1280.0
+        },
+        {
+          "kind": "v",
+          "x0": 954.0,
+          "y0": -88.0,
+          "x1": 1075.0,
+          "y1": 1489.0,
+          "thickness": 121.0,
+          "length": 1577.0
+        },
+        {
+          "kind": "v",
+          "x0": 1646.0,
+          "y0": 94.0,
+          "x1": 1765.0,
+          "y1": 1044.0,
+          "thickness": 119.0,
+          "length": 950.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "hane",
+        "other",
+        "other",
+        "other",
+        "other",
+        "bar_uroko",
+        "box_uroko",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.6824,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 272150.2,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.976814
+    },
+    {
+      "char": "食",
+      "unicode": "U+98DF",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 515.0,
+          "y0": 788.0,
+          "x1": 1514.0,
+          "y1": 840.0,
+          "thickness": 52.0,
+          "length": 999.0
+        },
+        {
+          "kind": "h",
+          "x0": 1028.0,
+          "y0": 514.0,
+          "x1": 1514.0,
+          "y1": 565.0,
+          "thickness": 51.0,
+          "length": 486.0
+        },
+        {
+          "kind": "v",
+          "x0": 515.0,
+          "y0": 61.0,
+          "x1": 632.0,
+          "y1": 840.0,
+          "thickness": 117.0,
+          "length": 779.0
+        },
+        {
+          "kind": "v",
+          "x0": 1401.0,
+          "y0": 514.0,
+          "x1": 1514.0,
+          "y1": 840.0,
+          "thickness": 113.0,
+          "length": 326.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "hara_pair",
+        "bar_uroko",
+        "hane"
+      ],
+      "vector_iou_stems": 0.2275,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 634775.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.982352
+    },
+    {
+      "char": "国",
+      "unicode": "U+56FD",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 215.0,
+          "y0": -6.0,
+          "x1": 1812.0,
+          "y1": 45.0,
+          "thickness": 51.0,
+          "length": 1597.0
+        },
+        {
+          "kind": "h",
+          "x0": 215.0,
+          "y0": 1489.0,
+          "x1": 1671.0,
+          "y1": 1540.0,
+          "thickness": 51.0,
+          "length": 1456.0
+        },
+        {
+          "kind": "h",
+          "x0": 215.0,
+          "y0": 285.0,
+          "x1": 1391.0,
+          "y1": 336.0,
+          "thickness": 51.0,
+          "length": 1176.0
+        },
+        {
+          "kind": "h",
+          "x0": 504.0,
+          "y0": 1202.0,
+          "x1": 1055.0,
+          "y1": 1253.0,
+          "thickness": 51.0,
+          "length": 551.0
+        },
+        {
+          "kind": "h",
+          "x0": 563.0,
+          "y0": 780.0,
+          "x1": 1055.0,
+          "y1": 831.0,
+          "thickness": 51.0,
+          "length": 492.0
+        },
+        {
+          "kind": "v",
+          "x0": 215.0,
+          "y0": -147.0,
+          "x1": 338.0,
+          "y1": 1540.0,
+          "thickness": 123.0,
+          "length": 1687.0
+        },
+        {
+          "kind": "v",
+          "x0": 1689.0,
+          "y0": -147.0,
+          "x1": 1812.0,
+          "y1": 1448.0,
+          "thickness": 123.0,
+          "length": 1595.0
+        },
+        {
+          "kind": "v",
+          "x0": 938.0,
+          "y0": 285.0,
+          "x1": 1055.0,
+          "y1": 1253.0,
+          "thickness": 117.0,
+          "length": 968.0
+        }
+      ],
+      "junctions": 1,
+      "templates": [
+        "top_cap",
+        "other",
+        "other",
+        "box_uroko",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.8166,
+      "vector_iou_templates": 0.9944,
+      "xor_stems": 165700.0,
+      "xor_templates": 5049.0,
+      "pixel_iou": 0.981824
+    },
+    {
+      "char": "車",
+      "unicode": "U+8ECA",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 151.0,
+          "y0": 221.0,
+          "x1": 1659.0,
+          "y1": 272.0,
+          "thickness": 51.0,
+          "length": 1508.0
+        },
+        {
+          "kind": "h",
+          "x0": 194.0,
+          "y0": 1352.0,
+          "x1": 1634.0,
+          "y1": 1403.0,
+          "thickness": 51.0,
+          "length": 1440.0
+        },
+        {
+          "kind": "h",
+          "x0": 377.0,
+          "y0": 518.0,
+          "x1": 1649.0,
+          "y1": 569.0,
+          "thickness": 51.0,
+          "length": 1272.0
+        },
+        {
+          "kind": "h",
+          "x0": 377.0,
+          "y0": 815.0,
+          "x1": 1649.0,
+          "y1": 866.0,
+          "thickness": 51.0,
+          "length": 1272.0
+        },
+        {
+          "kind": "h",
+          "x0": 377.0,
+          "y0": 1092.0,
+          "x1": 1649.0,
+          "y1": 1143.0,
+          "thickness": 51.0,
+          "length": 1272.0
+        },
+        {
+          "kind": "v",
+          "x0": 948.0,
+          "y0": -148.0,
+          "x1": 1071.0,
+          "y1": 1403.0,
+          "thickness": 123.0,
+          "length": 1551.0
+        },
+        {
+          "kind": "v",
+          "x0": 377.0,
+          "y0": 401.0,
+          "x1": 498.0,
+          "y1": 1143.0,
+          "thickness": 121.0,
+          "length": 742.0
+        },
+        {
+          "kind": "v",
+          "x0": 1530.0,
+          "y0": 420.0,
+          "x1": 1649.0,
+          "y1": 1143.0,
+          "thickness": 119.0,
+          "length": 723.0
+        }
+      ],
+      "junctions": 5,
+      "templates": [
+        "box_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.8426,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 120205.2,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.976737
+    },
+    {
+      "char": "金",
+      "unicode": "U+91D1",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 200.0,
+          "y0": -70.0,
+          "x1": 1618.0,
+          "y1": -18.0,
+          "thickness": 52.0,
+          "length": 1418.0
+        },
+        {
+          "kind": "h",
+          "x0": 282.0,
+          "y0": 578.0,
+          "x1": 1556.0,
+          "y1": 629.0,
+          "thickness": 51.0,
+          "length": 1274.0
+        },
+        {
+          "kind": "v",
+          "x0": 956.0,
+          "y0": -70.0,
+          "x1": 1077.0,
+          "y1": 940.0,
+          "thickness": 121.0,
+          "length": 1010.0
+        }
+      ],
+      "junctions": 2,
+      "templates": [
+        "hara_pair",
+        "top_cap",
+        "bar_uroko",
+        "hane",
+        "bar_uroko",
+        "bar_uroko",
+        "uchikomi",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.3409,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 480415.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 1.0
+    },
+    {
+      "char": "風",
+      "unicode": "U+98A8",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 338.0,
+          "y0": 1516.0,
+          "x1": 1522.0,
+          "y1": 1567.0,
+          "thickness": 51.0,
+          "length": 1184.0
+        },
+        {
+          "kind": "v",
+          "x0": 930.0,
+          "y0": 135.0,
+          "x1": 1045.0,
+          "y1": 1225.0,
+          "thickness": 115.0,
+          "length": 1090.0
+        },
+        {
+          "kind": "v",
+          "x0": 338.0,
+          "y0": 1139.0,
+          "x1": 461.0,
+          "y1": 1567.0,
+          "thickness": 123.0,
+          "length": 428.0
+        },
+        {
+          "kind": "v",
+          "x0": 604.0,
+          "y0": 578.0,
+          "x1": 719.0,
+          "y1": 911.0,
+          "thickness": 115.0,
+          "length": 333.0
+        },
+        {
+          "kind": "v",
+          "x0": 1268.0,
+          "y0": 578.0,
+          "x1": 1383.0,
+          "y1": 878.0,
+          "thickness": 115.0,
+          "length": 300.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "right_hara",
+        "hane",
+        "left_hara",
+        "top_cap",
+        "hane",
+        "top_cap",
+        "top_cap"
+      ],
+      "vector_iou_stems": 0.2913,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 741756.5,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.993814
+    },
+    {
+      "char": "東",
+      "unicode": "U+6771",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 168.0,
+          "y0": 1397.0,
+          "x1": 1654.0,
+          "y1": 1448.0,
+          "thickness": 51.0,
+          "length": 1486.0
+        },
+        {
+          "kind": "h",
+          "x0": 367.0,
+          "y0": 852.0,
+          "x1": 1671.0,
+          "y1": 903.0,
+          "thickness": 51.0,
+          "length": 1304.0
+        },
+        {
+          "kind": "h",
+          "x0": 367.0,
+          "y0": 1130.0,
+          "x1": 1671.0,
+          "y1": 1182.0,
+          "thickness": 52.0,
+          "length": 1304.0
+        },
+        {
+          "kind": "h",
+          "x0": 367.0,
+          "y0": 555.0,
+          "x1": 1671.0,
+          "y1": 606.0,
+          "thickness": 51.0,
+          "length": 1304.0
+        },
+        {
+          "kind": "v",
+          "x0": 952.0,
+          "y0": -147.0,
+          "x1": 1073.0,
+          "y1": 1448.0,
+          "thickness": 121.0,
+          "length": 1595.0
+        },
+        {
+          "kind": "v",
+          "x0": 367.0,
+          "y0": 438.0,
+          "x1": 484.0,
+          "y1": 1182.0,
+          "thickness": 117.0,
+          "length": 744.0
+        },
+        {
+          "kind": "v",
+          "x0": 1556.0,
+          "y0": 449.0,
+          "x1": 1671.0,
+          "y1": 1182.0,
+          "thickness": 115.0,
+          "length": 733.0
+        }
+      ],
+      "junctions": 3,
+      "templates": [
+        "hara_pair",
+        "box_uroko",
+        "bar_uroko",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.6786,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 274911.3,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.998993
+    },
+    {
+      "char": "花",
+      "unicode": "U+82B1",
+      "upm": 2048,
+      "width": 2048,
+      "stems_merged": [
+        {
+          "kind": "h",
+          "x0": 147.0,
+          "y0": 1366.0,
+          "x1": 1348.0,
+          "y1": 1417.0,
+          "thickness": 51.0,
+          "length": 1201.0
+        },
+        {
+          "kind": "v",
+          "x0": 516.0,
+          "y0": -147.0,
+          "x1": 631.0,
+          "y1": 610.0,
+          "thickness": 115.0,
+          "length": 757.0
+        },
+        {
+          "kind": "v",
+          "x0": 1067.0,
+          "y0": 96.0,
+          "x1": 1186.0,
+          "y1": 987.0,
+          "thickness": 119.0,
+          "length": 891.0
+        },
+        {
+          "kind": "v",
+          "x0": 680.0,
+          "y0": 1159.0,
+          "x1": 797.0,
+          "y1": 1417.0,
+          "thickness": 117.0,
+          "length": 258.0
+        },
+        {
+          "kind": "v",
+          "x0": 1231.0,
+          "y0": 1159.0,
+          "x1": 1348.0,
+          "y1": 1417.0,
+          "thickness": 117.0,
+          "length": 258.0
+        }
+      ],
+      "junctions": 0,
+      "templates": [
+        "other",
+        "other",
+        "bar_uroko",
+        "other",
+        "bar_uroko",
+        "top_cap",
+        "uchikomi"
+      ],
+      "vector_iou_stems": 0.3962,
+      "vector_iou_templates": 1.0,
+      "xor_stems": 461464.7,
+      "xor_templates": 0.0,
+      "pixel_iou": 0.976966
+    }
+  ],
+  "mean_vector_iou_templates": 0.9998,
+  "mean_pixel_iou": 0.990296,
+  "png": "/Users/motista/Desktop/antigravity/myfont/proofs/reproduce/rebuild_compare.png"
+}

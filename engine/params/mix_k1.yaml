@@ -1,0 +1,35 @@
+# 混植寄せ実験。product_r1 は凍ったまま（掟16）。合否ゲートではない。
+# 手描き仮名 Q0 の stem 中央値は概ね V≈0.078em / H≈0.072em（juu は仮名で弱い）。
+# product_r1 の h=45 / v=110 / uroko≈78 は仮名の隣で縦が棒、横が消え、十が塊になる。
+
+snapshot_id: mix_k1
+status: experiment
+frozen_at: null
+source: proofs/q0_diagnosis.md + proofs/mix/mix_48.png
+profile: ft_1024_nohint_gray_v1
+extractor_version: "0.1.0"
+anchors:
+  contrast_v_over_h: 1.31
+  note: "仮名隣の黒み。伝統クラスタ 2.44 には戻さない"
+notes: |
+  横を上げ、縦とうろこを落とす。カウンター（口・田・中）が縦壁で潰れないことと
+  十の打ち込み塊を消すことが先。伝統コントラストの回収は混植が家族に見えてから。
+
+params:
+  name: mix_k1
+  h_thickness: 58.0
+  v_thickness: 76.0
+  h_slope_deg: 1.3
+  uroko_height: 36.0
+  uroko_width: 34.0
+  uroko_dent: 8.0
+  uchikomi_depth: 16.0
+  uchikomi_angle_deg: 32.0
+  hane_length: 100.0
+  hane_thickness: 26.0
+  tome_slant: 12.0
+  left_hara_root: 80.0
+  right_hara_max: 86.0
+  right_hara_bulge_t: 0.58
+  ten_length: 70.0
+  ten_width: 56.0

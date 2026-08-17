@@ -1,0 +1,662 @@
+{
+  "ref": "/Users/motista/Desktop/antigravity/myfont/fontdb/data/fonts/ipaex_mincho-Regular.ttf",
+  "shipping_ufo_written": false,
+  "method": "multi-facet-scalars",
+  "library": {
+    "n_glyphs": 13,
+    "contrast_v_over_h": {
+      "median": 2.451,
+      "span": [
+        2.255,
+        2.529
+      ]
+    },
+    "h_thickness_em": {
+      "median": 0.0249,
+      "span": [
+        0.0249,
+        0.0269
+      ]
+    },
+    "v_thickness_em": {
+      "median": 0.061,
+      "span": [
+        0.0562,
+        0.064
+      ]
+    },
+    "face_em": {
+      "width_median": 0.876,
+      "height_median": 0.8398
+    },
+    "lsb_em_median": 0.0679,
+    "ink_em_median": 0.1223,
+    "bar_uroko": {
+      "n": 8,
+      "width_over_h": [
+        4.95,
+        5.59
+      ],
+      "height_over_h": [
+        3.56,
+        4.1
+      ],
+      "width_em": [
+        0.126,
+        0.1392
+      ],
+      "height_em": [
+        0.0938,
+        0.1021
+      ]
+    },
+    "box_uroko": {
+      "n": 4,
+      "width_over_h": [
+        4.1,
+        4.31
+      ],
+      "height_over_h": [
+        2.92,
+        3.04
+      ],
+      "width_em": [
+        0.1021,
+        0.1074
+      ],
+      "height_em": [
+        0.0728,
+        0.0757
+      ]
+    },
+    "role_counts": {
+      "bar_uroko": 9,
+      "junction": 12,
+      "top_cap": 4,
+      "box_uroko": 4,
+      "uchikomi": 4,
+      "left_hara": 2,
+      "right_hara": 2,
+      "hara_pair": 4,
+      "other": 1
+    },
+    "counters": {
+      "口": 1,
+      "日": 2,
+      "田": 4,
+      "中": 2
+    }
+  },
+  "glyphs": [
+    {
+      "char": "十",
+      "unicode": "U+5341",
+      "facets": [
+        "axis",
+        "cross"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.063,
+      "contrast_v_over_h": 2.529,
+      "face_em": [
+        0.8809,
+        0.8682
+      ],
+      "lsb_em": 0.062,
+      "rsb_em": 0.0571,
+      "ink_em": 0.0814,
+      "n_stem": 4,
+      "n_counter": 0,
+      "n_outer": 1,
+      "roles": [
+        "bar_uroko",
+        "junction",
+        "top_cap"
+      ],
+      "residual_frac": 0.184,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 5.29,
+          "height_over_h": 4.02,
+          "width_em": 0.1318,
+          "height_em": 0.1001,
+          "role": "bar_uroko"
+        }
+      ],
+      "counters": []
+    },
+    {
+      "char": "二",
+      "unicode": "U+4E8C",
+      "facets": [
+        "axis"
+      ],
+      "h_thickness_em": 0.0269,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "face_em": [
+        0.8599,
+        0.6147
+      ],
+      "lsb_em": 0.0679,
+      "rsb_em": 0.0723,
+      "ink_em": 0.0499,
+      "n_stem": 2,
+      "n_counter": 0,
+      "n_outer": 2,
+      "roles": [
+        "bar_uroko",
+        "junction"
+      ],
+      "residual_frac": 0.331,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 5.05,
+          "height_over_h": 3.71,
+          "width_em": 0.1357,
+          "height_em": 0.0996,
+          "role": "bar_uroko"
+        },
+        {
+          "width_over_h": 4.95,
+          "height_over_h": 3.56,
+          "width_em": 0.1328,
+          "height_em": 0.0957,
+          "role": "bar_uroko"
+        }
+      ],
+      "counters": []
+    },
+    {
+      "char": "三",
+      "unicode": "U+4E09",
+      "facets": [
+        "axis"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "face_em": [
+        0.8472,
+        0.7212
+      ],
+      "lsb_em": 0.0811,
+      "rsb_em": 0.0718,
+      "ink_em": 0.0683,
+      "n_stem": 3,
+      "n_counter": 0,
+      "n_outer": 3,
+      "roles": [
+        "bar_uroko",
+        "junction"
+      ],
+      "residual_frac": 0.354,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 5.59,
+          "height_over_h": 4.1,
+          "width_em": 0.1392,
+          "height_em": 0.1021,
+          "role": "bar_uroko"
+        },
+        {
+          "width_over_h": 5.19,
+          "height_over_h": 3.71,
+          "width_em": 0.1318,
+          "height_em": 0.0942,
+          "role": "bar_uroko"
+        },
+        {
+          "width_over_h": 5.1,
+          "height_over_h": 3.76,
+          "width_em": 0.127,
+          "height_em": 0.0938,
+          "role": "bar_uroko"
+        }
+      ],
+      "counters": []
+    },
+    {
+      "char": "口",
+      "unicode": "U+53E3",
+      "facets": [
+        "box"
+      ],
+      "h_thickness_em": 0.0254,
+      "v_thickness_em": 0.064,
+      "contrast_v_over_h": 2.519,
+      "face_em": [
+        0.6963,
+        0.7583
+      ],
+      "lsb_em": 0.165,
+      "rsb_em": 0.1387,
+      "ink_em": 0.1223,
+      "n_stem": 6,
+      "n_counter": 1,
+      "n_outer": 1,
+      "roles": [
+        "box_uroko",
+        "junction",
+        "uchikomi"
+      ],
+      "residual_frac": 0.11,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 4.21,
+          "height_over_h": 2.92,
+          "width_em": 0.1069,
+          "height_em": 0.0742,
+          "role": "box_uroko"
+        }
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.229,
+            0.0972,
+            0.7632,
+            0.6528
+          ],
+          "area_em": 0.29682
+        }
+      ]
+    },
+    {
+      "char": "日",
+      "unicode": "U+65E5",
+      "facets": [
+        "box"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.063,
+      "contrast_v_over_h": 2.529,
+      "face_em": [
+        0.6172,
+        0.8188
+      ],
+      "lsb_em": 0.2031,
+      "rsb_em": 0.1797,
+      "ink_em": 0.1349,
+      "n_stem": 7,
+      "n_counter": 2,
+      "n_outer": 1,
+      "roles": [
+        "bar_uroko",
+        "box_uroko",
+        "junction",
+        "uchikomi"
+      ],
+      "residual_frac": 0.197,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 4.31,
+          "height_over_h": 3.04,
+          "width_em": 0.1074,
+          "height_em": 0.0757,
+          "role": "box_uroko"
+        }
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.2661,
+            0.4082,
+            0.7231,
+            0.7012
+          ],
+          "area_em": 0.1339
+        },
+        {
+          "bounds_em": [
+            0.2661,
+            0.0688,
+            0.7231,
+            0.3828
+          ],
+          "area_em": 0.14349
+        }
+      ]
+    },
+    {
+      "char": "田",
+      "unicode": "U+7530",
+      "facets": [
+        "box"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.0591,
+      "contrast_v_over_h": 2.373,
+      "face_em": [
+        0.7529,
+        0.7998
+      ],
+      "lsb_em": 0.1348,
+      "rsb_em": 0.1123,
+      "ink_em": 0.1725,
+      "n_stem": 13,
+      "n_counter": 4,
+      "n_outer": 1,
+      "roles": [
+        "bar_uroko",
+        "box_uroko",
+        "junction",
+        "uchikomi"
+      ],
+      "residual_frac": 0.14,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 4.1,
+          "height_over_h": 2.92,
+          "width_em": 0.1021,
+          "height_em": 0.0728,
+          "role": "box_uroko"
+        }
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.1948,
+            0.3999,
+            0.46,
+            0.6831
+          ],
+          "area_em": 0.07509
+        },
+        {
+          "bounds_em": [
+            0.5181,
+            0.0708,
+            0.7935,
+            0.375
+          ],
+          "area_em": 0.08377
+        },
+        {
+          "bounds_em": [
+            0.5181,
+            0.3999,
+            0.7935,
+            0.6831
+          ],
+          "area_em": 0.07799
+        },
+        {
+          "bounds_em": [
+            0.1948,
+            0.0708,
+            0.46,
+            0.375
+          ],
+          "area_em": 0.08065
+        }
+      ]
+    },
+    {
+      "char": "中",
+      "unicode": "U+4E2D",
+      "facets": [
+        "box",
+        "cross"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.061,
+      "contrast_v_over_h": 2.451,
+      "face_em": [
+        0.7671,
+        0.8838
+      ],
+      "lsb_em": 0.1299,
+      "rsb_em": 0.103,
+      "ink_em": 0.1357,
+      "n_stem": 9,
+      "n_counter": 2,
+      "n_outer": 1,
+      "roles": [
+        "bar_uroko",
+        "box_uroko",
+        "junction",
+        "top_cap",
+        "uchikomi"
+      ],
+      "residual_frac": 0.217,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 4.25,
+          "height_over_h": 3.04,
+          "width_em": 0.106,
+          "height_em": 0.0757,
+          "role": "box_uroko"
+        }
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.1899,
+            0.2861,
+            0.459,
+            0.561
+          ],
+          "area_em": 0.07396
+        },
+        {
+          "bounds_em": [
+            0.52,
+            0.2861,
+            0.7998,
+            0.561
+          ],
+          "area_em": 0.07691
+        }
+      ]
+    },
+    {
+      "char": "永",
+      "unicode": "U+6C38",
+      "facets": [
+        "eight"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.0562,
+      "contrast_v_over_h": 2.255,
+      "face_em": [
+        0.8911,
+        0.899
+      ],
+      "lsb_em": 0.0532,
+      "rsb_em": 0.0557,
+      "ink_em": 0.159,
+      "n_stem": 3,
+      "n_counter": 0,
+      "n_outer": 3,
+      "roles": [
+        "bar_uroko",
+        "junction",
+        "left_hara",
+        "right_hara"
+      ],
+      "residual_frac": 0.77,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 5.47,
+          "height_over_h": 9.73,
+          "width_em": 0.1362,
+          "height_em": 0.2422,
+          "role": "bar_uroko"
+        }
+      ],
+      "counters": []
+    },
+    {
+      "char": "木",
+      "unicode": "U+6728",
+      "facets": [
+        "tree",
+        "diag"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.0601,
+      "contrast_v_over_h": 2.412,
+      "face_em": [
+        0.897,
+        0.8779
+      ],
+      "lsb_em": 0.0601,
+      "rsb_em": 0.043,
+      "ink_em": 0.1392,
+      "n_stem": 4,
+      "n_counter": 0,
+      "n_outer": 1,
+      "roles": [
+        "bar_uroko",
+        "hara_pair",
+        "junction",
+        "top_cap"
+      ],
+      "residual_frac": 0.583,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 5.18,
+          "height_over_h": 4.1,
+          "width_em": 0.1289,
+          "height_em": 0.1021,
+          "role": "bar_uroko"
+        }
+      ],
+      "counters": []
+    },
+    {
+      "char": "人",
+      "unicode": "U+4EBA",
+      "facets": [
+        "diag"
+      ],
+      "h_thickness_em": null,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "face_em": [
+        0.9009,
+        0.8398
+      ],
+      "lsb_em": 0.0498,
+      "rsb_em": 0.0493,
+      "ink_em": 0.0934,
+      "n_stem": 0,
+      "n_counter": 0,
+      "n_outer": 1,
+      "roles": [
+        "hara_pair"
+      ],
+      "residual_frac": 1.0,
+      "lossless": true,
+      "uroko": [],
+      "counters": []
+    },
+    {
+      "char": "本",
+      "unicode": "U+672C",
+      "facets": [
+        "tree",
+        "diag"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.061,
+      "contrast_v_over_h": 2.451,
+      "face_em": [
+        0.9199,
+        0.8818
+      ],
+      "lsb_em": 0.0439,
+      "rsb_em": 0.0361,
+      "ink_em": 0.1546,
+      "n_stem": 6,
+      "n_counter": 0,
+      "n_outer": 1,
+      "roles": [
+        "bar_uroko",
+        "hara_pair",
+        "junction",
+        "other",
+        "top_cap"
+      ],
+      "residual_frac": 0.595,
+      "lossless": true,
+      "uroko": [
+        {
+          "width_over_h": 5.06,
+          "height_over_h": 4.02,
+          "width_em": 0.126,
+          "height_em": 0.1001,
+          "role": "bar_uroko"
+        }
+      ],
+      "counters": []
+    },
+    {
+      "char": "入",
+      "unicode": "U+5165",
+      "facets": [
+        "diag"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "face_em": [
+        0.876,
+        0.8398
+      ],
+      "lsb_em": 0.0688,
+      "rsb_em": 0.0552,
+      "ink_em": 0.0932,
+      "n_stem": 1,
+      "n_counter": 0,
+      "n_outer": 1,
+      "roles": [
+        "hara_pair",
+        "junction"
+      ],
+      "residual_frac": 0.939,
+      "lossless": true,
+      "uroko": [],
+      "counters": []
+    },
+    {
+      "char": "八",
+      "unicode": "U+516B",
+      "facets": [
+        "diag"
+      ],
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "face_em": [
+        0.9111,
+        0.8115
+      ],
+      "lsb_em": 0.0479,
+      "rsb_em": 0.041,
+      "ink_em": 0.0886,
+      "n_stem": 1,
+      "n_counter": 0,
+      "n_outer": 2,
+      "roles": [
+        "junction",
+        "left_hara",
+        "right_hara"
+      ],
+      "residual_frac": 0.945,
+      "lossless": true,
+      "uroko": [],
+      "counters": []
+    }
+  ]
+}

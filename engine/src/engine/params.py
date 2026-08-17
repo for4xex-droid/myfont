@@ -120,10 +120,12 @@ def load_params_snapshot(snapshot_id: str, params_dir: Path | None = None) -> Mi
 
 
 PRODUCT_R1 = load_params_snapshot("product_r1")
+MIX_K1 = load_params_snapshot("mix_k1")
 
 
 PARAM_SETS = {
     "classic": CLASSIC,
     "modern": MODERN,
     "product_r1": PRODUCT_R1,
+    "mix_k1": MIX_K1,
 }

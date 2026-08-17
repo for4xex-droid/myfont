@@ -1,0 +1,2007 @@
+{
+  "ref": "/Users/motista/Desktop/antigravity/myfont/fontdb/data/fonts/ipaex_mincho-Regular.ttf",
+  "shipping_ufo_written": false,
+  "method": "exact-outline-split",
+  "glyphs": [
+    {
+      "char": "十",
+      "src_name": "aj2375",
+      "unicode": "U+5341",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 127.0,
+      "rsb": 117.0,
+      "lsb_em": 0.062,
+      "rsb_em": 0.0571,
+      "face": [
+        127.0,
+        -125.0,
+        1931.0,
+        1653.0
+      ],
+      "face_em": [
+        0.8809,
+        0.8682
+      ],
+      "ink_em": 0.0814,
+      "exact_area": 341277.0,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 145.0,
+          "y0": 836.0,
+          "x1": 950.0,
+          "y1": 887.0,
+          "thickness": 51.0,
+          "length": 805.0
+        },
+        {
+          "kind": "h",
+          "x0": 1079.0,
+          "y0": 836.0,
+          "x1": 1661.0,
+          "y1": 887.0,
+          "thickness": 51.0,
+          "length": 582.0
+        },
+        {
+          "kind": "v",
+          "x0": 950.0,
+          "y0": -125.0,
+          "x1": 1079.0,
+          "y1": 836.0,
+          "thickness": 129.0,
+          "length": 961.0
+        },
+        {
+          "kind": "v",
+          "x0": 950.0,
+          "y0": 887.0,
+          "x1": 1079.0,
+          "y1": 1536.0,
+          "thickness": 129.0,
+          "length": 649.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": 129.0,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.063,
+      "contrast_v_over_h": 2.529,
+      "terminals": [
+        {
+          "bounds": [
+            1661.0,
+            836.0,
+            1931.0,
+            1041.0
+          ],
+          "area": 33768.5,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.29,
+            "height_over_h": 4.02,
+            "width_em": 0.1318,
+            "height_em": 0.1001
+          }
+        },
+        {
+          "bounds": [
+            950.0,
+            1536.0,
+            1175.0,
+            1653.0
+          ],
+          "area": 22043.5,
+          "clockwise": false,
+          "kind": "top_cap",
+          "role": "top_cap"
+        },
+        {
+          "bounds": [
+            950.0,
+            836.0,
+            1079.0,
+            887.0
+          ],
+          "area": 6579.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            127.0,
+            836.0,
+            145.0,
+            887.0
+          ],
+          "area": 459.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "junction",
+        "top_cap"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.184
+    },
+    {
+      "char": "二",
+      "src_name": "aj3275",
+      "unicode": "U+4E8C",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 139.0,
+      "rsb": 148.0,
+      "lsb_em": 0.0679,
+      "rsb_em": 0.0723,
+      "face": [
+        139.0,
+        168.0,
+        1900.0,
+        1427.0
+      ],
+      "face_em": [
+        0.8599,
+        0.6147
+      ],
+      "ink_em": 0.0499,
+      "exact_area": 209109.7,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 162.0,
+          "y0": 168.0,
+          "x1": 1622.0,
+          "y1": 223.0,
+          "thickness": 55.0,
+          "length": 1460.0
+        },
+        {
+          "kind": "h",
+          "x0": 332.0,
+          "y0": 1231.0,
+          "x1": 1417.0,
+          "y1": 1286.0,
+          "thickness": 55.0,
+          "length": 1085.0
+        }
+      ],
+      "h_thickness": 55.0,
+      "v_thickness": null,
+      "h_thickness_em": 0.0269,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "terminals": [
+        {
+          "bounds": [
+            1622.0,
+            168.0,
+            1900.0,
+            372.0
+          ],
+          "area": 35118.3,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.05,
+            "height_over_h": 3.71,
+            "width_em": 0.1357,
+            "height_em": 0.0996
+          }
+        },
+        {
+          "bounds": [
+            1417.0,
+            1231.0,
+            1689.0,
+            1427.0
+          ],
+          "area": 32806.3,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 4.95,
+            "height_over_h": 3.56,
+            "width_em": 0.1328,
+            "height_em": 0.0957
+          }
+        },
+        {
+          "bounds": [
+            139.0,
+            168.0,
+            162.0,
+            223.0
+          ],
+          "area": 632.5,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            311.0,
+            1231.0,
+            332.0,
+            1286.0
+          ],
+          "area": 577.5,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "junction"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 2,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.331
+    },
+    {
+      "char": "三",
+      "src_name": "aj2174",
+      "unicode": "U+4E09",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 166.0,
+      "rsb": 147.0,
+      "lsb_em": 0.0811,
+      "rsb_em": 0.0718,
+      "face": [
+        166.0,
+        53.0,
+        1901.0,
+        1530.0
+      ],
+      "face_em": [
+        0.8472,
+        0.7212
+      ],
+      "ink_em": 0.0683,
+      "exact_area": 286464.3,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 189.0,
+          "y0": 53.0,
+          "x1": 1616.0,
+          "y1": 104.0,
+          "thickness": 51.0,
+          "length": 1427.0
+        },
+        {
+          "kind": "h",
+          "x0": 295.0,
+          "y0": 1337.0,
+          "x1": 1495.0,
+          "y1": 1389.0,
+          "thickness": 52.0,
+          "length": 1200.0
+        },
+        {
+          "kind": "h",
+          "x0": 416.0,
+          "y0": 731.0,
+          "x1": 1393.0,
+          "y1": 782.0,
+          "thickness": 51.0,
+          "length": 977.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": null,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "terminals": [
+        {
+          "bounds": [
+            1616.0,
+            53.0,
+            1901.0,
+            262.0
+          ],
+          "area": 36639.2,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.59,
+            "height_over_h": 4.1,
+            "width_em": 0.1392,
+            "height_em": 0.1021
+          }
+        },
+        {
+          "bounds": [
+            1495.0,
+            1337.0,
+            1765.0,
+            1530.0
+          ],
+          "area": 32329.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.19,
+            "height_over_h": 3.71,
+            "width_em": 0.1318,
+            "height_em": 0.0942
+          }
+        },
+        {
+          "bounds": [
+            1393.0,
+            731.0,
+            1653.0,
+            923.0
+          ],
+          "area": 30851.2,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.1,
+            "height_over_h": 3.76,
+            "width_em": 0.127,
+            "height_em": 0.0938
+          }
+        },
+        {
+          "bounds": [
+            166.0,
+            53.0,
+            189.0,
+            104.0
+          ],
+          "area": 586.5,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            393.0,
+            731.0,
+            416.0,
+            782.0
+          ],
+          "area": 586.5,
+          "clockwise": false,
+          "kind": "other",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            277.0,
+            1337.0,
+            295.0,
+            1389.0
+          ],
+          "area": 468.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "junction"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 3,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.354
+    },
+    {
+      "char": "口",
+      "src_name": "aj1969",
+      "unicode": "U+53E3",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 338.0,
+      "rsb": 284.0,
+      "lsb_em": 0.165,
+      "rsb_em": 0.1387,
+      "face": [
+        338.0,
+        -64.0,
+        1764.0,
+        1489.0
+      ],
+      "face_em": [
+        0.6963,
+        0.7583
+      ],
+      "ink_em": 0.1223,
+      "exact_area": 512809.5,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 469.0,
+          "y0": 147.0,
+          "x1": 1563.0,
+          "y1": 199.0,
+          "thickness": 52.0,
+          "length": 1094.0
+        },
+        {
+          "kind": "h",
+          "x0": 492.0,
+          "y0": 1337.0,
+          "x1": 1545.0,
+          "y1": 1389.0,
+          "thickness": 52.0,
+          "length": 1053.0
+        },
+        {
+          "kind": "v",
+          "x0": 338.0,
+          "y0": 199.0,
+          "x1": 469.0,
+          "y1": 1337.0,
+          "thickness": 131.0,
+          "length": 1138.0
+        },
+        {
+          "kind": "v",
+          "x0": 1563.0,
+          "y0": 199.0,
+          "x1": 1694.0,
+          "y1": 1288.0,
+          "thickness": 131.0,
+          "length": 1089.0
+        },
+        {
+          "kind": "v",
+          "x0": 338.0,
+          "y0": -64.0,
+          "x1": 469.0,
+          "y1": 147.0,
+          "thickness": 131.0,
+          "length": 211.0
+        },
+        {
+          "kind": "v",
+          "x0": 1563.0,
+          "y0": -48.0,
+          "x1": 1694.0,
+          "y1": 147.0,
+          "thickness": 131.0,
+          "length": 195.0
+        }
+      ],
+      "h_thickness": 52.0,
+      "v_thickness": 131.0,
+      "h_thickness_em": 0.0254,
+      "v_thickness_em": 0.064,
+      "contrast_v_over_h": 2.519,
+      "terminals": [
+        {
+          "bounds": [
+            1545.0,
+            1288.0,
+            1764.0,
+            1489.0
+          ],
+          "area": 29296.5,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "box_uroko",
+          "uroko": {
+            "width_over_h": 4.21,
+            "height_over_h": 2.92,
+            "width_em": 0.1069,
+            "height_em": 0.0742
+          }
+        },
+        {
+          "bounds": [
+            338.0,
+            1337.0,
+            492.0,
+            1456.0
+          ],
+          "area": 13322.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "uchikomi"
+        },
+        {
+          "bounds": [
+            338.0,
+            147.0,
+            469.0,
+            199.0
+          ],
+          "area": 6812.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            1563.0,
+            147.0,
+            1694.0,
+            199.0
+          ],
+          "area": 6812.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "box_uroko",
+        "junction",
+        "uchikomi"
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.229,
+            0.0972,
+            0.7632,
+            0.6528
+          ],
+          "area_em": 0.29682
+        }
+      ],
+      "n_counter": 1,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.11
+    },
+    {
+      "char": "日",
+      "src_name": "aj3284",
+      "unicode": "U+65E5",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 416.0,
+      "rsb": 368.0,
+      "lsb_em": 0.2031,
+      "rsb_em": 0.1797,
+      "face": [
+        416.0,
+        -86.0,
+        1680.0,
+        1591.0
+      ],
+      "face_em": [
+        0.6172,
+        0.8188
+      ],
+      "ink_em": 0.1349,
+      "exact_area": 565770.2,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 545.0,
+          "y0": 90.0,
+          "x1": 1481.0,
+          "y1": 141.0,
+          "thickness": 51.0,
+          "length": 936.0
+        },
+        {
+          "kind": "h",
+          "x0": 545.0,
+          "y0": 784.0,
+          "x1": 1481.0,
+          "y1": 836.0,
+          "thickness": 52.0,
+          "length": 936.0
+        },
+        {
+          "kind": "h",
+          "x0": 568.0,
+          "y0": 1436.0,
+          "x1": 1460.0,
+          "y1": 1487.0,
+          "thickness": 51.0,
+          "length": 892.0
+        },
+        {
+          "kind": "v",
+          "x0": 416.0,
+          "y0": 141.0,
+          "x1": 545.0,
+          "y1": 784.0,
+          "thickness": 129.0,
+          "length": 643.0
+        },
+        {
+          "kind": "v",
+          "x0": 1481.0,
+          "y0": 141.0,
+          "x1": 1608.0,
+          "y1": 784.0,
+          "thickness": 127.0,
+          "length": 643.0
+        },
+        {
+          "kind": "v",
+          "x0": 416.0,
+          "y0": 836.0,
+          "x1": 545.0,
+          "y1": 1436.0,
+          "thickness": 129.0,
+          "length": 600.0
+        },
+        {
+          "kind": "v",
+          "x0": 1481.0,
+          "y0": 836.0,
+          "x1": 1608.0,
+          "y1": 1391.0,
+          "thickness": 127.0,
+          "length": 555.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": 129.0,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.063,
+      "contrast_v_over_h": 2.529,
+      "terminals": [
+        {
+          "bounds": [
+            416.0,
+            -86.0,
+            545.0,
+            141.0
+          ],
+          "area": 29283.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "uchikomi"
+        },
+        {
+          "bounds": [
+            1460.0,
+            1391.0,
+            1680.0,
+            1591.0
+          ],
+          "area": 28889.2,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "box_uroko",
+          "uroko": {
+            "width_over_h": 4.31,
+            "height_over_h": 3.04,
+            "width_em": 0.1074,
+            "height_em": 0.0757
+          }
+        },
+        {
+          "bounds": [
+            1481.0,
+            -66.0,
+            1608.0,
+            141.0
+          ],
+          "area": 26289.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko"
+        },
+        {
+          "bounds": [
+            416.0,
+            1436.0,
+            568.0,
+            1563.0
+          ],
+          "area": 13604.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "uchikomi"
+        },
+        {
+          "bounds": [
+            416.0,
+            784.0,
+            545.0,
+            836.0
+          ],
+          "area": 6708.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            1481.0,
+            784.0,
+            1608.0,
+            836.0
+          ],
+          "area": 6604.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "box_uroko",
+        "junction",
+        "uchikomi"
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.2661,
+            0.4082,
+            0.7231,
+            0.7012
+          ],
+          "area_em": 0.1339
+        },
+        {
+          "bounds_em": [
+            0.2661,
+            0.0688,
+            0.7231,
+            0.3828
+          ],
+          "area_em": 0.14349
+        }
+      ],
+      "n_counter": 2,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.197
+    },
+    {
+      "char": "田",
+      "src_name": "aj3134",
+      "unicode": "U+7530",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 276.0,
+      "rsb": 230.0,
+      "lsb_em": 0.1348,
+      "rsb_em": 0.1123,
+      "face": [
+        276.0,
+        -90.0,
+        1818.0,
+        1548.0
+      ],
+      "face_em": [
+        0.7529,
+        0.7998
+      ],
+      "ink_em": 0.1725,
+      "exact_area": 723553.0,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 1061.0,
+          "y0": 94.0,
+          "x1": 1625.0,
+          "y1": 145.0,
+          "thickness": 51.0,
+          "length": 564.0
+        },
+        {
+          "kind": "h",
+          "x0": 1061.0,
+          "y0": 768.0,
+          "x1": 1625.0,
+          "y1": 819.0,
+          "thickness": 51.0,
+          "length": 564.0
+        },
+        {
+          "kind": "h",
+          "x0": 1061.0,
+          "y0": 1399.0,
+          "x1": 1609.0,
+          "y1": 1450.0,
+          "thickness": 51.0,
+          "length": 548.0
+        },
+        {
+          "kind": "h",
+          "x0": 399.0,
+          "y0": 94.0,
+          "x1": 942.0,
+          "y1": 145.0,
+          "thickness": 51.0,
+          "length": 543.0
+        },
+        {
+          "kind": "h",
+          "x0": 399.0,
+          "y0": 768.0,
+          "x1": 942.0,
+          "y1": 819.0,
+          "thickness": 51.0,
+          "length": 543.0
+        },
+        {
+          "kind": "h",
+          "x0": 422.0,
+          "y0": 1399.0,
+          "x1": 942.0,
+          "y1": 1450.0,
+          "thickness": 51.0,
+          "length": 520.0
+        },
+        {
+          "kind": "v",
+          "x0": 276.0,
+          "y0": 145.0,
+          "x1": 399.0,
+          "y1": 768.0,
+          "thickness": 123.0,
+          "length": 623.0
+        },
+        {
+          "kind": "v",
+          "x0": 942.0,
+          "y0": 145.0,
+          "x1": 1061.0,
+          "y1": 768.0,
+          "thickness": 119.0,
+          "length": 623.0
+        },
+        {
+          "kind": "v",
+          "x0": 1625.0,
+          "y0": 145.0,
+          "x1": 1746.0,
+          "y1": 768.0,
+          "thickness": 121.0,
+          "length": 623.0
+        },
+        {
+          "kind": "v",
+          "x0": 276.0,
+          "y0": 819.0,
+          "x1": 399.0,
+          "y1": 1399.0,
+          "thickness": 123.0,
+          "length": 580.0
+        },
+        {
+          "kind": "v",
+          "x0": 942.0,
+          "y0": 819.0,
+          "x1": 1061.0,
+          "y1": 1399.0,
+          "thickness": 119.0,
+          "length": 580.0
+        },
+        {
+          "kind": "v",
+          "x0": 1625.0,
+          "y0": 819.0,
+          "x1": 1746.0,
+          "y1": 1362.0,
+          "thickness": 121.0,
+          "length": 543.0
+        },
+        {
+          "kind": "v",
+          "x0": 276.0,
+          "y0": -90.0,
+          "x1": 399.0,
+          "y1": 94.0,
+          "thickness": 123.0,
+          "length": 184.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": 121.0,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.0591,
+      "contrast_v_over_h": 2.373,
+      "terminals": [
+        {
+          "bounds": [
+            1625.0,
+            -70.0,
+            1746.0,
+            145.0
+          ],
+          "area": 26015.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko"
+        },
+        {
+          "bounds": [
+            1609.0,
+            1362.0,
+            1818.0,
+            1548.0
+          ],
+          "area": 25606.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "box_uroko",
+          "uroko": {
+            "width_over_h": 4.1,
+            "height_over_h": 2.92,
+            "width_em": 0.1021,
+            "height_em": 0.0728
+          }
+        },
+        {
+          "bounds": [
+            276.0,
+            1399.0,
+            422.0,
+            1520.0
+          ],
+          "area": 12782.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "uchikomi"
+        },
+        {
+          "bounds": [
+            276.0,
+            768.0,
+            399.0,
+            819.0
+          ],
+          "area": 6273.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            276.0,
+            94.0,
+            399.0,
+            145.0
+          ],
+          "area": 6273.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            1625.0,
+            768.0,
+            1746.0,
+            819.0
+          ],
+          "area": 6171.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            942.0,
+            1399.0,
+            1061.0,
+            1450.0
+          ],
+          "area": 6069.0,
+          "clockwise": false,
+          "kind": "top_cap",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            942.0,
+            768.0,
+            1061.0,
+            819.0
+          ],
+          "area": 6069.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            942.0,
+            94.0,
+            1061.0,
+            145.0
+          ],
+          "area": 6069.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "box_uroko",
+        "junction",
+        "uchikomi"
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.1948,
+            0.3999,
+            0.46,
+            0.6831
+          ],
+          "area_em": 0.07509
+        },
+        {
+          "bounds_em": [
+            0.5181,
+            0.0708,
+            0.7935,
+            0.375
+          ],
+          "area_em": 0.08377
+        },
+        {
+          "bounds_em": [
+            0.5181,
+            0.3999,
+            0.7935,
+            0.6831
+          ],
+          "area_em": 0.07799
+        },
+        {
+          "bounds_em": [
+            0.1948,
+            0.0708,
+            0.46,
+            0.375
+          ],
+          "area_em": 0.08065
+        }
+      ],
+      "n_counter": 4,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.14
+    },
+    {
+      "char": "中",
+      "src_name": "aj2980",
+      "unicode": "U+4E2D",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 266.0,
+      "rsb": 211.0,
+      "lsb_em": 0.1299,
+      "rsb_em": 0.103,
+      "face": [
+        266.0,
+        -147.0,
+        1837.0,
+        1663.0
+      ],
+      "face_em": [
+        0.7671,
+        0.8838
+      ],
+      "ink_em": 0.1357,
+      "exact_area": 568999.5,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 1065.0,
+          "y0": 535.0,
+          "x1": 1638.0,
+          "y1": 586.0,
+          "thickness": 51.0,
+          "length": 573.0
+        },
+        {
+          "kind": "h",
+          "x0": 1065.0,
+          "y0": 1149.0,
+          "x1": 1620.0,
+          "y1": 1200.0,
+          "thickness": 51.0,
+          "length": 555.0
+        },
+        {
+          "kind": "h",
+          "x0": 389.0,
+          "y0": 535.0,
+          "x1": 940.0,
+          "y1": 586.0,
+          "thickness": 51.0,
+          "length": 551.0
+        },
+        {
+          "kind": "h",
+          "x0": 407.0,
+          "y0": 1149.0,
+          "x1": 940.0,
+          "y1": 1200.0,
+          "thickness": 51.0,
+          "length": 533.0
+        },
+        {
+          "kind": "v",
+          "x0": 940.0,
+          "y0": -147.0,
+          "x1": 1065.0,
+          "y1": 535.0,
+          "thickness": 125.0,
+          "length": 682.0
+        },
+        {
+          "kind": "v",
+          "x0": 266.0,
+          "y0": 586.0,
+          "x1": 389.0,
+          "y1": 1149.0,
+          "thickness": 123.0,
+          "length": 563.0
+        },
+        {
+          "kind": "v",
+          "x0": 940.0,
+          "y0": 586.0,
+          "x1": 1065.0,
+          "y1": 1149.0,
+          "thickness": 125.0,
+          "length": 563.0
+        },
+        {
+          "kind": "v",
+          "x0": 1638.0,
+          "y0": 586.0,
+          "x1": 1761.0,
+          "y1": 1108.0,
+          "thickness": 123.0,
+          "length": 522.0
+        },
+        {
+          "kind": "v",
+          "x0": 940.0,
+          "y0": 1200.0,
+          "x1": 1065.0,
+          "y1": 1548.0,
+          "thickness": 125.0,
+          "length": 348.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": 125.0,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.061,
+      "contrast_v_over_h": 2.451,
+      "terminals": [
+        {
+          "bounds": [
+            1620.0,
+            1108.0,
+            1837.0,
+            1304.0
+          ],
+          "area": 27805.7,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "box_uroko",
+          "uroko": {
+            "width_over_h": 4.25,
+            "height_over_h": 3.04,
+            "width_em": 0.106,
+            "height_em": 0.0757
+          }
+        },
+        {
+          "bounds": [
+            266.0,
+            367.0,
+            389.0,
+            586.0
+          ],
+          "area": 26937.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "uchikomi"
+        },
+        {
+          "bounds": [
+            1638.0,
+            396.0,
+            1761.0,
+            586.0
+          ],
+          "area": 23370.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko"
+        },
+        {
+          "bounds": [
+            940.0,
+            1548.0,
+            1157.0,
+            1663.0
+          ],
+          "area": 20393.8,
+          "clockwise": false,
+          "kind": "top_cap",
+          "role": "top_cap"
+        },
+        {
+          "bounds": [
+            266.0,
+            1149.0,
+            407.0,
+            1270.0
+          ],
+          "area": 12351.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "uchikomi"
+        },
+        {
+          "bounds": [
+            940.0,
+            1149.0,
+            1065.0,
+            1200.0
+          ],
+          "area": 6375.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            940.0,
+            535.0,
+            1065.0,
+            586.0
+          ],
+          "area": 6375.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "box_uroko",
+        "junction",
+        "top_cap",
+        "uchikomi"
+      ],
+      "counters": [
+        {
+          "bounds_em": [
+            0.1899,
+            0.2861,
+            0.459,
+            0.561
+          ],
+          "area_em": 0.07396
+        },
+        {
+          "bounds_em": [
+            0.52,
+            0.2861,
+            0.7998,
+            0.561
+          ],
+          "area_em": 0.07691
+        }
+      ],
+      "n_counter": 2,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.217
+    },
+    {
+      "char": "永",
+      "src_name": "aj1260",
+      "unicode": "U+6C38",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 109.0,
+      "rsb": 114.0,
+      "lsb_em": 0.0532,
+      "rsb_em": 0.0557,
+      "face": [
+        109.0,
+        -139.05,
+        1934.0,
+        1702.0
+      ],
+      "face_em": [
+        0.8911,
+        0.899
+      ],
+      "ink_em": 0.159,
+      "exact_area": 666813.5,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 410.0,
+          "y0": 1206.0,
+          "x1": 946.0,
+          "y1": 1257.0,
+          "thickness": 51.0,
+          "length": 536.0
+        },
+        {
+          "kind": "h",
+          "x0": 191.0,
+          "y0": 846.0,
+          "x1": 646.0,
+          "y1": 897.0,
+          "thickness": 51.0,
+          "length": 455.0
+        },
+        {
+          "kind": "v",
+          "x0": 967.0,
+          "y0": 98.0,
+          "x1": 1082.0,
+          "y1": 994.0,
+          "thickness": 115.0,
+          "length": 896.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": 115.0,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.0562,
+      "contrast_v_over_h": 2.255,
+      "terminals": [
+        {
+          "bounds": [
+            946.0,
+            37.0,
+            1934.0,
+            1355.0
+          ],
+          "area": 246706.5,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "right_hara"
+        },
+        {
+          "bounds": [
+            109.0,
+            -39.0,
+            857.0,
+            998.0
+          ],
+          "area": 138668.8,
+          "clockwise": false,
+          "kind": "other",
+          "role": "left_hara"
+        },
+        {
+          "bounds": [
+            594.0,
+            1393.0,
+            1225.0,
+            1702.0
+          ],
+          "area": 65651.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.47,
+            "height_over_h": 9.73,
+            "width_em": 0.1362,
+            "height_em": 0.2422
+          }
+        },
+        {
+          "bounds": [
+            588.0,
+            -139.05,
+            1082.0,
+            98.0
+          ],
+          "area": 61135.2,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko"
+        },
+        {
+          "bounds": [
+            389.0,
+            1206.0,
+            410.0,
+            1257.0
+          ],
+          "area": 535.5,
+          "clockwise": false,
+          "kind": "top_cap",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            170.0,
+            846.0,
+            191.0,
+            897.0
+          ],
+          "area": 535.5,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "junction",
+        "left_hara",
+        "right_hara"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 3,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.77
+    },
+    {
+      "char": "木",
+      "src_name": "aj3814",
+      "unicode": "U+6728",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 123.0,
+      "rsb": 88.0,
+      "lsb_em": 0.0601,
+      "rsb_em": 0.043,
+      "face": [
+        123.0,
+        -148.0,
+        1960.0,
+        1650.0
+      ],
+      "face_em": [
+        0.897,
+        0.8779
+      ],
+      "ink_em": 0.1392,
+      "exact_area": 583664.3,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 178.0,
+          "y0": 1075.0,
+          "x1": 899.0,
+          "y1": 1126.0,
+          "thickness": 51.0,
+          "length": 721.0
+        },
+        {
+          "kind": "h",
+          "x0": 1106.0,
+          "y0": 1075.0,
+          "x1": 1622.0,
+          "y1": 1126.0,
+          "thickness": 51.0,
+          "length": 516.0
+        },
+        {
+          "kind": "v",
+          "x0": 954.0,
+          "y0": -148.0,
+          "x1": 1077.0,
+          "y1": 907.0,
+          "thickness": 123.0,
+          "length": 1055.0
+        },
+        {
+          "kind": "v",
+          "x0": 954.0,
+          "y0": 1126.0,
+          "x1": 1077.0,
+          "y1": 1538.0,
+          "thickness": 123.0,
+          "length": 412.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": 123.0,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.0601,
+      "contrast_v_over_h": 2.412,
+      "terminals": [
+        {
+          "bounds": [
+            123.0,
+            55.0,
+            1960.0,
+            1126.0
+          ],
+          "area": 285953.5,
+          "clockwise": false,
+          "kind": "other",
+          "role": "hara_pair"
+        },
+        {
+          "bounds": [
+            1622.0,
+            1075.0,
+            1886.0,
+            1284.0
+          ],
+          "area": 33608.2,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.18,
+            "height_over_h": 4.1,
+            "width_em": 0.1289,
+            "height_em": 0.1021
+          }
+        },
+        {
+          "bounds": [
+            954.0,
+            1538.0,
+            1169.0,
+            1650.0
+          ],
+          "area": 20141.2,
+          "clockwise": false,
+          "kind": "top_cap",
+          "role": "top_cap"
+        },
+        {
+          "bounds": [
+            161.0,
+            1075.0,
+            178.0,
+            1126.0
+          ],
+          "area": 433.5,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "hara_pair",
+        "junction",
+        "top_cap"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.583
+    },
+    {
+      "char": "人",
+      "src_name": "aj2579",
+      "unicode": "U+4EBA",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 102.0,
+      "rsb": 101.0,
+      "lsb_em": 0.0498,
+      "rsb_em": 0.0493,
+      "face": [
+        102.0,
+        -100.0,
+        1947.0,
+        1620.0
+      ],
+      "face_em": [
+        0.9009,
+        0.8398
+      ],
+      "ink_em": 0.0934,
+      "exact_area": 391539.5,
+      "stems": [],
+      "h_thickness": null,
+      "v_thickness": null,
+      "h_thickness_em": null,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "terminals": [
+        {
+          "bounds": [
+            102.0,
+            -100.0,
+            1947.0,
+            1620.0
+          ],
+          "area": 391539.5,
+          "clockwise": true,
+          "kind": "other",
+          "role": "hara_pair"
+        }
+      ],
+      "roles": [
+        "hara_pair"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 1.0
+    },
+    {
+      "char": "本",
+      "src_name": "aj3722",
+      "unicode": "U+672C",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 90.0,
+      "rsb": 74.0,
+      "lsb_em": 0.0439,
+      "rsb_em": 0.0361,
+      "face": [
+        90.0,
+        -147.0,
+        1974.0,
+        1659.0
+      ],
+      "face_em": [
+        0.9199,
+        0.8818
+      ],
+      "ink_em": 0.1546,
+      "exact_area": 648381.3,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 176.0,
+          "y0": 1180.0,
+          "x1": 872.0,
+          "y1": 1231.0,
+          "thickness": 51.0,
+          "length": 696.0
+        },
+        {
+          "kind": "h",
+          "x0": 1116.0,
+          "y0": 1180.0,
+          "x1": 1636.0,
+          "y1": 1231.0,
+          "thickness": 51.0,
+          "length": 520.0
+        },
+        {
+          "kind": "h",
+          "x0": 583.0,
+          "y0": 289.0,
+          "x1": 952.0,
+          "y1": 340.0,
+          "thickness": 51.0,
+          "length": 369.0
+        },
+        {
+          "kind": "v",
+          "x0": 952.0,
+          "y0": 340.0,
+          "x1": 1077.0,
+          "y1": 1049.0,
+          "thickness": 125.0,
+          "length": 709.0
+        },
+        {
+          "kind": "v",
+          "x0": 952.0,
+          "y0": -147.0,
+          "x1": 1077.0,
+          "y1": 289.0,
+          "thickness": 125.0,
+          "length": 436.0
+        },
+        {
+          "kind": "v",
+          "x0": 952.0,
+          "y0": 1231.0,
+          "x1": 1077.0,
+          "y1": 1542.0,
+          "thickness": 125.0,
+          "length": 311.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": 125.0,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": 0.061,
+      "contrast_v_over_h": 2.451,
+      "terminals": [
+        {
+          "bounds": [
+            90.0,
+            121.0,
+            1974.0,
+            1231.0
+          ],
+          "area": 287249.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "hara_pair"
+        },
+        {
+          "bounds": [
+            952.0,
+            289.0,
+            1507.0,
+            477.0
+          ],
+          "area": 44421.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "other"
+        },
+        {
+          "bounds": [
+            1636.0,
+            1180.0,
+            1894.0,
+            1385.0
+          ],
+          "area": 32510.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "bar_uroko",
+          "uroko": {
+            "width_over_h": 5.06,
+            "height_over_h": 4.02,
+            "width_em": 0.126,
+            "height_em": 0.1001
+          }
+        },
+        {
+          "bounds": [
+            952.0,
+            1542.0,
+            1165.0,
+            1659.0
+          ],
+          "area": 20422.8,
+          "clockwise": false,
+          "kind": "top_cap",
+          "role": "top_cap"
+        },
+        {
+          "bounds": [
+            157.0,
+            1180.0,
+            176.0,
+            1231.0
+          ],
+          "area": 484.5,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        },
+        {
+          "bounds": [
+            565.0,
+            289.0,
+            583.0,
+            340.0
+          ],
+          "area": 459.0,
+          "clockwise": false,
+          "kind": "other",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "bar_uroko",
+        "hara_pair",
+        "junction",
+        "other",
+        "top_cap"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.595
+    },
+    {
+      "char": "入",
+      "src_name": "aj3286",
+      "unicode": "U+5165",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 141.0,
+      "rsb": 113.0,
+      "lsb_em": 0.0688,
+      "rsb_em": 0.0552,
+      "face": [
+        141.0,
+        -114.0,
+        1935.0,
+        1606.0
+      ],
+      "face_em": [
+        0.876,
+        0.8398
+      ],
+      "ink_em": 0.0932,
+      "exact_area": 390964.0,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 501.0,
+          "y0": 1434.0,
+          "x1": 966.0,
+          "y1": 1485.0,
+          "thickness": 51.0,
+          "length": 465.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": null,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "terminals": [
+        {
+          "bounds": [
+            141.0,
+            -114.0,
+            1935.0,
+            1606.0
+          ],
+          "area": 366739.0,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "hara_pair"
+        },
+        {
+          "bounds": [
+            481.0,
+            1434.0,
+            501.0,
+            1485.0
+          ],
+          "area": 510.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "hara_pair",
+        "junction"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 1,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.939
+    },
+    {
+      "char": "八",
+      "src_name": "aj3392",
+      "unicode": "U+516B",
+      "upm": 2048,
+      "width": 2048,
+      "lsb": 98.0,
+      "rsb": 84.0,
+      "lsb_em": 0.0479,
+      "rsb_em": 0.041,
+      "face": [
+        98.0,
+        -72.0,
+        1964.0,
+        1590.0
+      ],
+      "face_em": [
+        0.9111,
+        0.8115
+      ],
+      "ink_em": 0.0886,
+      "exact_area": 371435.7,
+      "stems": [
+        {
+          "kind": "h",
+          "x0": 774.0,
+          "y0": 1432.0,
+          "x1": 1177.0,
+          "y1": 1483.0,
+          "thickness": 51.0,
+          "length": 403.0
+        }
+      ],
+      "h_thickness": 51.0,
+      "v_thickness": null,
+      "h_thickness_em": 0.0249,
+      "v_thickness_em": null,
+      "contrast_v_over_h": null,
+      "terminals": [
+        {
+          "bounds": [
+            1177.0,
+            -61.0,
+            1964.0,
+            1590.0
+          ],
+          "area": 187683.2,
+          "clockwise": false,
+          "kind": "uroko",
+          "role": "right_hara"
+        },
+        {
+          "bounds": [
+            98.0,
+            -72.0,
+            854.0,
+            1225.0
+          ],
+          "area": 162715.0,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "left_hara"
+        },
+        {
+          "bounds": [
+            755.0,
+            1432.0,
+            774.0,
+            1483.0
+          ],
+          "area": 484.5,
+          "clockwise": false,
+          "kind": "uchikomi",
+          "role": "junction"
+        }
+      ],
+      "roles": [
+        "junction",
+        "left_hara",
+        "right_hara"
+      ],
+      "counters": [],
+      "n_counter": 0,
+      "n_outer": 2,
+      "xor_area": 0.0,
+      "lossless": true,
+      "residual_frac": 0.945
+    }
+  ],
+  "all_lossless": true
+}
