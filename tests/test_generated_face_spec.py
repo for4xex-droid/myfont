@@ -60,13 +60,13 @@ def test_live_spec_requires_upper_digits_slash_and_two_spaces_only():
 
 def test_live_spec_records_the_decided_names_and_license():
     text = SPEC.read_text(encoding="utf-8")
-    for name in ("Irodori Modern", "Irodori Classic", "Irodori Chic", "Irodori Pop"):
+    for name in ("Someiro Modern", "Someiro Classic", "Someiro Chic", "Someiro Pop"):
         assert name in text
     for filename in (
-        "IrodoriModern-Regular.otf",
-        "IrodoriClassic-Regular.otf",
-        "IrodoriChic-Regular.otf",
-        "IrodoriPop-Regular.otf",
+        "SomeiroModern-Regular.otf",
+        "SomeiroClassic-Regular.otf",
+        "SomeiroChic-Regular.otf",
+        "SomeiroPop-Regular.otf",
     ):
         assert filename in text
     assert "Copyright 2026 Motivation Studio LLC. All rights reserved." in text
