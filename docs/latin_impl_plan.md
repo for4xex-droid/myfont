@@ -1,7 +1,7 @@
-# タイポアート用アルファベット書体 実装計画 v1
+# タイポアート用アルファベット書体 実装計画 v2
 
-2026-09-29 策定。実装はまだ行わない。
-正本の優先順: `docs/生成書体の仕様.md` ＞ `GOLDENRULES.md` ＞ 本書 ＞ `docs/latin_display_plan.md`（制作計画。様式定義と工程の粗い順番）。
+2026-09-29 策定。同日 v2: 先行研究の調査（`docs/latin_research.md`）を §2・§4・§5・§7 に反映。実装はまだ行わない。
+正本の優先順: `docs/生成書体の仕様.md` ＞ `GOLDENRULES.md` ＞ 本書 ＞ `docs/latin_display_plan.md`（制作計画。様式定義と工程の粗い順番）＞ `docs/latin_research.md`（採否の根拠）。
 
 本書は「どのファイルに、何を、どの順で、どのテストを先に書いて作るか」を決める。数値の初期値は設計パラメータであり、仕様の未決定項目ではない。仕様の未決定項目は本書でも埋めない。
 
@@ -23,6 +23,8 @@
 | F10 | `*.otf` / `*.ttf` は gitignore（掟10） | 生成物はコミットしない。正本は YAML、黄金はハッシュと PNG |
 | F11 | `scripts/generated_face_spec.py` が仕様を読み、未決定があれば引き渡しを拒否する（現状は「太さの数」「命名の規則」でブロック） | 書き出し CLI の入口に組み込む。命名などが決まったら値を読む機能を足す |
 | F12 | 仮名 DSL（`engine/kana/schema.py`）は未知キーを拒否する厳格スキーマ | ラテン書体の DSL も同じ流儀で作る（黙って無視しない） |
+| F13 | `curve_fit` はニュートン法の再パラメータ化（`_reparam_newton`）と最大誤差での分割を既に持つ（Schneider 1990 型） | フィットの本体は作り直さない。足すのは区間数の最小化（Plass & Stone）だけで、それも条件付き |
+| F14 | engine の依存はすべて permissive（BSD・MIT・Apache）。字間・生成系の既存 OSS の多くは GPL（HT Letterspacer・Kernagic・Metaflop・libspiro など、`docs/latin_research.md` §2） | GPL・MPL のコードは読まない・写さない。考え方は論文か CC BY の文書から自作する |
 
 ---
 
@@ -75,7 +77,12 @@ D5 と D6 は、仕様書に項目を足してから決める。この計画で�
 
 ### 2.5 曲線
 
-- 輪郭の生成経路: 骨格 → 密サンプル → ペンで左右オフセット → 多角形 → pathops union → 穴保護付き微小除去 → 向きの正規化 → cubic フィット → 直線スナップ → 極値挿入 → 整数丸め → 再検査
+- 輪郭の生成経路: 骨格の節点 → **Hobby 展開で cubic 列** → 密サンプル → ペンで左右オフセット → 多角形 → **ストローク単位で自己重なりを解消**（pathops simplify） → 端物・接合の**塗り部品**を追加 → 字全体の pathops union → 穴保護付き微小除去 → 向きの正規化 → cubic フィット → 直線スナップ → 極値挿入 → **開始点の固定** → 整数丸め → 再検査
+- 端物（セリフ・頂点・ボール・スパー）はペンで掃かない。テンプレが閉じた塗り輪郭を返し、union で結合する（Romer 2012、FlexyFont）。ペン掃引は幹と曲線だけ
+- 曲線の内側では |κ|·半幅 ≥ 1 で尖点ができる（Farouki & Neff 1990）。G-K を fail のまま残し、さらに union の前にストローク単位で simplify をかけて、G-K 帯ぎりぎりの小さな折り返しを消す
+- cubic フィットは既存 `curve_fit` を使う（F13）。輪郭あたりの節点が上限を超えたときだけ、Plass & Stone の動的計画法で区間数を最小化し直す。閉じた輪郭は、下で固定する開始点で一度切って開曲線にしてから最小化する。開始点は必ず節点のまま残す
+- 誤差は節点だけでなく、元の多角形の密サンプルとの Hausdorff で**両方向に**測る（DeepVecFont-v2 の補助点）
+- 各輪郭の開始点は、その輪郭のオンカーブ点のうち y が最小、同じなら x が最小の点に固定する。輪郭の並びは（その輪郭の最小 y、最小 x）の昇順。向きは UFO の規約に合わせ、外形は反時計回り、穴は時計回り。TTF の向きは ufo2ft の変換に任せる。これで版ごとの差分とハッシュが安定する（VecFusion）
 - 漢字用 `rdp_polyline` は使わない
 - 丸め後に自己交差と輪郭数を**もう一度**検査する（丸めで交差が生まれうる）
 
@@ -88,14 +95,15 @@ engine/src/engine/latin/
   __init__.py
   glyphset.py        # 必須37字 ⇄ グリフ名（AGL: A..Z, zero..nine, slash）
   schema.py          # 骨格 YAML の厳格スキーマ（未知キー拒否）
-  load.py            # 骨格ローダ（variants 解決）
+  hobby.py           # 節点列（smooth/corner/line＋張力）→ cubic 列（Hobby 1985）
+  load.py            # 骨格ローダ（variants 解決・3層パラメータの合成）
   style.py           # 様式 snapshot（凍結 id＋内容ハッシュ）
   pens.py            # mono / nib の半幅列
   terminals.py       # flat / round / serif_bracketed / serif_hairline / ball / spur / apex
   joins.py           # apex / T / L / crotch / bowl_join の食い込みと細め
   build.py           # 1字の生成パイプライン（§2.5）
-  outline.py         # 直線スナップ・極値挿入・丸め・再検査
-  spacing.py         # 側面規則
+  outline.py         # 区間最小化（条件付き）・直線スナップ・極値挿入・開始点固定・丸め・再検査
+  spacing.py         # Tracy 法の側面5段＋面積法の照合測定
   kerning.py         # ペア候補と光学ギャップ計測
   ufo.py             # ラテン書体用 UFO 書き出し（字幅・メトリクス・kerning・WIP 印）
   compile.py         # OTF と TTF の両方をコンパイルし、両者の差を検査
@@ -111,6 +119,7 @@ engine/scripts/
   latin_proof.py     # 固定文面の組見本（hb-view）
   latin_sheet.py     # 様式比較シート・1パラメータ感度 PNG
   latin_export.py    # 引き渡し。仕様ゲート → ship_gate → 両形式
+  make_latin_blind_packet.py   # 工程 13。見本に書体名を出さない
 
 engine/tests/test_latin_*.py
 data/glyphset_latin_required.txt           # 仕様から派生。一致をテストで保証
@@ -133,28 +142,50 @@ unicode: 0x0041
 structure: apex_diagonals
 strokes:
   - id: left
-    spine: [[0.00, 0.00], [0.50, 1.00]]     # 直線は2点、曲線は 3n+1 点の cubic 列
+    knots: [[0.00, 0.00, line], [0.50, 1.00, corner]]   # [x, y, 型]。型は smooth / corner / line
     role: thin
     ends: {start: foot, end: apex}
   - id: right
-    spine: [[0.50, 1.00], [1.00, 0.00]]
+    knots: [[0.50, 1.00, corner], [1.00, 0.00, line]]
     role: thick
     ends: {start: apex, end: foot}
   - id: bar
-    spine: [[0.22, 0.30], [0.78, 0.30]]
+    knots: [[0.22, 0.30, line], [0.78, 0.30, line]]
     role: bar
     ends: {start: none, end: none}
 joins:
   - {a: left, b: right, type: apex}
   - {a: bar, b: left, type: T}
   - {a: bar, b: right, type: T}
+sides: {left: diagonal, right: diagonal}     # Tracy 法の5段。左右は独立（§4.3）
 expect: {contours: 2, holes: 1}
 variants:
   classic:
     joins: [{a: left, b: right, type: apex_cut}]
 ```
 
+曲線の例（O の外周。閉じた1ストローク）:
+
+```yaml
+strokes:
+  - id: bowl
+    closed: true
+    knots:                                   # 4節点。Hobby 展開で滑らかな cubic 4本になる
+      - [0.50, 0.00, smooth]
+      - [1.00, 0.50, smooth]
+      - [0.50, 1.00, smooth]
+      - [0.00, 0.50, smooth]
+    tension: 1.0                             # 省略時 1.0。0.75〜4.0 の範囲外は拒否。区間ごとなら tensions:
+    role: bowl
+```
+
 規則:
+- 骨格は**節点**で書き、制御点は書かない（Hobby 1985）。`hobby.py` が cubic 列へ展開する。ハッシュと再現性の対象は展開後の cubic 列
+- 節点型（Levien 2009 の語彙）: `smooth`＝接線が連続、`corner`＝接線が不連続、`line`＝隣の節点と直線で結ぶ。接線を固定するときは節点の4番目に角度（度。+x から反時計回り）を書く。`line` に角度が付いていたら拒否する
+- 区間ごとの張力は `tensions:` の配列。長さは区間数（閉曲線なら節点数、開曲線なら節点数−1）と一致しないとき拒否する。省略時は全区間が `tension`（既定 1.0）
+- 張力と接線角度は自由スカラーに数える（上限 12）
+- 張力の拒否範囲は 0.75 未満と 4.0 超。これはスキーマの設計値で、Hobby 論文の定数ではない
+- 次はロードを拒否する: 空の `knots`、同じ字の中の stroke `id` の重複、`closed: true` で節点が3未満、未知の節点型、節点が `[x, y, 型]` でも `[x, y, 型, 角度]` でもないもの
 - `ends` の値は語彙（`foot` / `apex` / `none` / `open` / `round_end` など）。**どのテンプレに展開するかは様式が決める**（例: `foot` はモダンで `flat`、クラシックで `serif_bracketed`、ポップで `round`）
 - `variants` は構造の差だけ。未知キーは拒否する
 - 1字あたりの自由スカラー（座標以外の数値）は 12 以下（仮名の編集バジェットを引き継ぐ）
@@ -169,7 +200,7 @@ pen: {type: mono, stem: 0.13, bar_ratio: 0.90}
 terminals: {foot: flat, apex: apex_sharp, open: flat, round_end: flat}
 joins: {crotch_thin: 0.82}
 proportions: {H: 0.74, O: 1.00, E: 0.50, S: 0.52, "/": 0.42, ...}   # 本体幅（キャップハイト比）
-sidebearing: {base: 0.30, straight: 1.00, round: 0.60, diagonal: 0.12}
+sidebearing: {base: 0.30, straight: 1.00, near_straight: 0.85, round: 0.60, diagonal: 0.12, open: 0.20}
 vertical: {ascender: 760, descender: -140}  # 全字の bbox を覆うこと（§5 G-M）
 micro_area_floor: 400                        # UPM²。穴は対象外
 curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
@@ -178,10 +209,30 @@ curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 - `style_id` は凍結 id。数値を変えたら id を上げる（掟16 と同型）。内容ハッシュを UFO lib と黄金に記録する
 - 様式 YAML は仕様の値（形式・命名）を持たない
 
+パラメータは3層で合成する（Hu & Hersch 2001）。後の層が前の層を上書きする。
+
+| 層 | 置き場 | 例 |
+|---|---|---|
+| 全体 | 様式 YAML の最上位 | `cap_height`、`pen.stem`、`overshoot` |
+| 役割グループ | 様式 YAML の `groups:` | `groups: {diagonal: {stem_ratio: 1.04}}`（斜め画をわずかに太くする）。側面の空きはここへ書かない |
+| 字ごと | 骨格 YAML の `variants.<style>` | ある字だけの `tension`、`dir`、接合の型 |
+
+- どの字がどのグループかは骨格側に持つ（`groups: [round]`）。グループはペンと比だけを上書きする。側面の空きはグループに載せない。D や B のように左右で段が違う字を、1つのグループ名では表せないため
+- グループ名は `docs/latin_mapping.md` の語彙に限る（工程 2 で作る。それまで骨格は書かない）
+- 比は名前で持つ（Shamir & Rappoport 1998）: `bar_ratio`・`crotch_thin`・`hairline_ratio` のように。無名の数値を字の YAML に散らさない
+- 様式の違いは連続値だけでなく**離散スイッチ**で持つ（Balashova 2019、FlexyFont）: `terminals` の対応表（例: `foot → flat | serif_bracketed | serif_hairline | round`）と `joins` の型
+
 ### 4.3 字間・カーニング
 
-- 側面: 各字の左右を `straight` / `round` / `diagonal` / `open` に分類した表を骨格側に持つ（`sides: {left: straight, right: round}`）
-- カーニング: 様式 YAML に `kerning:` として明示ペアだけ持つ。値は `kerning.py` の自動計測で**候補**を出し、作者が採用した値だけを書く（選好は `log_preference.py` で keep/discard/shift）
+- 側面は Tracy 法で決める（de Mello Vargas 2007 の解説による）。手順:
+  1. `HHHH` が均等に見える H の左右を決める（基準）
+  2. `HHOHH` で O の左右を決める
+  3. 各字の左右を5段に分類し、骨格側に持つ: `straight`（H と同じ）/ `near_straight`（やや少なめ）/ `round`（O と同じ）/ `diagonal`（最小。A・V・W の斜め側）/ `open`（C・L・T の開いた側。字ごとに作者が決める）
+  4. 数字も同じ規則で、`0` は `round`、`1` は `straight` から始める
+- 照合用の第2測定として、面積法（字の側面と隣の字のあいだの白の面積を、キャップハイトの帯で測る）を `spacing.py` に自作する。HT Letterspacer の**文書**（CC BY 4.0）を出典として記す。コードは GPL なので読まない（F14）
+- 面積法と Tracy 法の差が大きい字（様式ごとの帯を工程 10 で決める）は、作者の目視対象として一覧に出す。自動では直さない
+- リズム検査: 固定文面で、縦ステムの間隔の変動係数を測る。定義はこの計画のものである。帯は工程 10 で凍結し、凍結前は計測だけ、凍結後に帯の外なら fail にする
+- カーニング: 様式 YAML に `kerning:` として明示ペアだけ持つ。候補は、輪郭が重なるペアと、側面規則より明らかに広い隙間のペアに限る。作者が採用した値だけを書く（選好は `log_preference.py` で keep/discard/shift）
 
 ---
 
@@ -189,22 +240,25 @@ curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 
 | ID | 内容 | 実装 | 失敗時 |
 |---|---|---|---|
-| G-S | 骨格スキーマ（未知キー・座標範囲・自由スカラー ≤12） | `schema.py` | ロード失敗 |
-| G-K | 曲率半径 ≥ k×半幅（ペンの折り返し防止） | `build.py`（既存 `min_curvature_radius`） | 字 fail。YAML 側を直す |
+| G-S | 骨格スキーマ（未知キー・座標範囲・節点型・張力の範囲・自由スカラー ≤12） | `schema.py` | ロード失敗 |
+| G-H | Hobby 展開の決定性（同じ節点から同じ cubic 列）。`line` 区間は直線、`corner` で接線が不連続、`smooth` で連続。円の上下左右の極に置いた4節点では各接線が水平または垂直 | `hobby.py` | pytest fail |
+| G-K | 曲率半径 ≥ k×半幅（ペンの折り返し防止。Farouki & Neff の尖点条件） | `build.py`（既存 `min_curvature_radius`） | 字 fail。YAML 側を直す |
 | G-C | 輪郭数・穴の数が `expect` と一致 | `gate.py` | fail |
 | G-X | 自己交差 0（丸め後に再検査） | `outline.py`＋pathops | fail |
-| G-F | cubic フィット誤差 ≤ `max_error`、輪郭あたり節点 ≤ 上限、丸い部分の極値にオンカーブ点 | `outline.py` | fail（折れ線へは戻さない） |
-| G-L | 直線部は軸に平行（±0.5° 以内をスナップ、スナップ後は 0°） | `outline.py` | fail |
+| G-F | cubic フィット誤差 ≤ `max_error`（密サンプルとの両方向 Hausdorff）、輪郭あたり節点 ≤ 上限、丸い部分の極値にオンカーブ点 | `outline.py` | fail（折れ線へは戻さない） |
+| G-L | 直線部は軸に平行（±0.5° 以内をスナップ、スナップ後は 0°）。直線は line として書き出す | `outline.py` | fail |
+| G-ORD | 輪郭の開始点と向きが規則どおり（§2.5）、輪郭の並び順が決定的 | `outline.py` | fail |
 | G-O | オーバーシュートが帯内（丸・尖り別） | `gate.py` | fail |
 | G-M | 全字の bbox が ascender/descender と winAscent/winDescent に収まる（欠け防止） | `gate.py` | fail |
 | G-R | 再現性（同じ入力なら輪郭ハッシュ一致） | pytest | fail |
 | G-SET | 縦ステム中央値がセット内 ±5%。コントラスト比と応力角が様式帯内 | `gate.py`＋`measure.py` | fail |
-| G-SEP | 4様式の分離（§6.3） | `latin_sheet.py`＋`gate.py` | fail |
+| G-SEP | 4様式の分離（§6.3） | `latin_sheet.py`＋`gate.py` | 閾値の凍結後に fail。凍結前は計測だけ |
 | G-TT | TTF と OTF の差（二次曲線変換の誤差）: 2000px ラスタで IoU ≥ 0.999、輪郭 Hausdorff ≤ 1.0 UPM | `compile.py` | fail |
 | G-SPEC | 仕様に未決定が残っていない。cmap が必須集合と**完全一致**（収録外は fail） | `generated_face_spec.py`＋ship_gate 拡張 | 書き出し拒否 |
 | G-SHIP | `ship_gate.py` を OTF と TTF の両方に。様式のメトリクスを引数で渡す。FontBakery universal は WARN の採否を `ship_gate_rules.md` に書く | 既存＋引数 | fail |
 | G-EYE | 組見本の作者目視と黄金凍結 | `latin_proof.py` | 凍結しない |
-| G-BLIND | 盲検（様式当て 2/3、使えるか 2/3） | パック生成 | 出荷しない |
+| G-SP | 側面分類が全字にある。リズム検査は帯の凍結後に帯外なら fail。凍結前は計測だけ。面積法との差が大きい字は一覧に出す（fail にはしない） | `spacing.py` | 凍結後のリズムだけ fail |
+| G-BLIND | 盲検（様式当て 2/3、使えるか 2/3、印象語の一致 2/3） | パック生成 | 出荷しない |
 
 ---
 
@@ -251,18 +305,20 @@ curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 | # | 工程 | テスト（先に書く） | 実装 | DoD | 工数 | 依存 |
 |---|---|---|---|---|---|---|
 | 1 | 字集合 | 仕様の必須集合＝`data/glyphset_latin_required.txt`＝`glyphset.py` の37名。AGL 名の往復。収録外の字は拒否 | `glyphset.py`、txt | 3者一致が pytest で固定 | 2–3h | — |
-| 2 | スキーマとローダ | 未知キー拒否、座標範囲外拒否、variants の解決、スカラー上限。`H.yaml`・`O.yaml` の読み込み | `schema.py`、`load.py`、`H.yaml`、`O.yaml` | 2字がロードでき、壊れた YAML が全部拒否される | 6–10h | 1 |
+| 2 | スキーマ・Hobby 展開・ローダ | G-S: 未知キー、空 knots、id 重複、closed の節点3未満、座標範囲、張力範囲を拒否。variants の解決、3層の上書き順（グループは側面を上書きしない）、スカラー上限。G-H: `line` が直線、`corner` で接線不連続、円の極の4節点で接線が水平または垂直、同入力で同出力。`line` への角度と、長さの違う `tensions` は拒否。`H.yaml`・`O.yaml` の読み込み | `schema.py`、`hobby.py`、`load.py`、`H.yaml`、`O.yaml` | 2字がロードでき、壊れた YAML が全部拒否される | 10–16h | 1 |
 | 3 | 様式とペン | style id とハッシュの凍結、mono の半幅一定、nib で θ に直交する方向が最細、role 優先 | `style.py`、`pens.py`、styles 4本の骨組み | 合成サンプルでペン式が数値どおり | 6–10h | 2 |
-| 4 | 端物と接合 | 各テンプレの輪郭が閉じて自己交差なし、食い込み後 union で1輪郭、apex のオーバーシュート量、crotch の細め | `terminals.py`、`joins.py` | H・A・V 相当の合成骨格で G-C・G-X 緑 | 10–16h | 3 |
-| 5 | 輪郭パイプラインと UFO/コンパイル | 穴保護（小さい穴が残る）、極値挿入、直線スナップ、丸め後の再検査、TTF/OTF 差（G-TT）、字幅が比例表どおり、WIP 印が付く | `build.py`、`outline.py`、`ufo.py`、`compile.py`、`latin_build.py` | `H` `O` がモダンとポップで OTF・TTF まで通り、G-C/G-X/G-F/G-L/G-TT 緑 | 12–20h | 4 |
-| 6 | パイロット | `H O B V S 0` × 4様式で全字ゲート緑、様式分離の計測値が出る | 残り4字の骨格、nib の曲線、`latin_sheet.py`、`measure.py` | 比較シート1枚。作者目視で4様式を区別できる。分離閾値を凍結 | 20–35h | 5・R1 |
-| 7 | モダン37字 | 37字の G-C〜G-M、G-SET | 骨格31字、variants | 組見本の黄金 `latin_modern/FREEZE_v1` | 20–35h | 6 |
+| 4 | 端物と接合 | 各テンプレが閉じた塗り輪郭を返し自己交差なし（ペン掃引を使わない）、ストローク単位 simplify 後に折り返しが残らない、食い込み後 union で1輪郭、apex のオーバーシュート量、crotch の細め | `terminals.py`、`joins.py` | H・A・V 相当の合成骨格で G-C・G-X 緑 | 10–16h | 3 |
+| 5 | 輪郭パイプラインと UFO/コンパイル | 穴保護（小さい穴が残る）、両方向 Hausdorff、節点上限超えで区間最小化が働く、極値挿入、直線スナップ、開始点と向き（G-ORD）、丸め後の再検査、TTF/OTF 差（G-TT）、字幅が比例表どおり、WIP 印が付く | `build.py`、`outline.py`、`ufo.py`、`compile.py`、`latin_build.py` | `H` `O` がモダンとポップで OTF・TTF まで通り、G-C/G-X/G-F/G-L/G-ORD/G-TT 緑 | 14–24h | 4 |
+| 6 | パイロット | `H O B V S 0` × 4様式で全字ゲート緑。G-SEP は計測値を出し、閾値を凍結してから fail にする | 残り4字の骨格、nib の曲線、`latin_sheet.py`、`measure.py` | 比較シート1枚。作者目視で4様式を区別できる。分離閾値を凍結 | 20–35h | 5・R1 |
+| 7 | モダン37字 | 37字の G-C・G-X・G-F・G-L・G-ORD・G-O・G-M・G-SET。組見本の G-EYE | 骨格31字、variants | 組見本の黄金 `latin_modern/FREEZE_v1` | 20–35h | 6 |
 | 8 | ポップ37字 | 同上。小さい穴の保護（A・4・R・8） | ポップの variants、角丸 | 黄金 `latin_pop/FREEZE_v1` | 15–25h | 7 |
 | 9 | シック・クラシック37字 | 同上。ヘアラインの最小幅（ラスタで途切れない下限）、セリフの G-X | nib 様式の variants、serif テンプレの調整 | 黄金 `latin_chic` / `latin_classic` | 70–120h | 8 |
-| 10 | 字間・カーニング | 側面分類が全字にある。固定文面の字間ギャップのばらつきが帯内。カーニングは明示ペアだけ（上限 120 ペア/様式） | `spacing.py`、`kerning.py`、UFO の kerning と groups | 固定文面で歩行なし。黄金を v2 へ | 各様式 10–20h | 7–9 |
+| 10 | 字間・カーニング | Tracy 法の5段が全字にある。H→O→他の順で側面が決まる。面積法が合成 fixture（既知の白面積）で数値どおり。リズム検査（G-SP）。カーニングは明示ペアだけ（上限 120 ペア/様式）。衝突・大きな隙間のペアだけ候補に出す | `spacing.py`、`kerning.py`、UFO の kerning と groups（ufo2ft の kernFeatureWriter で GPOS 化） | 固定文面で歩行なし。面積法との差の一覧を作者が確認済み。黄金を v2 へ | 各様式 12–22h | 7–9 |
 | 11 | ウェイト（S-太さ決定後） | 各ウェイトで全ゲート緑、ステムが段ごとに単調に増える | 様式 YAML に段を追加 | 各ウェイトの黄金 | 様式あたり 15–30h | S-太さ・10 |
-| 12 | 引き渡し（S-命名・D5・D6 決定後） | 仕様パーサが命名を読む。未決定なら終了コード 2。cmap 完全一致。両形式で ship_gate 緑。ファイル名が仕様どおり | `generated_face_spec.py` 拡張、`latin_export.py`、ship_gate に完全一致オプション | 両形式 × 全様式 × 全ウェイトが揃う | 10–15h | S-命名・D5・D6・11 |
-| 13 | 盲検 | パックに書体名が出ない、対応表は SEALED | `make_latin_blind_packet.py` | 評価者3名、様式当て 2/3・使えるか 2/3 | 4–8h ＋評価待ち | 10 |
+| 12 | 引き渡し（S-命名・D5・D6 決定後） | G-SPEC: 仕様パーサが命名を読む。未決定なら終了コード 2。cmap 完全一致。両形式で G-SHIP が緑。ファイル名が仕様どおり | `generated_face_spec.py` 拡張、`latin_export.py`、ship_gate に完全一致オプション | 両形式 × 全様式 × 全ウェイトが揃う | 10–15h | S-命名・D5・D6・11 |
+| 13 | 盲検 | G-BLIND: パックに書体名が出ない、対応表は SEALED、印象語の選択肢が様式名を含まない | `make_latin_blind_packet.py` | 評価者3名、様式当て 2/3・使えるか 2/3・印象語の一致 2/3 | 5–9h ＋評価待ち | 10 |
+
+盲検の印象語（O'Donovan ほか 2014 の属性評価の流儀）: 評価者は各見本に、次の語から2つ選ぶ。初期値であり、工程 6 のパイロットで見直す: モダン＝幾何的・すっきり、クラシック＝格調・伝統的、シック＝優雅・劇的、ポップ＝親しみ・楽しい。選択肢は8語を混ぜて出す。
 
 並走トラック R（工程 1 と同時に始められる）:
 
@@ -272,7 +328,9 @@ curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 | R2 | ラテン probe 5種＋合成 fixture の単体テスト | 8書体で `ok` | 8–12h |
 | R3 | 参照帯 `targets/*.yaml` の凍結（extractor_version 付き） | 工程 6 の前に凍結 | 2–4h |
 
-合計の目安: 1ウェイトで 4様式の完成まで（工程 1–10、13、R）**約 230–370h**。
+合計（工程 1–10、13、R。工程 10 は 4様式分。工程 11・12 は仕様の決定後なので入れない）: 最小 2+10+6+10+14+20+20+15+70+48+5+14 = **234h**、最大 3+16+10+16+24+35+35+25+120+88+9+24 = **405h**。
+
+道具の候補（依存には入れない。工程 6・7 で別 venv で試し、入れるかを決める）: drawbot-skia（比較シート）、diffenator2（版ごとの差分表）、gftools の HTML 組見本。組見本の既定は `hb-view` のまま。いずれも Apache-2.0（`docs/latin_research.md` §2）。
 
 ---
 
@@ -280,7 +338,7 @@ curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 
 | 条件 | 撤退先 |
 |---|---|
-| 工程 5 で `O` が G-F（フィット誤差・節点・極値）を 16h 以内に満たせない | 生成後の輪郭を直接書かず、骨格から解析的に cubic オフセットを作る経路（Tiller–Hanson 型）へ切り替える。これも 16h で満たせなければ手描き（下記） |
+| 工程 5 で `O` が G-F（フィット誤差・節点・極値）を 16h 以内に満たせない | 生成後の輪郭を直接書かず、骨格から解析的に cubic オフセットを作る経路（Tiller–Hanson 型。kurbo の stroke 実装〔Apache-2.0〕をアルゴリズムの参考として読む）へ切り替える。これも 16h で満たせなければ手描き（下記） |
 | 工程 6 で4様式が区別できない | 字を増やす前に `latin_display_plan.md` §1 の定義とシグネチャ特徴を見直す |
 | 工程 9 でヘアラインが 48px で途切れる、またはセリフ接合の自己交差が消えない | その様式の Regular を Glyphs で手描きし、`fonts_out/latin/<style>.ufo` を正本にする。エンジンはゲート・字間・カーニング・書き出しだけに使う（仮名の方式Aと同型） |
 | 1様式の37字が工数の悲観値を超えた | その様式を後回しにし、他様式を先に閉じる |
@@ -317,6 +375,8 @@ curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 1. 最悪のシナリオ: エンジン出力が「機械っぽい」と判定され、仮名と同じく手描きに負ける。対策として、工程 6 のパイロットで早期に判定し、撤退先を §8 に決めてある
 2. 見落としやすい前提: 既存の微小輪郭除去の床（3,500 UPM²）が小さい穴を消す（F5）。角度だけのペンではディドンの A が崩れる（§2.3）。TTF の二次曲線変換で形が動く（G-TT）。ウェイトごとのフィットで補間できなくなる（§2.4 で補間自体をやめた）
 3. やらない選択: 1ウェイトの 148 字（37×4）だけなら、手描きの方が速い可能性がある。エンジンの回収は、ウェイト展開・一貫性ゲート・字間の再計算で得る。S-太さが「1」に決まった場合は、工程 6 の実測時間を見て、手描き中心に切り替えるかを再判断する
+
+**先行研究（v2 で追加）**: 採用した手法はすべて論文か permissive な文書・コードに出典がある（`docs/latin_research.md`）。GPL・MPL・ライセンス不明のコードには依存せず、読まない。学習ベースの生成は、権利・再現性・規模の理由で採らない。
 
 **実行順序**: 工程 5（コンパイル）が工程 6（計測）より前、R3（参照帯凍結）が工程 6 より前、工程 10（字間）が工程 11（ウェイト）より前、工程 12 は仕様の決定待ち。R は工程 1 と並走する。
 
