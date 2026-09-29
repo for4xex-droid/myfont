@@ -169,6 +169,26 @@ def test_multichar_glyphset_line_rejected(tmp_path: Path):
         ship_gate.load_glyphset(gs)
 
 
+def test_glyphset_bom_does_not_stick_to_the_first_character(tmp_path: Path):
+    gs = tmp_path / "bom.txt"
+    gs.write_bytes(b"\xef\xbb\xbfA\n")
+    assert ship_gate.load_glyphset(gs) == ["A"]
+
+
+def test_codepoint_lines_name_whitespace(tmp_path: Path):
+    gs = tmp_path / "ws.txt"
+    gs.write_text("A\nU+0020\nU+00A0\n", encoding="utf-8")
+    assert ship_gate.load_glyphset(gs) == ["A", " ", "\u00a0"]
+
+
+@pytest.mark.parametrize("line", ["U+20", "u+0020", "U+00G0", "U+110000", "U+0000"])
+def test_malformed_codepoint_line_rejected(tmp_path: Path, line: str):
+    gs = tmp_path / "bad.txt"
+    gs.write_text(line + "\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        ship_gate.load_glyphset(gs)
+
+
 def test_cli_empty_glyphset_exits_2(tmp_path: Path):
     otf = tmp_path / "min.ttf"
     _build_minimal_otf(otf, "あ")

@@ -22,7 +22,7 @@ def _load(path: Path, name: str):
     return mod
 
 
-def test_three_sources_list_the_same_37_characters_in_order():
+def test_three_sources_list_the_same_39_characters_in_order():
     spec = _load(ROOT / "scripts" / "generated_face_spec.py", "generated_face_spec")
     ship = _load(ROOT / "engine" / "scripts" / "ship_gate.py", "ship_gate")
     from engine.latin.glyphset import REQUIRED_CHARS
@@ -30,25 +30,28 @@ def test_three_sources_list_the_same_37_characters_in_order():
     from_spec = spec.load_spec(SPEC).required
     from_file = tuple(ship.load_glyphset(GLYPHSET))
     assert from_spec == REQUIRED_CHARS == from_file
-    assert len(REQUIRED_CHARS) == 37
+    assert len(REQUIRED_CHARS) == 39
+    assert REQUIRED_CHARS[-2:] == (" ", "\u00a0")
 
 
-def test_agl_names_roundtrip_against_fonttools():
-    from fontTools.agl import UV2AGL
+def test_glyph_names_roundtrip_against_fonttools():
+    from fontTools.agl import UV2AGL, toUnicode
 
     from engine.latin.glyphset import GLYPH_NAMES, REQUIRED_CHARS, character, glyph_name
 
-    names = tuple(UV2AGL[ord(ch)] for ch in REQUIRED_CHARS)
+    names = tuple(UV2AGL.get(ord(ch), f"uni{ord(ch):04X}") for ch in REQUIRED_CHARS)
     assert GLYPH_NAMES == names
-    assert len(set(names)) == 37
+    assert names[-2:] == ("space", "uni00A0")
+    assert len(set(names)) == 39
     for ch, name in zip(REQUIRED_CHARS, names, strict=True):
+        assert toUnicode(name) == ch
         assert glyph_name(ch) == name
         assert character(name) == ch
 
 
 @pytest.mark.parametrize(
     "ch",
-    ["a", " ", "あ", "\\", "Ａ", "", "0 ", ".", ","],
+    ["a", "\t", "\u3000", "\u2009", "あ", "\\", "Ａ", "", "0 ", ".", ","],
 )
 def test_character_outside_the_required_set_is_refused(ch: str):
     from engine.latin.glyphset import glyph_name, reject_outside
@@ -59,7 +62,7 @@ def test_character_outside_the_required_set_is_refused(ch: str):
         reject_outside([ch])
 
 
-@pytest.mark.parametrize("name", ["zero0", "Zero", "uni0030", "space", "fraction", ""])
+@pytest.mark.parametrize("name", ["zero0", "Zero", "uni0030", "nbspace", "uni0020", "fraction", ""])
 def test_unknown_glyph_name_is_refused(name: str):
     from engine.latin.glyphset import character
 
@@ -119,5 +122,20 @@ def test_glyphset_file_rejects_duplicates_and_multichar_lines(tmp_path: Path):
     missing = tmp_path / "missing.txt"
     with pytest.raises(FileNotFoundError):
         read_glyphset_file(missing)
+
+    codepoints = tmp_path / "codepoints.txt"
+    codepoints.write_text("A\nU+0020\nU+00A0\n", encoding="utf-8")
+    assert read_glyphset_file(codepoints) == ("A", " ", "\u00a0")
+
+    for bad in ("U+20\n", "u+0020\n", "U+00G0\n", "U+110000\n", "U+0000\n", "U+0020 A\n"):
+        broken = tmp_path / "broken.txt"
+        broken.write_text(bad, encoding="utf-8")
+        with pytest.raises(ValueError):
+            read_glyphset_file(broken)
+
+    dup_cp = tmp_path / "dup_cp.txt"
+    dup_cp.write_text("A\nU+0041\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        read_glyphset_file(dup_cp)
 
     assert read_glyphset_file(GLYPHSET) == REQUIRED_CHARS

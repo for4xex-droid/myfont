@@ -8,6 +8,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -15,13 +16,33 @@ DEFAULT_ASCENDER = 880
 DEFAULT_DESCENDER = -120
 DEFAULT_UPM = 1000
 
+# 空白は1字では書けないので U+XXXX で書く（大文字16進・4〜6桁）。
+_CODEPOINT_LINE = re.compile(r"U\+([0-9A-F]{4,6})")
+
+
+def _codepoint_char(line: str) -> str | None:
+    m = _CODEPOINT_LINE.fullmatch(line)
+    if m is None:
+        return None
+    cp = int(m.group(1), 16)
+    if cp == 0 or cp > 0x10FFFF or 0xD800 <= cp <= 0xDFFF:
+        raise ValueError(f"not a Unicode scalar value: {line!r}")
+    return chr(cp)
+
 
 def load_glyphset(path: Path) -> list[str]:
-    """1行1字の glyphset を読む。空・複数字行は ValueError（ゲートを黙殺させない）。"""
+    """1行1字（または U+XXXX）の glyphset を読む。空・複数字行は ValueError（ゲートを黙殺させない）。"""
     chars: list[str] = []
-    for i, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+    for i, raw in enumerate(path.read_text(encoding="utf-8-sig").splitlines(), start=1):
         line = raw.strip()
         if not line or line.startswith("#"):
+            continue
+        try:
+            coded = _codepoint_char(line)
+        except ValueError as e:
+            raise ValueError(f"{path}: line {i}: {e}") from None
+        if coded is not None:
+            chars.append(coded)
             continue
         if len(line) != 1:
             raise ValueError(f"{path}: line {i} must be exactly 1 character, got {line!r}")

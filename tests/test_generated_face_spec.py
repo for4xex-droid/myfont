@@ -30,7 +30,12 @@ OTF
 - ファミリー名: Example
 - スタイル名（太さごとの名前）: Regular
 - ファイル名の付け方: Example-Regular.otf
+
+### ライセンス
+- 権利者: Example
 """
+
+LIVE_REQUIRED = (*"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/", " ", "\u00a0")
 
 
 def _load():
@@ -43,19 +48,66 @@ def _load():
     return mod
 
 
-def test_live_spec_requires_upper_digits_slash_only():
+def test_live_spec_requires_upper_digits_slash_and_two_spaces_only():
     mod = _load()
     spec = mod.load_spec(SPEC)
-    assert spec.required == tuple("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/")
+    assert spec.required == LIVE_REQUIRED
     assert "a" not in spec.required
     assert "あ" not in spec.required
     assert "," not in spec.required
+    assert "\t" not in spec.required
+
+
+def test_live_spec_records_the_decided_names_and_license():
+    text = SPEC.read_text(encoding="utf-8")
+    for name in ("Irodori Modern", "Irodori Classic", "Irodori Chic", "Irodori Pop"):
+        assert name in text
+    for filename in (
+        "IrodoriModern-Regular.otf",
+        "IrodoriClassic-Regular.otf",
+        "IrodoriChic-Regular.otf",
+        "IrodoriPop-Regular.otf",
+    ):
+        assert filename in text
+    assert "Copyright 2026 Motivation Studio LLC. All rights reserved." in text
+    assert "`MTVS`" in text
+    assert "`Version 1.000`" in text
+    assert "docs/eula_draft.md" in text
+    draft = ROOT / "docs" / "eula_draft.md"
+    assert "下書き" in draft.read_text(encoding="utf-8")
+
+
+def test_cli_prints_spaces_as_codepoints(capsys):
+    mod = _load()
+    assert mod.main(["--spec", str(SPEC)]) == 2
+    out = capsys.readouterr().out
+    assert "U+0020" in out
+    assert "U+00A0" in out
+
+
+def test_reject_extras_shows_invisible_characters():
+    mod = _load()
+    spec = mod.parse_spec(DECIDED)
+    try:
+        mod.reject_extras(spec, ["\t", "\u3000"])
+    except mod.HandoffBlocked as e:
+        assert "'\\t'" in e.reasons[0]
+        assert "'\\u3000'" in e.reasons[0]
+        return
+    raise AssertionError("expected extras to fail")
 
 
 def test_live_spec_blocks_undecided_handoff_fields():
     mod = _load()
     spec = mod.load_spec(SPEC)
-    assert spec.blockers == ("太さの数", "命名の規則")
+    assert spec.blockers == ("命名の規則", "ライセンス")
+
+
+def test_missing_license_section_blocks(tmp_path: Path):
+    mod = _load()
+    text = DECIDED.split("### ライセンス")[0]
+    spec = mod.parse_spec(text)
+    assert spec.blockers == ("ライセンス: 節がない",)
 
 
 def test_block_handoff_does_not_create_a_font(tmp_path: Path):
@@ -65,7 +117,7 @@ def test_block_handoff_does_not_create_a_font(tmp_path: Path):
     try:
         mod.block_handoff(spec, dest)
     except mod.HandoffBlocked as e:
-        assert "太さの数" in e.reasons
+        assert "命名の規則" in e.reasons
     else:
         raise AssertionError("expected handoff block")
     assert not dest.exists()

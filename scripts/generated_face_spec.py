@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: EXE001 — python scripts/ で起動する。実行ビットは付けない。
 """生成書体の仕様を読んで、未決定のままフォントファイルを出さない。
 
 正本は docs/生成書体の仕様.md。このスクリプトは仕様を写さない。
@@ -20,6 +21,8 @@ _BULLETS = {
     "大文字 A〜Z": list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
     "数字 0〜9": list("0123456789"),
     "スラッシュ `/`": ["/"],
+    "空白 U+0020": [" "],
+    "ノーブレークスペース U+00A0（空白と同じ字幅）": ["\u00a0"],
 }
 
 _BLOCKER_SECTIONS = (
@@ -27,6 +30,7 @@ _BLOCKER_SECTIONS = (
     "太さの数",
     "等幅かどうか",
     "命名の規則",
+    "ライセンス",
 )
 
 
@@ -43,7 +47,7 @@ class GeneratedFaceSpec:
 
 
 def _sections(text: str) -> dict[str, str]:
-    parts = re.split(r"^### ", text, flags=re.M)
+    parts = re.split(r"^### ", text, flags=re.MULTILINE)
     out: dict[str, str] = {}
     for part in parts[1:]:
         title, _, body = part.partition("\n")
@@ -97,7 +101,8 @@ def load_spec(path: Path | None = None) -> GeneratedFaceSpec:
 def reject_extras(spec: GeneratedFaceSpec, chars: list[str]) -> None:
     extra = [ch for ch in chars if ch not in spec.required]
     if extra:
-        raise HandoffBlocked([f"収録外: {''.join(extra)}"])
+        shown = ", ".join(repr(ch) for ch in extra)
+        raise HandoffBlocked([f"収録外: {shown}"])
 
 
 def block_handoff(spec: GeneratedFaceSpec, dest: Path) -> tuple[str, ...]:
@@ -109,6 +114,13 @@ def block_handoff(spec: GeneratedFaceSpec, dest: Path) -> tuple[str, ...]:
     return spec.required
 
 
+def _show_char(ch: str) -> str:
+    """空白や印字できない字は U+XXXX にする。CLI の1行で NBSP が消えないようにする。"""
+    if ch == " " or not ch.isprintable():
+        return f"U+{ord(ch):04X}"
+    return ch
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Read the generated-face spec and refuse an early handoff")
     ap.add_argument("--spec", type=Path, default=SPEC_PATH)
@@ -118,7 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
-    print("required=" + "".join(spec.required))
+    print("required=" + "".join(_show_char(ch) for ch in spec.required))
     if spec.blockers:
         print("blocked=" + ",".join(spec.blockers), file=sys.stderr)
         return 2
