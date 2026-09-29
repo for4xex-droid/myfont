@@ -20,8 +20,8 @@ from engine.join_solver import (
     poly_to_path,
     split_contours,
 )
-from engine.latin.hobby import expand_stroke
-from engine.latin.joins import taper_end
+from engine.latin.hobby import Cubic, expand_stroke
+from engine.latin.joins import retract_end, taper_end
 from engine.latin.load import Resolved
 from engine.latin.pens import half_width
 from engine.latin.schema import Knot, Stroke
@@ -70,10 +70,9 @@ def _nudge_apex(stroke: Stroke, apex: float) -> Stroke:
     return replace(stroke, knots=tuple(knots))
 
 
-def _place(stroke: Stroke, resolved: Resolved):
+def _font_map(stroke: Stroke, resolved: Resolved):
+    """節点をフォント空間へ。閉じた字は単位正方形で展開してからこの写像を掛ける。"""
     style = resolved.style
-    prepared = _nudge_apex(stroke, style.overshoot["apex"])
-    cubics = expand_stroke(prepared)
     width = style.proportions[resolved.skeleton.glyph] * style.cap_height
     left = style.sidebearing["base"] * style.cap_height * style.sidebearing[resolved.skeleton.sides[0]]
     overshoot = style.overshoot["round"] * style.cap_height if stroke.role == "bowl" else 0.0
@@ -82,10 +81,20 @@ def _place(stroke: Stroke, resolved: Resolved):
     def xy(point: tuple[float, float]) -> tuple[float, float]:
         return (left + point[0] * width, point[1] * span - overshoot)
 
-    from engine.latin.hobby import Cubic
+    return xy
 
-    placed = tuple(Cubic(xy(c.p0), xy(c.c1), xy(c.c2), xy(c.p1)) for c in cubics)
-    return prepared, placed
+
+def _place(stroke: Stroke, resolved: Resolved):
+    prepared = _nudge_apex(stroke, resolved.style.overshoot["apex"])
+    xy = _font_map(prepared, resolved)
+    if stroke.closed:
+        # 閉じた4極は単位正方形で円にし、写像で楕円にする。
+        cubics = expand_stroke(prepared)
+        placed = tuple(Cubic(xy(c.p0), xy(c.c1), xy(c.c2), xy(c.p1)) for c in cubics)
+        return prepared, placed
+    # 開いた曲線は、縦横の縮尺が違ったあとの角度で Hobby を解く。
+    knots = tuple(Knot(xy((k.x, k.y))[0], xy((k.x, k.y))[1], k.kind, k.angle_deg) for k in prepared.knots)
+    return replace(prepared, knots=knots), expand_stroke(replace(prepared, knots=knots))
 
 
 def _sample(cubics) -> list[tuple[Vec2, Vec2]]:
@@ -159,12 +168,49 @@ def _terminal_paths(samples: list[tuple[Vec2, Vec2]], widths: list[float], strok
     return paths
 
 
-def _stroke_paths(stroke: Stroke, resolved: Resolved) -> list[Path]:
+def _centerline(stroke: Stroke, resolved: Resolved) -> tuple[list[tuple[Vec2, Vec2]], list[float]]:
     _prepared, cubics = _place(stroke, resolved)
     samples = _sample(cubics)
     if len(samples) < 2:
+        return [], []
+    return samples, _widths(samples, resolved, stroke)
+
+
+def _apply_joins(
+    samples: dict[str, list[tuple[Vec2, Vec2]]],
+    widths: dict[str, list[float]],
+    resolved: Resolved,
+) -> None:
+    """接合の a 側の端を、b の中心線まで戻す。幹の端は削らない。"""
+    for join in resolved.skeleton.joins:
+        if join.type not in ("bowl_join", "T", "L"):
+            continue
+        if join.a not in samples or join.b not in samples:
+            continue
+        _bury(samples, widths, join.a, join.b)
+
+
+def _bury(
+    samples: dict[str, list[tuple[Vec2, Vec2]]],
+    widths: dict[str, list[float]],
+    joiner: str,
+    partner: str,
+) -> None:
+    cur_s, cur_w = samples[joiner], widths[joiner]
+    for at_start in (True, False):
+        cur_s, cur_w = retract_end(cur_s, cur_w, samples[partner], widths[partner], at_start=at_start)
+    samples[joiner] = cur_s
+    widths[joiner] = cur_w
+
+
+def _stroke_paths(
+    stroke: Stroke,
+    samples: list[tuple[Vec2, Vec2]],
+    widths: list[float],
+    resolved: Resolved,
+) -> list[Path]:
+    if len(samples) < 2:
         return []
-    widths = _widths(samples, resolved, stroke)
     paths: list[Path] = []
     if stroke.closed:
         outer, inner = variable_width_ring_outlines(samples, widths)
@@ -181,7 +227,17 @@ def _stroke_paths(stroke: Stroke, resolved: Resolved) -> list[Path]:
 
 
 def build_glyph(resolved: Resolved) -> GlyphOutline:
-    paths = [path for stroke in resolved.skeleton.strokes for path in _stroke_paths(stroke, resolved)]
+    strokes = resolved.skeleton.strokes
+    samples: dict[str, list[tuple[Vec2, Vec2]]] = {}
+    widths: dict[str, list[float]] = {}
+    for stroke in strokes:
+        samples[stroke.id], widths[stroke.id] = _centerline(stroke, resolved)
+    _apply_joins(samples, widths, resolved)
+    paths = [
+        path
+        for stroke in strokes
+        for path in _stroke_paths(stroke, samples[stroke.id], widths[stroke.id], resolved)
+    ]
     united = _union_all(paths)
     raw = [tuple(Vec2(x, y) for x, y in contour_points(c)) for c in split_contours(united)]
     floor = resolved.style.micro_area_floor

@@ -32,14 +32,14 @@ def _slab(origin: Vec2, outward: Vec2, length: float, thick: float) -> list[Vec2
     ]
 
 
-def _bracket(origin: Vec2, outward: Vec2, length: float, thick: float, bracket: float) -> list[Vec2]:
+def _bracket(origin: Vec2, outward: Vec2, length: float, thick: float, bracket: float, half_width: float) -> list[Vec2]:
     """セリフの横棒と、幹へ戻る短いブラケット。自己交差しない六角形。"""
     direction = outward.normalized()
     normal = direction.perpendicular()
     back = origin - direction * (thick * 0.35)
     front = origin + direction * thick
     half = length / 2.0
-    neck = half * 0.55
+    neck = min(half * 0.55, max(half_width, 1.0))
     inner = origin - direction * (thick * 0.35 + max(bracket, thick))
     return [
         front + normal * half,
@@ -76,7 +76,7 @@ def terminal_polygon(
     if kind == "serif_hairline":
         return _slab(origin, outward, serif_length, max(serif_thick, 1.0))
     if kind == "serif_bracketed":
-        return _bracket(origin, outward, serif_length, max(serif_thick, 1.0), bracket)
+        return _bracket(origin, outward, serif_length, max(serif_thick, 1.0), bracket, half_width)
     if kind == "spur":
         return _slab(origin, outward, serif_length * 0.45, max(serif_thick, 1.0))
     raise ValueError(f"unknown terminal {kind!r}")

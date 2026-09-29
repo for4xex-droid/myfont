@@ -384,7 +384,7 @@ spike7 の結合検証で判明した実態:
 
 最終同期: 2026-09-30。
 
-正本は `docs/生成書体の仕様.md`。日本語の新規グリフ・骨格・盲検・品位作業・常用漢字の量産は休止。現行はアルファベット。先行研究の採否は `docs/latin_research.md`。実装計画 v2 はパイロット（工程2–6。比較シート `proofs/latin/pilot_sheet.png`、分離の凍結 `engine/src/engine/latin/targets/separation.yaml`）まで到達し、次は工程7（モダンの残り31字）。ファミリー名は Someiro（「Irodori」は商標の危険で替えた。`docs/legal_research.md`）。他者に渡す条件は決定済み（区分は1つ、1者の中は台数・人数とも上限なし、自前の Web フォントは可、更新版は追加料金なし。下書き `docs/eula_draft.md`）。仕様の残りは、出願前の商標調査、EULA の URL 公開、日本語の著作権表記を足すかで、そのあいだはファイルを出さない。内部ビルドは version 0.001 で git に入れない。以下は休止前の到達点。
+正本は `docs/生成書体の仕様.md`。日本語の新規グリフ・骨格・盲検・品位作業・常用漢字の量産は休止。現行はアルファベット。先行研究の採否は `docs/latin_research.md`。実装計画 v2 はパイロット（工程2–6。比較シート `proofs/latin/pilot_sheet.png`、分離の凍結 `engine/src/engine/latin/targets/separation.yaml`）まで到達した。B の左のはみ出しは戻した。次は B の腰と V の先端を閉じてから工程7（モダンの残り31字）。ファミリー名は Someiro（「Irodori」は商標の危険で替えた。`docs/legal_research.md`）。他者に渡す条件は決定済み（区分は1つ、1者の中は台数・人数とも上限なし、自前の Web フォントは可、更新版は追加料金なし。下書き `docs/eula_draft.md`）。仕様の残りは、出願前の商標調査、EULA の URL 公開、日本語の著作権表記を足すかで、そのあいだはファイルを出さない。内部ビルドは version 0.001 で git に入れない。以下は休止前の到達点。
 
 1. ~~P-Q0＋P-R1~~ — 診断表と `receive_manual.py` 済
 2. ~~P-Q1~~ — づ・ん・や・を・る 受け入れ済（ink/20px 外れ解消）

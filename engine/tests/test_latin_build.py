@@ -21,6 +21,17 @@ def test_pilot_glyph_matches_expected_contours(glyph, style):
     assert outline.advance > 0
 
 
+def test_modern_b_bowls_do_not_stick_out_of_the_stem():
+    resolved = load_resolved("B", "modern")
+    outline = build_glyph(resolved)
+    style = resolved.style
+    width = style.proportions["B"] * style.cap_height
+    left = style.sidebearing["base"] * style.cap_height * style.sidebearing["straight"]
+    stem_left = left + 0.18 * width - (style.cap_height * resolved.pen.stem / 2.0)
+    outer = next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
+    assert min(point.x for point in outer) >= stem_left - 2.0
+
+
 def test_pop_h_is_heavier_than_modern_and_chic_o_is_narrower():
     def ink(glyph, style):
         outline = build_glyph(load_resolved(glyph, style))
