@@ -1,0 +1,22 @@
+glyph: S
+unicode: 0x0053
+structure: spine
+groups: [round]
+strokes:
+  - id: spine
+    knots:
+      - [0.75, 0.96, smooth]
+      - [0.42, 0.96, smooth]
+      - [0.20, 0.80, smooth]
+      - [0.22, 0.62, smooth]
+      - [0.45, 0.50, smooth]
+      - [0.78, 0.38, smooth]
+      - [0.80, 0.20, smooth]
+      - [0.58, 0.04, smooth]
+      - [0.25, 0.04, smooth]
+    tension: 1.0
+    role: bowl
+    ends: {start: open, end: open}
+joins: []
+sides: {left: open, right: open}
+expect: {contours: 1, holes: 0}

@@ -1,0 +1,22 @@
+glyph: H
+unicode: 0x0048
+structure: stem_pair
+groups: [straight]
+strokes:
+  - id: left
+    knots: [[0.08, 0.00, line], [0.08, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+  - id: right
+    knots: [[0.92, 0.00, line], [0.92, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+  - id: bar
+    knots: [[0.08, 0.48, line], [0.92, 0.48, line]]
+    role: bar
+    ends: {start: none, end: none}
+joins:
+  - {a: bar, b: left, type: T}
+  - {a: bar, b: right, type: T}
+sides: {left: straight, right: straight}
+expect: {contours: 1, holes: 0}

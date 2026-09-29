@@ -1,0 +1,18 @@
+glyph: "0"
+unicode: 0x0030
+structure: bowl
+groups: [round]
+strokes:
+  - id: bowl
+    closed: true
+    knots:
+      - [0.50, 0.00, smooth]
+      - [0.92, 0.50, smooth]
+      - [0.50, 1.00, smooth]
+      - [0.08, 0.50, smooth]
+    tension: 1.05
+    role: bowl
+    ends: {start: none, end: none}
+joins: []
+sides: {left: round, right: round}
+expect: {contours: 2, holes: 1}

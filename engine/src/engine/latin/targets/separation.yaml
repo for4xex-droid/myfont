@@ -1,0 +1,45 @@
+# 2026-09-30 凍結。パイロットの H と O を、ヒントなし ppem 500 で測った値。
+# 草案の帯（コントラスト 8–12、O の幅/高さ 0.62–0.78）はゲートに使わない。
+# 参照8書体は未取得。正規化の幅は、この4様式の実測の最小と最大。
+extractor_version: 1
+frozen: "2026-09-30"
+distance_axes:
+  - contrast
+  - o_width_over_height
+  - stem_over_cap
+  - serif_over_cap
+  - foot_taper
+# コントラストが 1 に近い様式では、太い方向の角度がラスタのノイズで動く。記録だけして距離に入れない。
+recorded_only:
+  - thick_ray_deg
+styles:
+  modern:
+    contrast: 1.0326086956521738
+    o_width_over_height: 0.9705882352941176
+    stem_over_cap: 0.13142857142857142
+    serif_over_cap: 0.0
+    foot_taper: 0.0
+    thick_ray_deg: 60
+  classic:
+    contrast: 2.2127659574468086
+    o_width_over_height: 0.96
+    stem_over_cap: 0.1457142857142857
+    serif_over_cap: 0.037142857142857144
+    foot_taper: 0.0
+    thick_ray_deg: 150
+  chic:
+    contrast: 7.25
+    o_width_over_height: 0.798941798941799
+    stem_over_cap: 0.16
+    serif_over_cap: 0.03142857142857143
+    foot_taper: 0.0
+    thick_ray_deg: 30
+  pop:
+    contrast: 1.0193548387096774
+    o_width_over_height: 1.0275229357798166
+    stem_over_cap: 0.21285714285714286
+    serif_over_cap: 0.0
+    foot_taper: 0.7986577181208054
+    thick_ray_deg: 15
+# 凍結時の最近ペア（モダンとクラシック）の距離。これ未満は分離不足。
+min_distance: 1.0338284145138559

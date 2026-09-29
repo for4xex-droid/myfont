@@ -1,0 +1,14 @@
+style_id: chic_v1
+cap_height: 700
+overshoot: {round: 0.020, apex: 0.028}
+pen: {type: nib, stem: 0.16, bar_ratio: 0.10, hairline: 0.018, theta_deg: 0}
+terminals: {foot: serif_hairline, apex: apex_sharp, none: none, open: flat, round_end: ball}
+joins: {crotch_thin: 0.70}
+proportions: {H: 0.58, O: 0.70, B: 0.52, V: 0.62, S: 0.44, "0": 0.64}
+sidebearing: {base: 0.06, straight: 1.00, near_straight: 0.85, round: 0.50, diagonal: 0.16, open: 0.30}
+vertical: {ascender: 860, descender: -220}
+micro_area_floor: 400
+curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
+groups:
+  diagonal: {stem_ratio: 1.06}
+metrics: {serif_length: 0.22, serif_thick: 0.016, bracket: 0.0, round_frac: 0.45}

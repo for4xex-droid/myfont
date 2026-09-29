@@ -1,0 +1,13 @@
+style_id: modern_v1
+cap_height: 700
+overshoot: {round: 0.018, apex: 0.012}
+pen: {type: mono, stem: 0.13, bar_ratio: 0.90}
+terminals: {foot: flat, apex: apex_sharp, none: none, open: flat, round_end: flat}
+joins: {crotch_thin: 1.0}
+proportions: {H: 0.74, O: 1.00, B: 0.68, V: 0.78, S: 0.56, "0": 0.92}
+sidebearing: {base: 0.08, straight: 1.00, near_straight: 0.85, round: 0.55, diagonal: 0.20, open: 0.35}
+vertical: {ascender: 820, descender: -180}
+micro_area_floor: 400
+curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
+groups: {}
+metrics: {}

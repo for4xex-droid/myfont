@@ -1,0 +1,32 @@
+glyph: B
+unicode: 0x0042
+structure: bowl
+groups: [round]
+strokes:
+  - id: stem
+    knots: [[0.18, 0.00, line], [0.18, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+  - id: upper
+    knots:
+      - [0.02, 0.40, smooth]
+      - [0.55, 0.50, smooth]
+      - [0.90, 0.76, smooth]
+      - [0.55, 0.98, smooth]
+      - [0.02, 0.98, smooth]
+    role: bowl
+    ends: {start: none, end: none}
+  - id: lower
+    knots:
+      - [0.02, 0.02, smooth]
+      - [0.62, 0.02, smooth]
+      - [0.98, 0.26, smooth]
+      - [0.62, 0.50, smooth]
+      - [0.02, 0.60, smooth]
+    role: bowl
+    ends: {start: none, end: none}
+joins:
+  - {a: upper, b: stem, type: bowl_join}
+  - {a: lower, b: stem, type: bowl_join}
+sides: {left: straight, right: round}
+expect: {contours: 3, holes: 2}
