@@ -10,6 +10,7 @@
 | `glyphset_joyo2136_uninames.txt` | `uniXXXX` 一覧 | 上記から生成 |
 | `glyphset_p1_kana_core20.txt` | P1 ひらがな核心20字 | PLAN §3.5 |
 | `glyphset_alpha.txt` | α 版公開スコープ（仮名・英数・約物・基準漢字） | `docs/strategy.md` α 定義 |
+| `glyphset_latin_required.txt` | 大文字 A–Z・数字 0–9・スラッシュ（37字、1字1行） | `docs/生成書体の仕様.md` の収録節 |
 
 再生成スクリプト: `scripts/freeze_glyphsets.py`（既存凍結ファイルの再検証＋再出力）。
 

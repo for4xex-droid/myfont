@@ -1,6 +1,6 @@
 # タイポアート用アルファベット書体 実装計画 v2
 
-2026-09-29 策定。同日 v2: 先行研究の調査（`docs/latin_research.md`）を §2・§4・§5・§7 に反映。実装はまだ行わない。
+2026-09-29 策定。同日 v2: 先行研究の調査（`docs/latin_research.md`）を §2・§4・§5・§7 に反映。工程1（字集合）は同日完了。次は工程2。
 正本の優先順: `docs/生成書体の仕様.md` ＞ `GOLDENRULES.md` ＞ 本書 ＞ `docs/latin_display_plan.md`（制作計画。様式定義と工程の粗い順番）＞ `docs/latin_research.md`（採否の根拠）。
 
 本書は「どのファイルに、何を、どの順で、どのテストを先に書いて作るか」を決める。数値の初期値は設計パラメータであり、仕様の未決定項目ではない。仕様の未決定項目は本書でも埋めない。
@@ -300,11 +300,11 @@ curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 
 ## 7. 工程（TDD。各工程で先に失敗するテストを書く）
 
-表の「テスト（先に書く）」が工程ごとの RED。緑にしてから次へ進む。どの工程でも `engine/tests` の既存 233 件は緑のまま。
+表の「テスト（先に書く）」が工程ごとの RED。緑にしてから次へ進む。どの工程でも、工程1開始前の `engine/tests` 233 件は緑のまま。工程1完了時点では字集合の19件が加わり 252 件。
 
 | # | 工程 | テスト（先に書く） | 実装 | DoD | 工数 | 依存 |
 |---|---|---|---|---|---|---|
-| 1 | 字集合 | 仕様の必須集合＝`data/glyphset_latin_required.txt`＝`glyphset.py` の37名。AGL 名の往復。収録外の字は拒否 | `glyphset.py`、txt | 3者一致が pytest で固定 | 2–3h | — |
+| 1 | 字集合（済 2026-09-29） | 仕様の必須集合＝`data/glyphset_latin_required.txt`＝`glyphset.py` の37名。AGL 名の往復。収録外の字は拒否 | `glyphset.py`、txt | 3者一致が pytest で固定 | 2–3h | — |
 | 2 | スキーマ・Hobby 展開・ローダ | G-S: 未知キー、空 knots、id 重複、closed の節点3未満、座標範囲、張力範囲を拒否。variants の解決、3層の上書き順（グループは側面を上書きしない）、スカラー上限。G-H: `line` が直線、`corner` で接線不連続、円の極の4節点で接線が水平または垂直、同入力で同出力。`line` への角度と、長さの違う `tensions` は拒否。`H.yaml`・`O.yaml` の読み込み | `schema.py`、`hobby.py`、`load.py`、`H.yaml`、`O.yaml` | 2字がロードでき、壊れた YAML が全部拒否される | 10–16h | 1 |
 | 3 | 様式とペン | style id とハッシュの凍結、mono の半幅一定、nib で θ に直交する方向が最細、role 優先 | `style.py`、`pens.py`、styles 4本の骨組み | 合成サンプルでペン式が数値どおり | 6–10h | 2 |
 | 4 | 端物と接合 | 各テンプレが閉じた塗り輪郭を返し自己交差なし（ペン掃引を使わない）、ストローク単位 simplify 後に折り返しが残らない、食い込み後 union で1輪郭、apex のオーバーシュート量、crotch の細め | `terminals.py`、`joins.py` | H・A・V 相当の合成骨格で G-C・G-X 緑 | 10–16h | 3 |
