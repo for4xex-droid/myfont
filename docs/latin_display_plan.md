@@ -19,7 +19,7 @@
 | 太さの数 | 1（2026-09-29） | 各様式を、その様式らしい太さの1ウェイトで作る |
 | 等幅かどうか | プロポーショナル（2026-09-29） | 字幅は様式ごとの比例表。L4 で側面規則＋カーニング |
 | 命名 | 構成は 2026-09-29。ファミリー名は 2026-09-30 に Someiro Modern / Classic / Chic / Pop（Irodori は商標の危険で替えた）。スタイル名 `Regular`、ファイル名 `SomeiroModern-Regular.otf/.ttf` など。出願前の商標調査は未 | 商標確認までは内部ラベル（`modern` など）で作業し、WIP 印を付ける |
-| ライセンス | 独自 EULA、fsType は Installable、権利者 Motivation Studio LLC、ベンダー ID `MTVS`、`Version 1.000` 形式（2026-09-29）。英文表記の確認は 2026-09-30 に済（登記された英文名はなく、訳語を使う）。EULA 本文・URL と日本語の著作権表記は未 | EULA 下書きは `docs/eula_draft.md`。調査は `docs/legal_research.md`。name ID 13・14 は確定まで埋めない |
+| ライセンス | 独自 EULA、fsType は Installable、権利者 Motivation Studio LLC、ベンダー ID `MTVS`、`Version 1.000` 形式（2026-09-29）。英文表記の確認は 2026-09-30 に済。使い方は同日決定（区分は1つ、1者の中は台数・人数とも上限なし、自前の Web フォントは可、更新版は追加料金なし）。EULA の URL 公開と日本語の著作権表記は未 | EULA 下書きは `docs/eula_draft.md`。調査は `docs/legal_research.md`。name ID 13・14 は URL を公開するまで埋めない |
 
 **決定ゲート**（決めた内容を仕様へ書いてから次へ進む）:
 
