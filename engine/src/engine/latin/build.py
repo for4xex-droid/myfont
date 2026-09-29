@@ -21,7 +21,13 @@ from engine.join_solver import (
     split_contours,
 )
 from engine.latin.hobby import Cubic, expand_stroke
-from engine.latin.joins import retract_end, taper_end
+from engine.latin.joins import (
+    bevel_apex_valley,
+    retract_end,
+    smooth_side_pinches,
+    taper_end,
+    trim_apex_stub,
+)
 from engine.latin.load import Resolved
 from engine.latin.pens import half_width
 from engine.latin.schema import Knot, Stroke
@@ -247,6 +253,10 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     largest = max(range(len(raw)), key=lambda i: abs(_signed_area(raw[i])))
     sign = 1.0 if _signed_area(raw[largest]) >= 0.0 else -1.0
     holes = tuple(_signed_area(c) * sign < 0.0 for c in raw)
+    raw = tuple(
+        tuple(smooth_side_pinches(trim_apex_stub(bevel_apex_valley(list(contour))))) if not hole else contour
+        for contour, hole in zip(raw, holes)
+    )
     style = resolved.style
     width = style.proportions[resolved.skeleton.glyph] * style.cap_height
     right = style.sidebearing["base"] * style.cap_height * style.sidebearing[resolved.skeleton.sides[1]]
