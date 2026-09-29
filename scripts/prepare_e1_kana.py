@@ -34,6 +34,23 @@ def e1_chars() -> list[str]:
     return [ln.strip() for ln in E1_LIST.read_text(encoding="utf-8").splitlines() if ln.strip()]
 
 
+def parse_chars(raw: str | None) -> list[str]:
+    if not raw:
+        return e1_chars()
+    allowed = set(e1_chars())
+    out: list[str] = []
+    for ch in raw:
+        if ch.isspace():
+            continue
+        if ch not in allowed:
+            raise ValueError(f"{ch} is not in E1 list")
+        if ch not in out:
+            out.append(ch)
+    if not out:
+        raise ValueError("no E1 chars given")
+    return out
+
+
 def uni_name(char: str) -> str:
     return f"uni{ord(char):04X}"
 
@@ -84,7 +101,14 @@ def write_ufo(char: str, png: bytes, png_name: str) -> Path:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Create E1 work UFOs without wiping existing")
     ap.add_argument("--no-desktop", action="store_true")
+    ap.add_argument("--chars", default="", help="対象字。空なら E1 全44字")
     args = ap.parse_args(argv)
+
+    try:
+        chars = parse_chars(args.chars or None)
+    except ValueError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
 
     missing = [n for n, p in REFERENCE_FONTS.items() if n == DEFAULT_BG and not p.is_file()]
     if missing:
@@ -98,15 +122,17 @@ def main(argv: list[str] | None = None) -> int:
 
     created = 0
     skipped = 0
-    for char in e1_chars():
+    for char in chars:
         dest = UFO_ROOT / f"{char}.ufo"
-        if dest.exists():
-            print(f"skip {char}: {dest} exists")
-            skipped += 1
-            continue
         png = render_em_png(bg_font, char)
         if not args.no_desktop:
-            (DESKTOP / f"{char}.png").write_bytes(png)
+            desk = DESKTOP / f"{char}.png"
+            desk.write_bytes(png)
+            print(f"{char} desktop={desk}")
+        if dest.exists():
+            print(f"skip ufo {char}: {dest} exists")
+            skipped += 1
+            continue
         write_ufo(char, png, f"{char}_guide_{DEFAULT_BG}.png")
         print(f"{char} ufo={dest}")
         created += 1

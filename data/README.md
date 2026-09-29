@@ -12,3 +12,10 @@
 | `glyphset_alpha.txt` | α 版公開スコープ（仮名・英数・約物・基準漢字） | `docs/strategy.md` α 定義 |
 
 再生成スクリプト: `scripts/freeze_glyphsets.py`（既存凍結ファイルの再検証＋再出力）。
+
+語彙・計測プロトコル（字形セットではない）:
+
+| ファイル | 内容 |
+|---|---|
+| `kage_vocab.yaml` | KAGE 線種・端タグ → エンジン名。座標なし（掟9） |
+| `rights_distance.yaml` | 権利用レイ距離の extractor。`quality_gate: false` |

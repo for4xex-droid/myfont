@@ -1,6 +1,6 @@
 # P-D1 デザインDNA（A）— つ・づ・っ の中腹
 
-**済（P-D1）**。黄金 `kana_g3_blind_d1`。E1 以降も同じ DNA を通す。
+**済（P-D1）**。黄金 `kana_g3_blind_d1`。E1 は 2026-09-29 から休止（`docs/生成書体の仕様.md`）。再開するときは同じ DNA を通す。
 
 正本 `fonts_out/MyMincho.ufo` を Glyphs で開かない。
 37字は DNA A 済み。つ系の再調整が要るときだけこの手順。
@@ -15,7 +15,7 @@
 4. File → Save
 5. づ（`uni3065`）・っ（`uni3063`）も同じ
 
-中腹を戻したあと、骨格だけ離す:
+中腹を戻したあと、骨格だけ離す（`--stem` は端物固定が既定。外すとき `--no-pin-ends`）:
 
 `engine/.venv/bin/python scripts/diverge_dna.py つ づ っ --apply --stem`
 

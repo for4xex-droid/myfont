@@ -32,6 +32,16 @@ def test_e1_list_excludes_drawn_and_historic():
     assert len(set(chars)) == 44
 
 
+def test_parse_chars_wave1():
+    mod = _load()
+    assert mod.parse_chars("だでにゆれ") == ["だ", "で", "に", "ゆ", "れ"]
+    try:
+        mod.parse_chars("あ")
+    except ValueError:
+        return
+    raise AssertionError("expected refuse non-E1 char")
+
+
 def test_write_ufo_refuses_existing(tmp_path: Path, monkeypatch):
     from ufoLib2 import Font
 

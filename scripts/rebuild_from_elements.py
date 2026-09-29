@@ -59,6 +59,8 @@ BOX_PEAK_X = 0.39
 BOX_PEAK_H = 1.98
 TOP_LEFT_H = 1.40
 HARA_SPINE_K = 96
+# スカラー経路のはらい。法線幅8点では人 0.15。左右24点で 0.93。
+HARA_SCALAR_K = 24
 # 箱うろこの高さ比。これより大きい Y ギャップだけ開いた T とみなす。
 OPEN_T_GAP_OVER_H = 3.3
 # 開いた十字。これ超のギャップは別部品（国の中の玉）。木は 3.3h。
@@ -983,6 +985,24 @@ def _ten_poly(bounds: list[float]) -> list[Vec2]:
     ]
 
 
+def _uchikomi_poly(bounds: list[float]) -> list[Vec2]:
+    """打ち込みは半矩形の直角三角。輪郭点は持たない。"""
+    x0, y0, x1, y1 = bounds
+    return [Vec2(x1, y0), Vec2(x1, y1), Vec2(x0, y0)]
+
+
+def _hane_poly(bounds: list[float]) -> list[Vec2]:
+    x0, y0, x1, y1 = bounds
+    w, h = max(1.0, x1 - x0), max(1.0, y1 - y0)
+    return [
+        Vec2(x0, y1),
+        Vec2(x0 + 0.35 * w, y1),
+        Vec2(x1, y0 + 0.45 * h),
+        Vec2(x1 - 0.12 * w, y0),
+        Vec2(x0 + 0.08 * w, y0 + 0.22 * h),
+    ]
+
+
 def template_paths(term: dict, stems: list[dict]) -> list[OpsPath]:
     role = term.get("role") or term["kind"]
     b = term["bounds"]
@@ -1024,7 +1044,49 @@ def template_paths(term: dict, stems: list[dict]) -> list[OpsPath]:
         return [_poly_path(p) for p in _hara_pair_polys(b)]
     if role == "ten":
         return [_poly_path(_ten_poly(b))]
+    if role in ("uchikomi", "junction"):
+        return [_poly_path(_uchikomi_poly(b))]
+    if role == "hane":
+        return [_poly_path(_hane_poly(b))]
+    if role == "other":
+        return [_poly_path(_ten_poly(b))]
     return []
+
+
+def scalar_paths(term: dict, stems: list[dict]) -> list[OpsPath]:
+    """軸画端物は計測比。はらいは使わない（scalar_hara_paths 側）。"""
+    return template_paths(term, stems)
+
+
+def scalar_hara_paths(
+    term: dict,
+    rings: list[list[tuple[float, float]]],
+    *,
+    split_pair: bool = False,
+    exact_rings: list[list[tuple[float, float]]] | None = None,
+    stems: list[dict] | None = None,
+) -> list[OpsPath]:
+    """はらいは左右輪郭を24点。中心線＋法線幅は人が折れる。"""
+    role = term.get("role") or term["kind"]
+    b = term["bounds"]
+    matched = [r for r in rings if _overlap(_ring_bounds(r), b) > 0.45]
+    if role == "hara_pair" and split_pair:
+        src = max(exact_rings, key=len) if exact_rings else (matched[0] if len(matched) == 1 else None)
+        if src is not None:
+            if roof_stem(stems or [], _ring_bounds(src)) is None:
+                paths = []
+                for outer, inner in split_hara_pair_chains(src):
+                    if len(outer) >= 2 and len(inner) >= 2:
+                        paths.append(outline_from_sides(outer, inner, k=HARA_SCALAR_K))
+                if paths:
+                    return paths
+            matched = split_hara_pair_with_roof(src, stems or [])
+    paths: list[OpsPath] = []
+    for ring in matched:
+        sides = _split_sides(ring)
+        if sides is not None:
+            paths.append(outline_from_sides(*sides, k=HARA_SCALAR_K))
+    return paths
 
 
 def _ring_is_wide(ring: list[tuple[float, float]], upm: float) -> bool:
@@ -1140,7 +1202,7 @@ def write_rebuild_ttf(rows: list[dict], dest: Path) -> None:
     fb.save(dest)
 
 
-def rebuild_row(row: dict) -> dict:
+def rebuild_row(row: dict, mode: str = "copy") -> dict:
     from extract_ref_elements import glyph_recording, recording_to_path
 
     rec, _, _, _ = glyph_recording(Path(row["_ref"]), row["char"])
@@ -1165,18 +1227,48 @@ def rebuild_row(row: dict) -> dict:
         difference([exact], [stem_only], residual.getPen(), fix_winding=True)
     else:
         residual = exact
-    # 端物・はらいの残差は二次を潰さない。折れ線化は分割・くびれの解析だけ。
     used = []
-    for t in real:
-        role = t.get("role") or t["kind"]
-        used.append("uchikomi" if role == "junction" else role)
-    if split_pair and exact_rings:
-        roof = roof_stem(merged, _ring_bounds(max(exact_rings, key=len)))
-        if roof is not None:
-            apex = max(max(exact_rings, key=len), key=lambda p: p[1])
-            if roof_shoulder_poly(roof, apex) is not None:
-                used.append("roof_shoulder")
-    rebuilt = combine([stem_only, residual], union) if merged else residual
+    extras: list[OpsPath] = []
+    if mode == "scalar":
+        rings = _ops_rings(residual)
+        for t in real:
+            role = t.get("role") or t["kind"]
+            if role in ("left_hara", "right_hara", "hara_pair", "hane", "ten", "other"):
+                parts = scalar_hara_paths(
+                    t,
+                    rings,
+                    split_pair=split_pair,
+                    exact_rings=exact_rings,
+                    stems=merged,
+                )
+                if not parts:
+                    parts = scalar_paths(t, merged)
+            else:
+                parts = scalar_paths(t, merged)
+            if parts:
+                extras.extend(parts)
+                used.append("uchikomi" if role == "junction" else role)
+        if split_pair and exact_rings:
+            roof = roof_stem(merged, _ring_bounds(max(exact_rings, key=len)))
+            if roof is not None:
+                apex = max(max(exact_rings, key=len), key=lambda p: p[1])
+                shoulder = roof_shoulder_poly(roof, apex)
+                if shoulder is not None:
+                    extras.append(_poly_path(shoulder))
+                    used.append("roof_shoulder")
+        rebuilt = combine([stem_only] + extras, union) if extras else stem_only
+    else:
+        # 端物・はらいの残差は二次を潰さない。折れ線化は分割・くびれの解析だけ。
+        for t in real:
+            role = t.get("role") or t["kind"]
+            used.append("uchikomi" if role == "junction" else role)
+        if split_pair and exact_rings:
+            roof = roof_stem(merged, _ring_bounds(max(exact_rings, key=len)))
+            if roof is not None:
+                apex = max(max(exact_rings, key=len), key=lambda p: p[1])
+                if roof_shoulder_poly(roof, apex) is not None:
+                    used.append("roof_shoulder")
+        rebuilt = combine([stem_only, residual], union) if merged else residual
     iou_stems, xor_stems = vector_iou(exact, stem_only)
     iou_tmpl, xor_tmpl = vector_iou(exact, rebuilt)
     return {
@@ -1191,6 +1283,7 @@ def rebuild_row(row: dict) -> dict:
         "vector_iou_templates": round(iou_tmpl, 4),
         "xor_stems": round(xor_stems, 1),
         "xor_templates": round(xor_tmpl, 1),
+        "mode": mode,
         "_path": rebuilt,
         "_stem_path": stem_only,
         "_exact": exact,
@@ -1228,7 +1321,7 @@ def write_md(rows: list[dict], dest: Path) -> None:
     lines = [
         "# ステム＋端物テンプレ再構成",
         "",
-        "開いた接合を閉じ、打ち込みは三角で戻す。はらいと端物の残差は二次を潰さない。正本は書いていない。",
+        "開いた接合を閉じ、打ち込みは三角で戻す。copy は残差の二次を戻す。scalar は計測比のテンプレだけ。正本は書いていない。",
         "",
         "| 字 | stems IoU | templates IoU | 画素 IoU | 接合 | テンプレ |",
         "|---|---:|---:|---:|---:|---|",
@@ -1252,6 +1345,12 @@ def main(argv: list[str] | None = None) -> int:
         default="十二三口日田中永八人入木本大天又文火矢川水手上土王玉力刀月用小心少耳言古石見雨食国車金風東花",
     )
     ap.add_argument("--out", type=Path, default=OUT_DEFAULT)
+    ap.add_argument(
+        "--mode",
+        choices=("copy", "scalar"),
+        default="copy",
+        help="copy=残差の二次を戻す。scalar=計測比のテンプレだけ（座標を写さない）",
+    )
     args = ap.parse_args(argv)
     if not args.ref.is_file():
         print(f"error: missing {args.ref}", file=sys.stderr)
@@ -1263,15 +1362,15 @@ def main(argv: list[str] | None = None) -> int:
         row = extract_char(args.ref, ch)
         row["_ref"] = str(args.ref)
         extracted.append(row)
-    rebuilt = [rebuild_row(r) for r in extracted]
-    ttf = scratch / "rebuild.ttf"
+    rebuilt = [rebuild_row(r, mode=args.mode) for r in extracted]
+    ttf = scratch / f"rebuild_{args.mode}.ttf"
     write_rebuild_ttf(rebuilt, ttf)
     stem_rows = []
     for r in rebuilt:
         copy = dict(r)
         copy["_path"] = r["_stem_path"]
         stem_rows.append(copy)
-    stem_ttf = scratch / "rebuild_stems.ttf"
+    stem_ttf = scratch / f"rebuild_stems_{args.mode}.ttf"
     write_rebuild_ttf(stem_rows, stem_ttf)
     pairs = []
     for r in rebuilt:
@@ -1285,12 +1384,13 @@ def main(argv: list[str] | None = None) -> int:
             f"{r['char']} stems={r['vector_iou_stems']:.3f} tmpl={r['vector_iou_templates']:.3f} "
             f"px={pix:.4f} terms={r['templates']}"
         )
-    png = args.out / "rebuild_compare.png"
+    png = args.out / ("scalar_compare.png" if args.mode == "scalar" else "rebuild_compare.png")
     sheet(pairs, png)
     payload = {
         "ref": str(args.ref),
         "shipping_ufo_written": False,
-        "method": "stems-plus-templates",
+        "method": "stems-plus-scalar-templates" if args.mode == "scalar" else "stems-plus-residual-copy",
+        "mode": args.mode,
         "uroko_family": {
             "bottom_frac": UROKO_BOTTOM_FRAC,
             "tip_y_frac": UROKO_TIP_Y_FRAC,
@@ -1304,9 +1404,11 @@ def main(argv: list[str] | None = None) -> int:
         "png": str(png),
     }
     args.out.mkdir(parents=True, exist_ok=True)
-    json_path = args.out / "rebuild.json"
+    json_name = "scalar.json" if args.mode == "scalar" else "rebuild.json"
+    md_name = "scalar.md" if args.mode == "scalar" else "rebuild.md"
+    json_path = args.out / json_name
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    write_md(rebuilt, args.out / "rebuild.md")
+    write_md(rebuilt, args.out / md_name)
     print(f"mean tmpl IoU={payload['mean_vector_iou_templates']} px={payload['mean_pixel_iou']} {png}")
     return 0
 

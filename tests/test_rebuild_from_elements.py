@@ -313,3 +313,18 @@ def test_juu_ttf_keeps_lsb(tmp_path):
     ref_c = mod.render_em(mod.REF_DEFAULT, "十")
     rec_c = mod.render_em(dest, "十")
     assert mod.iou(ref_c >= mod.INK, rec_c >= mod.INK) > 0.90
+
+
+def test_scalar_axis_beats_hara_band():
+    mod = _load()
+    if not mod.REF_DEFAULT.is_file():
+        pytest.skip("IPAex not on disk")
+    juu = mod.extract_char(mod.REF_DEFAULT, "十")
+    juu["_ref"] = str(mod.REF_DEFAULT)
+    hito = mod.extract_char(mod.REF_DEFAULT, "人")
+    hito["_ref"] = str(mod.REF_DEFAULT)
+    axis = mod.rebuild_row(juu, mode="scalar")
+    hara = mod.rebuild_row(hito, mode="scalar")
+    assert axis["mode"] == "scalar"
+    assert axis["vector_iou_templates"] > 0.95
+    assert hara["vector_iou_templates"] > 0.90

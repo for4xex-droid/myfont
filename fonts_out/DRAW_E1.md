@@ -1,8 +1,10 @@
 # P-E1 ひらがな残り（現代仮名）
 
+**休止（2026-09-29）**: この手順では描かない。正本は `docs/生成書体の仕様.md`。
+
 正本 `fonts_out/MyMincho.ufo` を Glyphs で開かない。
 各字は `fonts_out/manual_kana/{字}.ufo` だけ。ガイドは IPAex ラスタ（なぞらない）。
-描いた字は `diverge_dna.py --apply` を通してから receive。つ系が混じる波は `--stem`。部分 receive は他字を HEAD に戻すので、その波の字を全部並べる。
+描いた字は `diverge_dna.py --apply` を通してから receive。つ系が混じる波は `--stem`（端物固定が既定）。部分 receive は他字を HEAD に戻すので、その波の字を全部並べる。
 
 ゐゑゔゕゖは作らない。濁点の大きさは Q3 の がじづぞぼ に揃える。本体と合体しない。穴パス禁止。Remove Overlap 禁止。
 

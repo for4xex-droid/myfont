@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import math
 import sys
 from pathlib import Path
 
@@ -217,7 +218,102 @@ def test_apply_preserve_stem_flag(tmp_path: Path):
     Font().save(work)
     mod = _load()
     action = mod.apply_one(Font.open(dest), work, "つ", mod.DNA_A, preserve_stem=True)
-    assert action == "warped-stem"
+    assert action == "warped-stem-pin"
+
+
+def _rect_with_mids(glyph, x0: float, y0: float, x1: float, y1: float) -> None:
+    """各辺に中点がある矩形。4点だけだと全部が角になりピンが無効になる。"""
+    pen = glyph.getPen()
+    mx, my = (x0 + x1) / 2, (y0 + y1) / 2
+    pen.moveTo((x0, y0))
+    pen.lineTo((mx, y0))
+    pen.lineTo((x1, y0))
+    pen.lineTo((x1, my))
+    pen.lineTo((x1, y1))
+    pen.lineTo((mx, y1))
+    pen.lineTo((x0, y1))
+    pen.lineTo((x0, my))
+    pen.closePath()
+
+
+def test_terminal_weights_pin_corners_not_mids():
+    mod = _load()
+    poly = [
+        (100.0, 80.0),
+        (200.0, 80.0),
+        (300.0, 80.0),
+        (300.0, 180.0),
+        (300.0, 280.0),
+        (200.0, 280.0),
+        (100.0, 280.0),
+        (100.0, 180.0),
+    ]
+    w = mod._terminal_weights(poly)
+    assert len(w) == 8
+    corners = [w[0], w[2], w[4], w[6]]
+    mids = [w[1], w[3], w[5], w[7]]
+    assert max(corners) < min(mids)
+    assert max(corners) < 0.35
+    assert min(mids) > 0.65
+
+
+def test_four_point_rect_does_not_freeze():
+    mod = _load()
+    poly = [(100.0, 200.0), (500.0, 200.0), (500.0, 280.0), (100.0, 280.0)]
+    w = mod._terminal_weights(poly)
+    assert all(x == 1.0 for x in w)
+
+
+def test_pin_terminals_holds_corners_moves_body():
+    from ufoLib2 import Font
+
+    mod = _load()
+    g = Font().newGlyph("rect")
+    _rect_with_mids(g, 100, 80, 300, 280)
+    pts0 = [(p.x, p.y) for c in g for p in c]
+    mod.warp_glyph(g, mod.DNA_A, pin_terminals=True)
+    pts1 = [(p.x, p.y) for c in g for p in c]
+    assert pts1 != pts0
+    # 下辺中点は gravity が ymin に貼り付く。右辺中点（index 3）で胴の移動を見る
+    corner_d = math.hypot(pts1[0][0] - pts0[0][0], pts1[0][1] - pts0[0][1])
+    mid_d = math.hypot(pts1[3][0] - pts0[3][0], pts1[3][1] - pts0[3][1])
+    assert mid_d > corner_d * 1.4
+    assert mid_d > 1.0
+
+
+def test_stem_plus_pin_keeps_mid_width():
+    from ufoLib2 import Font
+
+    mod = _load()
+    g = Font().newGlyph("bar")
+    _rect_with_mids(g, 100, 200, 500, 280)
+    poly0 = [(p.x, p.y) for c in g for p in c]
+    mid_i = 1
+    w0 = mod._opposite_width(poly0, mid_i)
+    assert w0 is not None and 40 < w0 < 120
+    mod.warp_preserve_stem(g, mod.DNA_A, pin_terminals=True)
+    poly1 = [(p.x, p.y) for c in g for p in c]
+    assert poly1 != poly0
+    w1 = mod._opposite_width(poly1, mid_i)
+    assert w1 is not None
+    assert abs(w1 - w0) < 16
+
+
+def test_apply_stem_pins_by_default(tmp_path: Path):
+    from ufoLib2 import Font
+
+    dest = tmp_path / "dest.ufo"
+    df = Font()
+    dg = df.newGlyph("uni3064")
+    dg.width = 1000
+    dg.unicodes = [0x3064]
+    _bar(dg)
+    df.save(dest)
+    work = tmp_path / "つ.ufo"
+    Font().save(work)
+    mod = _load()
+    action = mod.apply_one(Font.open(dest), work, "つ", mod.DNA_A, preserve_stem=True)
+    assert action == "warped-stem-pin"
 
 
 def test_dry_run_does_not_write(tmp_path: Path, monkeypatch):

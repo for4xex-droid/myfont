@@ -1,6 +1,8 @@
 # 品位→α 計画 v1（P1 盲検後）
 
-2026-08-17 策定。P1 仮名縮小盲検が α Go したあとの正本ロードマップ。
+2026-08-17 策定。最終同期: 2026-09-29。P1 仮名縮小盲検が α Go したあとの到達点記録。
+
+**休止（2026-09-29）**: 日本語の新規制作は `docs/生成書体の仕様.md` により停止。P-E1 以降には着手しない。現行は `docs/latin_impl_plan.md`。
 Grok 4.6 監査（リポジトリ実測＋既存計画との突合）を反映。
 
 関連: `PLAN.md` §7、`docs/strategy.md`、`docs/blind_test.md`、`docs/kana_parametric_plan.md`、`docs/vector_quality_adoption_plan.md`、`GOLDENRULES.md`。
@@ -128,6 +130,7 @@ Grok 4.6 監査（リポジトリ実測＋既存計画との突合）を反映�
 - **受け入れ（2026-08-17）**: 37字 `receive_manual.py --force`。字間帯内、ゴミ0。つ系は手直し後に `--stem`（DNA A 幅維持×2）。vs IPAex 平均 **0.649**。つ 0.733 / づ 0.455 / っ 0.739。最大は ひ 0.788。作者目視 OK。黄金 `kana_g3_blind_d1` / `kana_g3_d1` / 各字 `FREEZE_d1.json`
 - **工数**: 手直し 1–3h ＋ receive / 組見本
 - **依存**: P-Q5。E1 は本プロセスの受け入れ後
+- **先行研究の取り込み（2026-08-19）**: `--stem` は端物固定が既定（`diverge_dna.py`）。選好は `log_preference.py`（点数禁止）。権利の第2軸は `rights_distance.py`（合否にしない）。漢字部品は `data/kage_vocab.yaml`（座標なし）
 
 ## 3. 受け入れ自動化（R）
 
@@ -252,7 +255,7 @@ P-MIX 混植捨てシート（正本非マージ・E1と並走）
 
 ## 7. フェーズ
 
-### 次の2週間
+### 休止前の2週間（2026-09-29 で打ち止め）
 
 1. ~~P-Q0 診断表~~
 2. ~~P-R1 receive~~ ＋ P-R2「正本を開かない」（export_manual_work で作業 UFO へ戻せる）
@@ -260,7 +263,7 @@ P-MIX 混植捨てシート（正本非マージ・E1と並走）
 4. P-G1
 5. S2a 実施記録（並走）
 6. ~~P-Q5~~ 荒いクローズ。Q4は不要（ギラが主因ではない）
-7. ~~P-D1~~ DNA A。黄金 `kana_g3_blind_d1`。次は P-E1。P-G1 / S2a は並走可
+7. ~~P-D1~~ DNA A。黄金 `kana_g3_blind_d1`。P-E1 は休止により着手しない
 
 この2週間で漢字・カタカナ・販売文面に手を出さない。
 

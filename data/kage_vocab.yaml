@@ -1,0 +1,49 @@
+# KAGE の線種・端タグ語彙だけ。座標・部品パスは持たない（掟9・11）。
+# kage-engine 本体はリンクしない（掟12b）。写像は自前。
+schema: mymincho.kage_vocab.v1
+coordinates: false
+source: "GlyphWiki KAGE tag numbers only; no glyph geometry"
+engine_kinds:
+  - horizontal
+  - vertical
+  - left_hara
+  - right_hara
+  - ten
+  - kana_curve
+line_types:
+  "0": "special"
+  "1": "straight"
+  "2": "curve"
+  "3": "bend"
+  "4": "otake"
+  "6": "complex_curve"
+  "7": "vertical_sweep"
+start_tags:
+  "0": none
+  "2": uchikomi
+  "4": hane
+  "5": taper
+  "7": none
+  "8": none
+  "12": uchikomi
+  "13": none
+  "22": uchikomi
+  "23": uchikomi
+  "24": hane
+  "32": uchikomi
+end_tags:
+  "0": none
+  "2": uroko
+  "4": hane
+  "5": taper
+  "7": tome
+  "8": none
+  "12": none
+  "13": none
+  "22": tome
+  "23": tome
+  "24": hane
+  "32": uchikomi
+# タイプ99（未展開部品）は製品骨格に入れない（掟17b）
+forbidden_line_types:
+  - 99

@@ -1,8 +1,9 @@
 # 輪郭距離メモ（S2a 並走・P-D1）
 
-合否ゲートではない。参照アウトラインはコピーしていない（掟9）。取得するのは正規化ラスタの IoU だけ。
+合否ゲートではない。参照アウトラインはコピーしていない（掟9）。取得するのは正規化ラスタの IoU と、幅・交差のレイ署名だけ。
 
 計測: bbox 正規化 200px、閾値64。参照間の物差しは IPAex・しっぽり・Zen Old の総当たり最大。
+レイ距離は `scripts/rights_distance.py`（`data/rights_distance.yaml` extractor 0.1.0）。用途は権利の下限だけ。品質合否・自動調整の目的関数にしない。
 
 ## 2026-08-17 手描き37字（ワープ前）
 
@@ -43,4 +44,5 @@
 
 - 正本は `diverge_dna.py` が書かない。作業 UFO → 手直し → `receive_manual.py`
 - E1 以降も受け入れ前に同じ DNA を通す
-- IoU を画素類似度の合否には使わない（掟・`kana_parametric_plan`）
+- IoU もレイ距離も画素類似度の合否には使わない（掟・`kana_parametric_plan`）
+- 選好は点数にしない。`scripts/log_preference.py` で keep/discard/shift だけ残す

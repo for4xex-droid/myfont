@@ -6,5 +6,5 @@
 
 済（正本へマージ済み）: 核心20字＋の。
 済（追加）: は・ひ・ほ・ま・め・や・る・り・を・ん・っ・が・じ・づ・ぞ・ぼ。
-済（P-D1）: DNA A。黄金 `kana_g3_blind_d1`。次は P-E1（`DRAW_E1.md`）。描いた字は `diverge_dna.py --apply` してから receive。
+済（P-D1）: DNA A。黄金 `kana_g3_blind_d1`。P-E1 は 2026-09-29 から休止（`docs/生成書体の仕様.md`）。`DRAW_E1.md` では描かない。
 デスクトップの画像は `~/Desktop/MyMincho手書き/`。

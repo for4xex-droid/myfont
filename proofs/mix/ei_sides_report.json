@@ -1,0 +1,39 @@
+{
+  "throwaway": true,
+  "shipping_ufo_written": false,
+  "params": "mix_k1",
+  "kanji_ids": [
+    "juu",
+    "ni",
+    "san",
+    "ei",
+    "kuchi",
+    "nichi",
+    "ta",
+    "naka"
+  ],
+  "patched": "uni6C38",
+  "hara_model": "ipaex leftover left/right sides resampled to 24+24, bbox-mapped onto engine 掠/磔",
+  "kept_engine": "TEN, HORIZONTAL, VERTICAL+hane, short LEFT_HARA (啄)",
+  "scratch_ufo": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/_scratch/MyMincho-mix-ei-sides.ufo",
+  "scratch_otf": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/_scratch/MyMincho-mix-ei-sides.otf",
+  "n_contours": 4,
+  "renders": [
+    {
+      "size": 20,
+      "png": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/mix_ei_sides_20.png",
+      "backend": "hb-view+stitch",
+      "sha256": "a9716f23048a45a570d6bc35e06d3d5b8a353a92808e41d0320a7a2f240f9945"
+    },
+    {
+      "size": 48,
+      "png": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/mix_ei_sides_48.png",
+      "backend": "hb-view+stitch",
+      "sha256": "c6a82155926553a769e6e5a160eeab9391174d9cd2f7c30573d62b75883fc1e5"
+    }
+  ],
+  "compare": "/Users/motista/Desktop/antigravity/myfont/proofs/mix/compare_k1_vs_ei_sides_48.png",
+  "verdict": "still_separate_faces",
+  "holes_from_bbox_map": 2,
+  "note": "48px で寄せ集めは消えない。256px では掠・磔の左右は一次幅より字らしいが接合は開いたまま。DSL に 24 点は足さない。E4 しない。"
+}

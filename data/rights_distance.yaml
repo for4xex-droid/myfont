@@ -1,0 +1,8 @@
+# 権利用レイ距離。品質合否・自動調整の目的関数にしない。
+extractor_version: "0.1.0"
+purpose: rights_floor_only
+quality_gate: false
+pack_size: 64
+angles_deg: [0, 45, 90, 135]
+n_bins: 12
+# 合成ラスタでも参照ラスタでも、取得するのは派生スカラーだけ（掟9）

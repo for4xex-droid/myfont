@@ -3,6 +3,7 @@
 
 既定は dry-run。書くとき --apply（作業 UFO のみ）。
 つ・づ・っ は骨格だけ動かし、局所幅を保つ（--stem）。
+--stem のとき端物（角・止め）は既定で固定する（Igarashi 2010 の皮膚固定）。
 
 例:
   engine/.venv/bin/python scripts/diverge_dna.py
@@ -40,6 +41,12 @@ class DNA:
 DNA_A = DNA(futokoro=0.08, gravity=0.92, balance=1.08, tension=1.06)
 # つ系は DNA A を幅維持で2回（1回だと IoU が戻る。強い1回は欠ける）
 STEM_PASSES = 2
+# 端物ピン: 輪郭周長のこの割合以内を固定。半分以上が種ならピンしない
+PIN_RADIUS_FRAC = 0.14
+PIN_MIN_SEEDS = 2
+PIN_MAX_SEEDS = 8
+PIN_SEED_SHARE_MAX = 0.5
+PIN_SHARP_RAD = 0.45  # ≈26°。これ以上を端物種にする
 
 
 def _is_oncurve(point) -> bool:
@@ -118,11 +125,64 @@ def _field_fn(glyph, dna: DNA):
     return field
 
 
-def warp_glyph(glyph, dna: DNA) -> None:
+def _turn_abs(poly: list[tuple[float, float]], i: int) -> float:
+    n = len(poly)
+    ax, ay = poly[(i - 1) % n]
+    bx, by = poly[i]
+    cx, cy = poly[(i + 1) % n]
+    v1x, v1y = bx - ax, by - ay
+    v2x, v2y = cx - bx, cy - by
+    n1, n2 = math.hypot(v1x, v1y), math.hypot(v2x, v2y)
+    if n1 < 1e-9 or n2 < 1e-9:
+        return 0.0
+    v1x, v1y, v2x, v2y = v1x / n1, v1y / n1, v2x / n2, v2y / n2
+    return abs(math.atan2(v1x * v2y - v1y * v2x, v1x * v2x + v1y * v2y))
+
+
+def _contour_dist(n: int, i: int, j: int) -> int:
+    d = abs(i - j)
+    return min(d, n - d)
+
+
+def _terminal_weights(poly: list[tuple[float, float]]) -> list[float]:
+    """角・止め付近=0、胴=1。点が少なく種が過半数ならピンしない。"""
+    n = len(poly)
+    if n < 6:
+        return [1.0] * n
+    angles = [_turn_abs(poly, i) for i in range(n)]
+    ordered = sorted(range(n), key=lambda i: angles[i], reverse=True)
+    seeds = [i for i in ordered if angles[i] >= PIN_SHARP_RAD][:PIN_MAX_SEEDS]
+    if len(seeds) < PIN_MIN_SEEDS:
+        seeds = ordered[:PIN_MIN_SEEDS]
+    if len(seeds) / n > PIN_SEED_SHARE_MAX:
+        return [1.0] * n
+    radius = max(1, int(n * PIN_RADIUS_FRAC))
+    out: list[float] = []
+    for i in range(n):
+        d = min(_contour_dist(n, i, s) for s in seeds)
+        t = min(d / radius, 1.0)
+        out.append(t * t * (3.0 - 2.0 * t))
+    return out
+
+
+def _lerp_pts(
+    src: list[tuple[float, float]],
+    dst: list[tuple[float, float]],
+    weights: list[float],
+) -> list[tuple[float, float]]:
+    return [
+        (a[0] + w * (b[0] - a[0]), a[1] + w * (b[1] - a[1]))
+        for a, b, w in zip(src, dst, weights)
+    ]
+
+
+def warp_glyph(glyph, dna: DNA, pin_terminals: bool = False) -> None:
     field = _field_fn(glyph, dna)
     if field is None:
         return
+    originals: list[list[tuple[float, float]]] = []
     for contour in glyph:
+        originals.append([(p.x, p.y) for p in contour])
         for p in contour:
             p.x, p.y = field(p.x, p.y)
 
@@ -139,8 +199,16 @@ def warp_glyph(glyph, dna: DNA) -> None:
             p.x = anchor.x + (p.x - anchor.x) * dna.tension
             p.y = anchor.y + (p.y - anchor.y) * dna.tension
 
+    if not pin_terminals:
+        return
+    for contour, src in zip(glyph, originals):
+        dst = [(p.x, p.y) for p in contour]
+        pinned = _lerp_pts(src, dst, _terminal_weights(src))
+        for p, (x, y) in zip(contour, pinned):
+            p.x, p.y = x, y
 
-def warp_preserve_stem(glyph, dna: DNA) -> None:
+
+def warp_preserve_stem(glyph, dna: DNA, pin_terminals: bool = False) -> None:
     """骨格（反対側との中点）だけ場で動かし、元の局所幅で戻す。"""
     field = _field_fn(glyph, dna)
     if field is None:
@@ -169,6 +237,8 @@ def warp_preserve_stem(glyph, dna: DNA) -> None:
             if n2x == 0.0 and n2y == 0.0:
                 n2x, n2y = nx, ny
             planned.append((mx2 - n2x * width * 0.5, my2 - n2y * width * 0.5))
+        if pin_terminals:
+            planned = _lerp_pts(poly, planned, _terminal_weights(poly))
         for p, (x, y) in zip(contour, planned):
             p.x, p.y = x, y
 
@@ -208,6 +278,7 @@ def apply_one(
     char: str,
     dna: DNA,
     preserve_stem: bool = False,
+    pin_terminals: bool | None = None,
 ) -> str:
     from ufoLib2 import Font
 
@@ -232,13 +303,15 @@ def apply_one(
     wg.lib[MANUAL_LIB] = True
     if image is not None:
         wg.image = image
+    if pin_terminals is None:
+        pin_terminals = bool(preserve_stem)
     if preserve_stem:
         for _ in range(STEM_PASSES):
-            warp_preserve_stem(wg, dna)
-        action = "warped-stem"
+            warp_preserve_stem(wg, dna, pin_terminals=pin_terminals)
+        action = "warped-stem-pin" if pin_terminals else "warped-stem"
     else:
-        warp_glyph(wg, dna)
-        action = "warped"
+        warp_glyph(wg, dna, pin_terminals=pin_terminals)
+        action = "warped-pin" if pin_terminals else "warped"
     work.save()
     return action
 
@@ -262,6 +335,20 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="つ・づ・っ は骨格ワープ＋幅維持。他字は通常ワープ",
     )
+    pin = ap.add_mutually_exclusive_group()
+    pin.add_argument(
+        "--pin-ends",
+        dest="pin_ends",
+        action="store_true",
+        default=None,
+        help="角・止めを固定。--stem では既定オン",
+    )
+    pin.add_argument(
+        "--no-pin-ends",
+        dest="pin_ends",
+        action="store_false",
+        help="端物もワープする",
+    )
     ap.add_argument("--dest", type=Path, default=DEFAULT_DEST)
     ap.add_argument("--src-root", type=Path, default=DEFAULT_SRC_ROOT)
     args = ap.parse_args(argv)
@@ -284,16 +371,19 @@ def main(argv: list[str] | None = None) -> int:
             if name not in dest or len(dest[name]) == 0:
                 print(f"{char} {name} skip (empty dest)", file=sys.stderr)
                 continue
-            note = " 幅維持" if args.stem and char in HAND_FIX else ""
+            use_stem = args.stem and char in HAND_FIX
+            note = " 幅維持" if use_stem else ""
+            if use_stem and args.pin_ends is not False:
+                note += " 端物固定"
             if args.apply:
                 work = args.src_root / f"{char}.ufo"
-                use_stem = args.stem and char in HAND_FIX
                 action = apply_one(
                     dest,
                     work,
                     char,
                     DNA_A,
                     preserve_stem=use_stem,
+                    pin_terminals=args.pin_ends,
                 )
                 glyph = Font.open(work)[name]
             else:
