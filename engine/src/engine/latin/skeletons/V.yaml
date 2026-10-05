@@ -18,3 +18,10 @@ expect: {contours: 1, holes: 0}
 variants:
   classic:
     joins: [{a: left, b: right, type: apex_cut}]
+    # 右脚はペン角に従う。thin だと水平画用のヘアラインになり、針になる。
+    strokes:
+      - {id: right, role: run}
+  # ディドンは垂直軸で左右対称。右脚をヘアラインにすると針になる。
+  chic:
+    strokes:
+      - {id: right, role: thick}

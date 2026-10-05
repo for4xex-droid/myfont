@@ -9,20 +9,21 @@ strokes:
     ends: {start: foot, end: foot}
   - id: upper
     knots:
-      - [0.02, 0.40, smooth]
-      - [0.55, 0.50, smooth]
-      - [0.90, 0.76, smooth]
-      - [0.55, 0.98, smooth]
-      - [0.02, 0.98, smooth]
+      # 下の山と同じ比率。右の極だけ内側だと、上の山が縦に潰れて見える。
+      - [0.02, 0.52, smooth, 0]
+      - [0.62, 0.52, smooth, 0]
+      - [1.00, 0.78, smooth, 90]
+      - [0.62, 1.00, smooth, 180]
+      - [0.02, 1.00, smooth, 180]
     role: bowl
     ends: {start: none, end: none}
   - id: lower
     knots:
-      - [0.02, 0.02, smooth]
-      - [0.62, 0.02, smooth]
-      - [0.98, 0.26, smooth]
-      - [0.62, 0.50, smooth]
-      - [0.02, 0.60, smooth]
+      - [0.02, 0.00, smooth, 0]
+      - [0.62, 0.00, smooth, 0]
+      - [1.00, 0.28, smooth, 90]
+      - [0.62, 0.52, smooth, 180]
+      - [0.02, 0.52, smooth, 180]
     role: bowl
     ends: {start: none, end: none}
 joins:

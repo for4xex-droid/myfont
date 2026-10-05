@@ -11,9 +11,24 @@ from engine.latin.gate import assert_separated, load_separation
 
 def test_frozen_pilot_meets_its_own_threshold():
     spec = load_separation()
-    assert spec["min_distance"] == pytest.approx(1.0338284145138559)
+    assert spec["nearest_distance"] == pytest.approx(1.030593912763502)
+    assert spec["min_distance"] == pytest.approx(1.023287944059543)
+    assert spec["min_distance"] <= spec["nearest_distance"]
     assert_separated(spec["styles"], spec)
     assert ("modern", "classic") in spec["distances"]
+
+
+def test_threshold_above_the_frozen_nearest_is_rejected(tmp_path):
+    import yaml
+
+    from engine.latin.gate import separation_path
+
+    raw = yaml.safe_load(separation_path().read_text(encoding="utf-8"))
+    raw["min_distance"] = raw["nearest_distance"] + 0.01
+    path = tmp_path / "separation.yaml"
+    path.write_text(yaml.safe_dump(raw), encoding="utf-8")
+    with pytest.raises(ValueError, match="threshold"):
+        load_separation(path)
 
 
 def test_collapsed_classic_fails():

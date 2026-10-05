@@ -26,6 +26,16 @@ def test_nib_is_thinnest_parallel_to_theta_and_thickest_perpendicular():
     assert thin < thick
 
 
+def test_nib_width_is_smooth_through_the_thin_direction():
+    """|sin| は最細の所で傾きが反転し、碗の天地に角ができる。"""
+    step = math.radians(1.0)
+    mid = half_width(NIB, "bowl", 0.0)
+    arrived = (mid - half_width(NIB, "bowl", -step)) / step
+    left = (half_width(NIB, "bowl", step) - mid) / step
+    assert arrived == pytest.approx(0.0, abs=0.02)
+    assert left == pytest.approx(0.0, abs=0.02)
+
+
 def test_role_overrides_the_nib_angle():
     along_thin_axis = 0.0
     assert half_width(NIB, "thick", along_thin_axis) == pytest.approx(0.08)

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 KNOT_TYPES = frozenset({"smooth", "corner", "line"})
-ROLES = frozenset({"thick", "thin", "bar", "bowl"})
+ROLES = frozenset({"thick", "thin", "bar", "bowl", "run"})
 ENDS = frozenset({"foot", "apex", "none", "open", "round_end"})
 SIDES = frozenset({"straight", "near_straight", "round", "diagonal", "open"})
 JOIN_TYPES = frozenset({"apex", "apex_cut", "T", "L", "crotch", "bowl_join"})

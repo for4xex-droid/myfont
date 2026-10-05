@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from itertools import pairwise
 
 from engine.geometry import Vec2
 
@@ -178,6 +179,243 @@ def _tangent_bridge(points: list[Vec2], chain: list[int]) -> list[Vec2]:
     return samples
 
 
+def _off_horizontal(delta: Vec2) -> float:
+    off = abs(math.degrees(math.atan2(delta.y, delta.x)))
+    return min(off, 180.0 - off)
+
+
+def _tangent_corner(origin: Vec2, start_tan: Vec2, end: Vec2, end_tan: Vec2) -> Vec2 | None:
+    """始点と終点の接線が交わる点。二次曲線はこの点を制御点にすると変曲しない。"""
+    denom = start_tan.cross(end_tan)
+    if abs(denom) < 1e-8:
+        return None
+    along = (end - origin).cross(end_tan) / denom
+    if not 4.0 <= along <= 180.0:
+        return None
+    control = origin + start_tan * along
+    if (end - control).dot(end_tan) < 4.0:
+        return None
+    return control
+
+
+def _quadratic(start: Vec2, control: Vec2, end: Vec2) -> list[Vec2]:
+    samples: list[Vec2] = []
+    for step in range(1, 12):
+        t = step / 12.0
+        u = 1.0 - t
+        samples.append(start * (u * u) + control * (2.0 * u * t) + end * (t * t))
+    return samples
+
+
+def _long_horizontals(points: list[Vec2]) -> list[tuple[float, int, int]]:
+    found: list[tuple[float, int, int]] = []
+    n = len(points)
+    for index in range(n):
+        start, end = points[index], points[(index + 1) % n]
+        if abs(end.x - start.x) < 40.0 or abs(end.y - start.y) > 1.2:
+            continue
+        found.append(((start.y + end.y) / 2.0, index, (index + 1) % n))
+    return found
+
+
+def fair_bar_joins(points: list[Vec2], *, mid_y: float) -> list[Vec2]:
+    """横棒から碗へ入る内周の凹みと角だけを、横棒に接する曲線で置き換える。
+
+    中央の横棒と、上下の山が天と地の横棒へ入る角が対象。碗の途中の太さは変えない。
+    """
+    pts = _ring(points)
+    if len(pts) < 8:
+        return pts
+    edges = _long_horizontals(pts)
+    if not edges:
+        return pts
+    mid = min(edges, key=lambda item: abs(item[0] - mid_y))
+    floor = min(edges, key=lambda item: item[0])
+    ceiling = max(edges, key=lambda item: item[0])
+    if abs(mid[0] - mid_y) <= 100.0:
+        pts = _fair_at_height(pts, mid[0])
+    long = {"min_side": 56.0, "min_arc": 70.0, "reach": 240.0}
+    if floor[0] < mid_y - 80.0 and abs(floor[0] - mid[0]) > 20.0:
+        pts = _fair_at_height(pts, floor[0], **long)
+    if ceiling[0] > mid_y + 80.0 and abs(ceiling[0] - mid[0]) > 20.0:
+        pts = _fair_at_height(pts, ceiling[0], **long)
+    return pts
+
+
+def _fair_at_height(
+    points: list[Vec2],
+    height: float,
+    *,
+    min_side: float = 16.0,
+    min_arc: float = 28.0,
+    reach: float = 160.0,
+) -> list[Vec2]:
+    edges = _long_horizontals(points)
+    if not edges:
+        return points
+    _y, index, nxt = min(edges, key=lambda item: abs(item[0] - height))
+    if abs(_y - height) > 8.0:
+        return points
+    return _fair_horizontal(points, index, nxt, min_side=min_side, min_arc=min_arc, reach=reach)
+
+
+def _fair_horizontal(
+    points: list[Vec2],
+    index: int,
+    nxt: int,
+    *,
+    min_side: float = 16.0,
+    min_arc: float = 28.0,
+    reach: float = 160.0,
+) -> list[Vec2]:
+    pts = _ring(points)
+    n = len(pts)
+    if n < 8 or nxt != (index + 1) % n:
+        return pts
+    start, end = pts[index], pts[nxt]
+    if end.x >= start.x:
+        junction, step, origin = nxt, 1, end
+    else:
+        junction, step, origin = index, -1, start
+    first = pts[(junction + step) % n] - origin
+    if first.length() < 1e-6:
+        return pts
+    ymin = min(point.y for point in pts)
+    ymax = max(point.y for point in pts)
+    bowl_up = abs(origin.y - ymin) <= abs(origin.y - ymax)
+
+    def side(point: Vec2) -> float:
+        return point.y - origin.y if bowl_up else origin.y - point.y
+
+    path = [junction]
+    acc = [0.0]
+    cursor = junction
+    while acc[-1] < reach:
+        ahead = (cursor + step) % n
+        acc.append(acc[-1] + (pts[ahead] - pts[cursor]).length())
+        path.append(ahead)
+        cursor = ahead
+        if cursor == junction:
+            break
+    sides = [side(pts[at]) for at in path]
+    if _off_horizontal(first) <= 8.0 and min(sides) >= -2.0:
+        return pts
+    start_tan = Vec2(1.0, 0.0) if pts[(junction + step) % n].x >= origin.x - 0.5 else Vec2(-1.0, 0.0)
+    landing: int | None = None
+    control: Vec2 | None = None
+    for at in range(1, len(path)):
+        if acc[at] < min_arc or sides[at] < min_side or acc[at] > reach - 10.0:
+            continue
+        here = path[at]
+        prev = pts[path[at - 1]]
+        after = pts[(here + step) % n]
+        if abs(_turn(prev, pts[here], after)) > 12.0:
+            continue
+        end_tan = after - pts[here]
+        if end_tan.length() < 1e-6:
+            continue
+        corner = _tangent_corner(origin, start_tan, pts[here], end_tan.normalized())
+        if corner is None or side(corner) < -1.0:
+            continue
+        landing = here
+        control = corner
+        break
+    if landing is None or control is None:
+        return pts
+    samples = _quadratic(origin, control, pts[landing])
+    if min(side(point) for point in samples) < -1.0:
+        return pts
+    walk = [junction]
+    cursor = junction
+    while cursor != landing:
+        cursor = (cursor + step) % n
+        walk.append(cursor)
+        if len(walk) > n:
+            return pts
+    if step == 1:
+        chain, bridge = walk, samples
+    else:
+        chain, bridge = list(reversed(walk)), list(reversed(samples))
+    return _replace_chain(pts, chain, bridge)
+
+
+def _level_edge(a: Vec2, b: Vec2) -> bool:
+    dx = abs(b.x - a.x)
+    return dx > 6.0 and abs(b.y - a.y) < dx * 0.05
+
+
+def _notch(t: float) -> float:
+    """端では傾きを戻し、底だけを狭く曲げる。"""
+    if abs(t) >= 1.0:
+        return 0.0
+    return math.cos(math.pi * t / 2.0) ** 3
+
+
+def _x_on(span: list[Vec2], y: float) -> float:
+    for left, right in pairwise(span):
+        if abs(right.y - left.y) < 1e-6:
+            continue
+        if (left.y - y) * (right.y - y) <= 0.0:
+            along = (y - left.y) / (right.y - left.y)
+            return left.x + (right.x - left.x) * along
+    return min(span, key=lambda point: abs(point.y - y)).x
+
+
+def deepen_outer_waist(points: list[Vec2], *, depth: float = 30.0, half: float = 40.0) -> list[Vec2]:
+    """右の二つの山のあいだだけ、外側の谷を鋭く左へ寄せる。内周は動かさない。"""
+    pts = _ring(points)
+    n = len(pts)
+    if n < 8:
+        return pts
+    ymin = min(point.y for point in pts)
+    ymax = max(point.y for point in pts)
+    span = ymax - ymin
+    if span < 40.0:
+        return pts
+    right = max(point.x for point in pts)
+    mid = (ymin + ymax) / 2.0
+    band = [index for index, point in enumerate(pts) if point.x > right - 110.0 and abs(point.y - mid) < span * 0.28]
+    if len(band) < 3:
+        return pts
+    waist_at = min(band, key=lambda index: pts[index].x)
+    waist = pts[waist_at]
+    if not any(point.y > waist.y + 50.0 and point.x > waist.x + 16.0 for point in pts):
+        return pts
+    if not any(point.y < waist.y - 50.0 and point.x > waist.x + 16.0 for point in pts):
+        return pts
+
+    def outside(index: int) -> bool:
+        point = pts[index]
+        return abs(point.y - waist.y) > half or point.x < waist.x - 10.0
+
+    def edge(step: int) -> int:
+        cursor = waist_at
+        for _ in range(n // 3):
+            nxt = (cursor + step) % n
+            if outside(nxt):
+                return nxt
+            cursor = nxt
+        return cursor
+
+    start, end = edge(-1), edge(1)
+    chain = [start]
+    cursor = start
+    while cursor != end:
+        cursor = (cursor + 1) % n
+        chain.append(cursor)
+        if len(chain) > n // 2:
+            return pts
+    span_pts = [pts[index] for index in chain]
+    if abs(span_pts[-1].y - span_pts[0].y) < 12.0:
+        return pts
+    steps = max(10, int(abs(span_pts[-1].y - span_pts[0].y) / 4.0))
+    bridge: list[Vec2] = []
+    for step in range(1, steps):
+        y = span_pts[0].y + (span_pts[-1].y - span_pts[0].y) * step / steps
+        bridge.append(Vec2(_x_on(span_pts, y) - depth * _notch((y - waist.y) / half), y))
+    return _replace_chain(pts, chain, bridge)
+
+
 def smooth_side_pinches(points: list[Vec2], *, turn_lim: float = -100.0, reach: float = 70.0) -> list[Vec2]:
     """横から入った鋭いくびれだけを弧で埋める。上下に開いた股は触らない。"""
     pts = _ring(points)
@@ -188,6 +426,9 @@ def smooth_side_pinches(points: list[Vec2], *, turn_lim: float = -100.0, reach: 
         replaced = False
         for i in range(n):
             if _turn(pts[(i - 1) % n], pts[i], pts[(i + 1) % n]) > turn_lim:
+                continue
+            if _level_edge(pts[(i - 1) % n], pts[i]) or _level_edge(pts[i], pts[(i + 1) % n]):
+                # セリフの下面と画の付け根。くびれではない。
                 continue
             chain = _chain_through(pts, _walk(pts, i, -1, reach), _walk(pts, i, 1, reach), i)
             if chain is None or len(chain) < 3:
@@ -202,6 +443,68 @@ def smooth_side_pinches(points: list[Vec2], *, turn_lim: float = -100.0, reach: 
             break
         if not replaced:
             break
+    return pts
+
+
+def blunt_inner_peak(points: list[Vec2], *, band: float = 50.0, gap: float = 6.0) -> list[Vec2]:
+    """外の端より内側で、カウンターに突き出した尖りを隣との弦まで落とす。"""
+    pts = _ring(points)
+    n = len(pts)
+    if n < 8:
+        return pts
+    ymax = max(point.y for point in pts)
+    ymin = min(point.y for point in pts)
+    out = list(pts)
+    for index in range(n):
+        point = pts[index]
+        prev = pts[index - 1]
+        nxt = pts[(index + 1) % n]
+        if abs(_turn(prev, point, nxt)) < 30.0 or abs(nxt.x - prev.x) < 1.0:
+            continue
+        high = point.y > ymax - band and point.y < ymax - gap and prev.y < point.y - 2.0 and nxt.y < point.y - 2.0
+        low = point.y < ymin + band and point.y > ymin + gap and prev.y > point.y + 2.0 and nxt.y > point.y + 2.0
+        if not high and not low:
+            continue
+        t = (point.x - prev.x) / (nxt.x - prev.x)
+        t = min(1.0, max(0.0, t))
+        out[index] = Vec2(point.x, prev.y + (nxt.y - prev.y) * t)
+    return out
+
+
+def fill_crown_saddle(points: list[Vec2], *, depth: float = 40.0, gap: float = 30.0) -> list[Vec2]:
+    """上下の端で、2つの肩のあいだに浅く沈んだ所を肩から肩への直線で埋める。
+
+    細い方向が水平のペンでは、ヘアラインの両側の太りが外へも膨らみ、頂が鞍形に凹む。
+    """
+    pts = _ring(points)
+    for sign in (1.0, -1.0):
+        n = len(pts)
+        if n < 8:
+            return pts
+        height = [point.y * sign for point in pts]
+        top = max(range(n), key=height.__getitem__)
+        best: list[int] | None = None
+        for j in range(n):
+            if j == top or abs(pts[j].x - pts[top].x) < gap or height[j] < height[top] - depth:
+                continue
+            if height[j] < height[j - 1] or height[j] < height[(j + 1) % n]:
+                continue
+            floor = height[j]
+            lo, hi = sorted((pts[top].x, pts[j].x))
+            for a, b in ((top, j), (j, top)):
+                chain = _chain_through(pts, a, b, a)
+                if chain is None or len(chain) < 3:
+                    continue
+                inner = chain[1:-1]
+                sink = min(height[k] for k in inner)
+                if not floor - depth <= sink < floor - 2.0:
+                    continue
+                if any(not lo - 1.0 <= pts[k].x <= hi + 1.0 for k in inner):
+                    continue
+                if best is None or len(chain) < len(best):
+                    best = chain
+        if best is not None:
+            pts = _replace_chain(pts, best, [])
     return pts
 
 

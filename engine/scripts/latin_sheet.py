@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from engine.latin.sheet import render_pilot_sheet
+from engine.latin.sheet import render_b_curvature, render_pilot_sheet
 
 
 def main() -> None:
@@ -19,6 +19,7 @@ def main() -> None:
     )
     args = parser.parse_args()
     print(render_pilot_sheet(args.output))
+    print(render_b_curvature(args.output.with_name("b_curvature.png")))
 
 
 if __name__ == "__main__":

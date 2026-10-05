@@ -30,15 +30,19 @@ def load_separation(path: Path | None = None) -> dict[str, Any]:
     }
     distances = pairwise_distances(styles, axes, span)
     nearest = min(distances.values())
-    frozen = float(raw["min_distance"])
-    if abs(nearest - frozen) > 1e-9:
-        raise ValueError(f"separation: min distance {nearest} != frozen {frozen}")
+    recorded = float(raw["nearest_distance"])
+    if abs(nearest - recorded) > 1e-9:
+        raise ValueError(f"separation: nearest distance {nearest} != frozen {recorded}")
+    threshold = float(raw["min_distance"])
+    if threshold > nearest + 1e-9:
+        raise ValueError(f"separation: threshold {threshold} above the frozen nearest {nearest}")
     return {
         "axes": axes,
         "styles": styles,
         "span": span,
         "distances": distances,
-        "min_distance": frozen,
+        "nearest_distance": recorded,
+        "min_distance": threshold,
     }
 
 

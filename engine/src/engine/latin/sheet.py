@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -74,5 +75,83 @@ def render_pilot_sheet(path: Path) -> Path:
             ox = label_w + col * cell_w + (cell_w - outline.advance * scale) / 2
             baseline = top + cell_h - 36
             _paint(draw, outline, ox, baseline, scale)
+    image.save(path)
+    return path
+
+
+def _ring(contour):
+    pts = list(contour)
+    if len(pts) > 1 and abs(pts[0].x - pts[-1].x) < 1e-9 and abs(pts[0].y - pts[-1].y) < 1e-9:
+        pts = pts[:-1]
+    return pts
+
+
+def _resample(pts, step: float):
+    out = [pts[0]]
+    carry = 0.0
+    for start, end in zip(pts, pts[1:] + pts[:1]):
+        length = math.hypot(end.x - start.x, end.y - start.y)
+        if length < 1e-9:
+            continue
+        t = step - carry
+        while t <= length:
+            out.append(type(start)(start.x + (end.x - start.x) * t / length, start.y + (end.y - start.y) * t / length))
+            t += step
+        carry = length - (t - step)
+    return out[:-1]
+
+
+def _curvature(pts) -> list[float]:
+    """度/10単位。比較テストと同じ窓。"""
+    found = []
+    n = len(pts)
+    for i in range(n):
+        a, b, c = pts[(i - 2) % n], pts[i], pts[(i + 2) % n]
+        turn = math.atan2(c.y - b.y, c.x - b.x) - math.atan2(b.y - a.y, b.x - a.x)
+        turn = (turn + math.pi) % (2 * math.pi) - math.pi
+        found.append(math.degrees(turn) / 6.0 * 10.0)
+    return found
+
+
+def render_b_curvature(path: Path) -> Path:
+    """クラシックとシックの B。穴の縁から、曲がりに比例した櫛を出す。
+
+    櫛が穴の内側へ揃って出て、赤（逆向き）が無ければ、穴は凸で曲がりが段になっていない。
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    styles = ("classic", "chic")
+    scale = 0.9
+    cell_w = 620
+    height = 780
+    image = Image.new("RGB", (cell_w * len(styles), height), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    font = _font(22)
+    for col, style in enumerate(styles):
+        outline = build_glyph(load_resolved("B", style))
+        ox = col * cell_w + 40
+        baseline = height - 40
+        draw.text((ox, 16), _LABELS[style], fill=(40, 40, 40), font=font)
+        _paint(draw, outline, ox, baseline, scale)
+        for contour, hole in zip(outline.contours, outline.holes):
+            if not hole:
+                continue
+            pts = _resample(_ring(contour), 6.0)
+            curve = _curvature(pts)
+            count = len(pts)
+            # 幹との継ぎ目は直角なので、櫛は碗の右側だけにする。
+            left = min(point.x for point in pts)
+            right = max(point.x for point in pts)
+            for index, (point, kappa) in enumerate(zip(pts, curve)):
+                if point.x < left + (right - left) * 0.35:
+                    continue
+                a, b = pts[(index - 1) % count], pts[(index + 1) % count]
+                heading = math.atan2(b.y - a.y, b.x - a.x)
+                # 進行方向の左。曲がりが正なら、櫛は穴の内側へ揃う。
+                left_x, left_y = -math.sin(heading), math.cos(heading)
+                length = kappa * 1.6 * scale
+                x0, y0 = ox + point.x * scale, baseline - point.y * scale
+                color = (180, 40, 40) if kappa < 0.0 else (30, 90, 160)
+                draw.line((x0, y0, x0 + left_x * length, y0 - left_y * length), fill=color, width=1)
     image.save(path)
     return path

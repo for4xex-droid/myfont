@@ -1,8 +1,10 @@
-# 2026-09-30 凍結。パイロットの H と O を、ヒントなし ppem 500 で測った値。
+# 2026-10-01 再凍結（初回 2026-09-30）。パイロットの H と O を、ヒントなし ppem 500 で測った値。
+# 再凍結の理由: 画が基準線・キャップハイトから太さの半分はみ出していたのを直し、O の外形が縮んだ。
+# 形の縦横比は保ったまま、ラスタの丸めが1ピクセル動いた。
 # 草案の帯（コントラスト 8–12、O の幅/高さ 0.62–0.78）はゲートに使わない。
 # 参照8書体は未取得。正規化の幅は、この4様式の実測の最小と最大。
 extractor_version: 1
-frozen: "2026-09-30"
+frozen: "2026-10-01"
 distance_axes:
   - contrast
   - o_width_over_height
@@ -14,32 +16,35 @@ recorded_only:
   - thick_ray_deg
 styles:
   modern:
-    contrast: 1.0326086956521738
-    o_width_over_height: 0.9705882352941176
+    contrast: 1.0217391304347827
+    o_width_over_height: 0.967032967032967
     stem_over_cap: 0.13142857142857142
     serif_over_cap: 0.0
     foot_taper: 0.0
-    thick_ray_deg: 60
+    thick_ray_deg: 15
   classic:
-    contrast: 2.2127659574468086
-    o_width_over_height: 0.96
+    contrast: 2.1666666666666665
+    o_width_over_height: 0.9640883977900553
     stem_over_cap: 0.1457142857142857
     serif_over_cap: 0.037142857142857144
     foot_taper: 0.0
     thick_ray_deg: 150
   chic:
-    contrast: 7.25
-    o_width_over_height: 0.798941798941799
+    contrast: 7.125
+    o_width_over_height: 0.7978142076502732
     stem_over_cap: 0.16
     serif_over_cap: 0.03142857142857143
     foot_taper: 0.0
-    thick_ray_deg: 30
+    thick_ray_deg: 0
   pop:
-    contrast: 1.0193548387096774
-    o_width_over_height: 1.0275229357798166
-    stem_over_cap: 0.21285714285714286
+    contrast: 1.0129032258064516
+    o_width_over_height: 1.0306406685236769
+    stem_over_cap: 0.21857142857142858
     serif_over_cap: 0.0
-    foot_taper: 0.7986577181208054
+    foot_taper: 0.9477124183006536
     thick_ray_deg: 15
-# 凍結時の最近ペア（モダンとクラシック）の距離。これ未満は分離不足。
-min_distance: 1.0338284145138559
+# 凍結時の最近ペア（モダンとクラシック）の距離。
+nearest_distance: 1.030593912763502
+# ゲートの閾値。同じフォントを ppem 480–520（2刻み）で測ったときの最近ペア距離の最小。
+# ラスタの丸めだけで動く幅をここで吸収する。これ未満は分離不足。
+min_distance: 1.023287944059543

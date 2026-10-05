@@ -4,19 +4,31 @@ structure: spine
 groups: [round]
 strokes:
   - id: spine
+    # 両端は立ち気味に入り、切り口が水平になる。
     knots:
-      - [0.75, 0.96, smooth, 180]
-      - [0.42, 0.96, smooth]
-      - [0.20, 0.80, smooth]
-      - [0.22, 0.62, smooth]
-      - [0.45, 0.50, smooth]
-      - [0.78, 0.38, smooth]
-      - [0.80, 0.20, smooth]
-      - [0.58, 0.04, smooth]
-      - [0.25, 0.04, smooth, 180]
+      - [0.86, 0.78, smooth, 105]
+      - [0.50, 1.00, smooth, 180]
+      - [0.15, 0.76, smooth, 270]
+      - [0.50, 0.52, smooth]
+      - [0.86, 0.25, smooth, 270]
+      - [0.50, 0.00, smooth, 180]
+      - [0.13, 0.22, smooth, 105]
     tension: 1.0
     role: bowl
     ends: {start: open, end: open}
 joins: []
 sides: {left: open, right: open}
 expect: {contours: 1, holes: 0}
+variants:
+  # 細い方向が水平のペンでは、上下の頂を平らにしないとヘアラインが点になる。
+  chic:
+    strokes:
+      - id: spine
+        knots:
+          - [0.88, 0.78, smooth, 100]
+          - [0.50, 1.00, smooth, 180]
+          - [0.14, 0.74, smooth, 270]
+          - [0.50, 0.52, smooth]
+          - [0.86, 0.26, smooth, 270]
+          - [0.50, 0.00, smooth, 180]
+          - [0.12, 0.22, smooth, 100]

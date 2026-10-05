@@ -18,11 +18,11 @@ def _semicircle(origin: Vec2, outward: Vec2, radius: float, steps: int = 16) -> 
 
 
 def _slab(origin: Vec2, outward: Vec2, length: float, thick: float) -> list[Vec2]:
-    """端から外へ伸びる横棒。幹と重なるように少し内側へ入れる。"""
+    """幹の端に内側から載せる横棒。外の面は幹の端と同じ高さ。"""
     direction = outward.normalized()
     normal = direction.perpendicular()
-    back = origin - direction * (thick * 0.35)
-    front = origin + direction * thick
+    back = origin - direction * (thick * 1.35)
+    front = origin
     half = length / 2.0
     return [
         back + normal * half,
@@ -36,11 +36,11 @@ def _bracket(origin: Vec2, outward: Vec2, length: float, thick: float, bracket: 
     """セリフの横棒と、幹へ戻る短いブラケット。自己交差しない六角形。"""
     direction = outward.normalized()
     normal = direction.perpendicular()
-    back = origin - direction * (thick * 0.35)
-    front = origin + direction * thick
+    back = origin - direction * (thick * 1.35)
+    front = origin
     half = length / 2.0
     neck = min(half * 0.55, max(half_width, 1.0))
-    inner = origin - direction * (thick * 0.35 + max(bracket, thick))
+    inner = origin - direction * (thick * 1.35 + max(bracket, thick))
     return [
         front + normal * half,
         front - normal * half,
