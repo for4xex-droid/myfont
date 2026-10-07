@@ -32,7 +32,11 @@ _UNCHANGED = (
 
 def _ring(contour):
     pts = list(contour)
-    if len(pts) > 1 and abs(pts[0].x - pts[-1].x) < 1e-6 and abs(pts[0].y - pts[-1].y) < 1e-6:
+    if (
+        len(pts) > 1
+        and abs(pts[0].x - pts[-1].x) < 1e-6
+        and abs(pts[0].y - pts[-1].y) < 1e-6
+    ):
         pts = pts[:-1]
     return pts
 
@@ -46,7 +50,12 @@ def _resample(pts, step):
             continue
         t = step - carry
         while t <= length:
-            out.append(type(start)(start.x + (end.x - start.x) * t / length, start.y + (end.y - start.y) * t / length))
+            out.append(
+                type(start)(
+                    start.x + (end.x - start.x) * t / length,
+                    start.y + (end.y - start.y) * t / length,
+                )
+            )
             t += step
         carry = length - (t - step)
     return out[:-1]
@@ -67,7 +76,11 @@ def _curvature(pts):
 def _stem_right(resolved) -> float:
     cap = resolved.style.cap_height
     width = resolved.style.proportions["B"] * cap
-    left = resolved.style.sidebearing["base"] * cap * resolved.style.sidebearing["straight"]
+    left = (
+        resolved.style.sidebearing["base"]
+        * cap
+        * resolved.style.sidebearing["straight"]
+    )
     return left + 0.18 * width + cap * resolved.pen.stem / 2.0
 
 
@@ -76,7 +89,9 @@ def _holes(outline):
 
 
 def _outer(outline):
-    return next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
+    return next(
+        contour for contour, hole in zip(outline.contours, outline.holes) if not hole
+    )
 
 
 def _dent(contour) -> float:
@@ -106,7 +121,13 @@ def _dent(contour) -> float:
         for a, b in zip(hull, hull[1:] + hull[:1]):
             abx, aby = b[0] - a[0], b[1] - a[1]
             length = abx * abx + aby * aby
-            t = 0.0 if length < 1e-12 else max(0.0, min(1.0, ((px - a[0]) * abx + (py - a[1]) * aby) / length))
+            t = (
+                0.0
+                if length < 1e-12
+                else max(
+                    0.0, min(1.0, ((px - a[0]) * abx + (py - a[1]) * aby) / length)
+                )
+            )
             best = min(best, math.hypot(px - a[0] - abx * t, py - a[1] - aby * t))
         return best
 
@@ -209,7 +230,18 @@ def _wall(hole, outer):
         for start, end in zip(edge, edge[1:] + edge[:1]):
             abx, aby = end.x - start.x, end.y - start.y
             length = abx * abx + aby * aby
-            t = 0.0 if length < 1e-12 else max(0.0, min(1.0, ((point.x - start.x) * abx + (point.y - start.y) * aby) / length))
+            t = (
+                0.0
+                if length < 1e-12
+                else max(
+                    0.0,
+                    min(
+                        1.0,
+                        ((point.x - start.x) * abx + (point.y - start.y) * aby)
+                        / length,
+                    ),
+                )
+            )
             qx = start.x + abx * t
             qy = start.y + aby * t
             dist = math.hypot(point.x - qx, point.y - qy)
@@ -252,7 +284,11 @@ def _bow_curvature(style):
     for hole in _holes(outline):
         pts = _resample(_ring(hole), 3.0)
         curve = _curvature(pts)
-        side = [(point, abs(kappa)) for point, kappa in zip(pts, curve) if point.x > stem + 80.0 and abs(kappa) > 0.4]
+        side = [
+            (point, abs(kappa))
+            for point, kappa in zip(pts, curve)
+            if point.x > stem + 80.0 and abs(kappa) > 0.4
+        ]
         found.append(side)
     return found
 
@@ -269,8 +305,16 @@ def test_bowl_curvature_follows_the_pen():
         ys = [point.y for point, _kappa in side]
         low, high = min(ys), max(ys)
         span = high - low
-        middle = [kappa for point, kappa in side if abs(point.y - (low + high) / 2.0) < span * 0.2]
-        ends = [kappa for point, kappa in side if abs(point.y - (low + high) / 2.0) > span * 0.35]
+        middle = [
+            kappa
+            for point, kappa in side
+            if abs(point.y - (low + high) / 2.0) < span * 0.2
+        ]
+        ends = [
+            kappa
+            for point, kappa in side
+            if abs(point.y - (low + high) / 2.0) > span * 0.35
+        ]
         assert sum(ends) / len(ends) > sum(middle) / len(middle) * 1.8
 
 
@@ -283,7 +327,9 @@ def test_classic_b_outer_hills_are_not_notched():
         if point.x < right - 40.0:
             continue
         before, after = pts[(index - 1) % count], pts[(index + 1) % count]
-        turn = math.atan2(after.y - point.y, after.x - point.x) - math.atan2(point.y - before.y, point.x - before.x)
+        turn = math.atan2(after.y - point.y, after.x - point.x) - math.atan2(
+            point.y - before.y, point.x - before.x
+        )
         turn = (turn + math.pi) % (2 * math.pi) - math.pi
         assert abs(math.degrees(turn)) < 8.0
 
@@ -297,7 +343,10 @@ def test_classic_b_stress_follows_the_pen():
     for hole in _holes(outline):
         wall = _wall(hole, outer)
         assert wall
-        mid = (min(point.y for point, _dist in wall) + max(point.y for point, _dist in wall)) / 2.0
+        mid = (
+            min(point.y for point, _dist in wall)
+            + max(point.y for point, _dist in wall)
+        ) / 2.0
         upper = sorted(dist for point, dist in wall if point.y >= mid)
         lower = sorted(dist for point, dist in wall if point.y < mid)
         assert upper and lower
@@ -315,13 +364,19 @@ def _valley(outer):
     mid = (min(ys) + max(ys)) / 2.0
     span = max(ys) - min(ys)
     right = max(point.x for point in pts)
-    band = [point for point in pts if abs(point.y - mid) < 0.22 * span and point.x > right - 160.0]
+    band = [
+        point
+        for point in pts
+        if abs(point.y - mid) < 0.22 * span and point.x > right - 160.0
+    ]
     assert band
     return min(band, key=lambda point: point.x)
 
 
 def _valley_gap(hole, valley):
-    return min(math.hypot(point.x - valley.x, point.y - valley.y) for point in _ring(hole))
+    return min(
+        math.hypot(point.x - valley.x, point.y - valley.y) for point in _ring(hole)
+    )
 
 
 @pytest.mark.parametrize("style", _CONTRAST)
@@ -344,7 +399,13 @@ def _hausdorff(left, right) -> float:
                 bx, by = dst[(i + 1) % n]
                 abx, aby = bx - ax, by - ay
                 length = abx * abx + aby * aby
-                t = 0.0 if length < 1e-12 else max(0.0, min(1.0, ((px - ax) * abx + (py - ay) * aby) / length))
+                t = (
+                    0.0
+                    if length < 1e-12
+                    else max(
+                        0.0, min(1.0, ((px - ax) * abx + (py - ay) * aby) / length)
+                    )
+                )
                 near = min(near, math.hypot(px - ax - abx * t, py - ay - aby * t))
             worst = max(worst, near)
         return worst
@@ -359,11 +420,30 @@ def _outline_gap(left, right) -> float:
         points = [(point.x, point.y) for point in contour]
         index = min(
             (i for i in range(len(right.contours)) if i not in used),
-            key=lambda i: _hausdorff(points, [(point.x, point.y) for point in right.contours[i]]),
+            key=lambda i: _hausdorff(
+                points, [(point.x, point.y) for point in right.contours[i]]
+            ),
         )
         used.add(index)
-        worst = max(worst, _hausdorff(points, [(point.x, point.y) for point in right.contours[index]]))
+        worst = max(
+            worst,
+            _hausdorff(points, [(point.x, point.y) for point in right.contours[index]]),
+        )
     return worst
+
+
+def test_modern_b_keeps_its_outline_when_samples_change():
+    """モダン B のくびれは弧長で決める。サンプル 24 と 160 の差は 0.6 以内。"""
+    resolved = load_resolved("B", "modern")
+    original = build._SAMPLES
+    try:
+        build._SAMPLES = 24
+        coarse = build_glyph(resolved)
+        build._SAMPLES = 160
+        fine = build_glyph(resolved)
+    finally:
+        build._SAMPLES = original
+    assert _outline_gap(coarse, fine) <= 0.6
 
 
 @pytest.mark.parametrize("style", _CONTRAST)

@@ -8,7 +8,9 @@ from itertools import pairwise
 from engine.geometry import Vec2
 
 
-def taper_end(half_widths: list[float], *, at_start: bool, factor: float, fraction: float = 0.22) -> None:
+def taper_end(
+    half_widths: list[float], *, at_start: bool, factor: float, fraction: float = 0.22
+) -> None:
     """端の半幅を factor 倍へ滑らかに寄せる。factor が 1 なら変えない。"""
     if factor == 1.0 or len(half_widths) < 3:
         return
@@ -24,7 +26,9 @@ def taper_end(half_widths: list[float], *, at_start: bool, factor: float, fracti
         half_widths[last - i] *= (1.0 - blend) + factor * blend
 
 
-def _closest(point: Vec2, samples: list[tuple[Vec2, Vec2]]) -> tuple[float, Vec2, int] | None:
+def _closest(
+    point: Vec2, samples: list[tuple[Vec2, Vec2]]
+) -> tuple[float, Vec2, int] | None:
     best: tuple[float, Vec2, int] | None = None
     for i in range(len(samples) - 1):
         start = samples[i][0]
@@ -83,7 +87,9 @@ def retract_end(
         s0, s1 = side(p0), side(p1)
         t = 0.0 if abs(s1 - s0) < 1e-9 else max(0.0, min(1.0, -s0 / (s1 - s0)))
         pos = p0.lerp(p1, t)
-        return [(pos, pts[k][1])] + pts[k:], [ws[k - 1] + (ws[k] - ws[k - 1]) * t] + ws[k:]
+        return [(pos, pts[k][1])] + pts[k:], [ws[k - 1] + (ws[k] - ws[k - 1]) * t] + ws[
+            k:
+        ]
     k = len(pts) - 1
     while k > 0 and side(pts[k][0]) < 0.0:
         k -= 1
@@ -93,7 +99,9 @@ def retract_end(
     s0, s1 = side(p0), side(p1)
     t = 0.0 if abs(s1 - s0) < 1e-9 else max(0.0, min(1.0, -s0 / (s1 - s0)))
     pos = p0.lerp(p1, t)
-    return pts[: k + 1] + [(pos, pts[k][1])], ws[: k + 1] + [ws[k] + (ws[k + 1] - ws[k]) * t]
+    return pts[: k + 1] + [(pos, pts[k][1])], ws[: k + 1] + [
+        ws[k] + (ws[k + 1] - ws[k]) * t
+    ]
 
 
 def _ring(points: list[Vec2]) -> list[Vec2]:
@@ -108,20 +116,37 @@ def _turn(a: Vec2, b: Vec2, c: Vec2) -> float:
     return math.degrees(math.atan2(v1.cross(v2), v1.dot(v2)))
 
 
-def _walk(points: list[Vec2], start: int, step: int, reach: float) -> int:
+def _cut_at(
+    points: list[Vec2], start: int, step: int, distance: float
+) -> tuple[int, int, float, Vec2]:
+    """start から step 方向へ、弧長 distance の点。
+
+    戻り値は輪郭順の辺 (始点, 終点)、その辺上の位置、点。頂点で止めない。
+    """
     acc = 0.0
     index = start
     n = len(points)
-    for _ in range(n - 2):
+    for _ in range(n):
         nxt = (index + step) % n
-        acc += (points[nxt] - points[index]).length()
+        delta = points[nxt] - points[index]
+        seg = delta.length()
+        if seg > 1e-9 and acc + seg >= distance:
+            along = min(1.0, (distance - acc) / seg)
+            point = points[index] + delta * along
+            if step > 0:
+                return index, nxt, along, point
+            return nxt, index, 1.0 - along, point
+        acc += seg
         index = nxt
-        if acc >= reach:
+        if nxt == start:
             break
-    return index
+    nxt = (start + 1) % n
+    return start, nxt, 0.0, points[start]
 
 
-def _chain_through(points: list[Vec2], start: int, end: int, must: int) -> list[int] | None:
+def _chain_through(
+    points: list[Vec2], start: int, end: int, must: int
+) -> list[int] | None:
     n = len(points)
     chain = [start]
     index = start
@@ -143,7 +168,26 @@ def _chord_depth(point: Vec2, start: Vec2, end: Vec2) -> float:
     return abs((point - start).cross(chord)) / length
 
 
-def _replace_chain(points: list[Vec2], chain: list[int], bridge: list[Vec2]) -> list[Vec2]:
+def _drop_span(
+    points: list[Vec2], first: int, last: int, bridge: list[Vec2]
+) -> list[Vec2]:
+    """first から last まで（輪郭順、両端を含む）を bridge に替える。"""
+    if not bridge:
+        return points
+    n = len(points)
+    out = list(bridge)
+    index = (last + 1) % n
+    for _ in range(n):
+        if index == first:
+            return out
+        out.append(points[index])
+        index = (index + 1) % n
+    return points
+
+
+def _replace_chain(
+    points: list[Vec2], chain: list[int], bridge: list[Vec2]
+) -> list[Vec2]:
     """chain の内側を bridge に替える。輪郭の順は保つ。"""
     out = [points[chain[0]], *bridge]
     index = chain[-1]
@@ -156,13 +200,8 @@ def _replace_chain(points: list[Vec2], chain: list[int], bridge: list[Vec2]) -> 
     return out
 
 
-def _tangent_bridge(points: list[Vec2], chain: list[int]) -> list[Vec2]:
-    """残した側の接線で、くびれを三次曲線でつなぐ。"""
-    n = len(points)
-    start = points[chain[0]]
-    end = points[chain[-1]]
-    into = start - points[(chain[0] - 1) % n]
-    out = points[(chain[-1] + 1) % n] - end
+def _bridge(start: Vec2, into: Vec2, end: Vec2, out: Vec2) -> list[Vec2]:
+    """始点と終点の接線で、くびれを三次曲線でつなぐ。"""
     if into.length() < 1e-6 or out.length() < 1e-6:
         return []
     into = into.normalized()
@@ -175,7 +214,9 @@ def _tangent_bridge(points: list[Vec2], chain: list[int]) -> list[Vec2]:
     for step in range(1, 7):
         t = step / 7.0
         u = 1.0 - t
-        samples.append(start * (u**3) + c1 * (3 * u * u * t) + c2 * (3 * u * t * t) + end * (t**3))
+        samples.append(
+            start * (u**3) + c1 * (3 * u * u * t) + c2 * (3 * u * t * t) + end * (t**3)
+        )
     return samples
 
 
@@ -184,7 +225,9 @@ def _off_horizontal(delta: Vec2) -> float:
     return min(off, 180.0 - off)
 
 
-def _tangent_corner(origin: Vec2, start_tan: Vec2, end: Vec2, end_tan: Vec2) -> Vec2 | None:
+def _tangent_corner(
+    origin: Vec2, start_tan: Vec2, end: Vec2, end_tan: Vec2
+) -> Vec2 | None:
     """始点と終点の接線が交わる点。二次曲線はこの点を制御点にすると変曲しない。"""
     denom = start_tan.cross(end_tan)
     if abs(denom) < 1e-8:
@@ -256,7 +299,9 @@ def _fair_at_height(
     _y, index, nxt = min(edges, key=lambda item: abs(item[0] - height))
     if abs(_y - height) > 8.0:
         return points
-    return _fair_horizontal(points, index, nxt, min_side=min_side, min_arc=min_arc, reach=reach)
+    return _fair_horizontal(
+        points, index, nxt, min_side=min_side, min_arc=min_arc, reach=reach
+    )
 
 
 def _fair_horizontal(
@@ -300,7 +345,11 @@ def _fair_horizontal(
     sides = [side(pts[at]) for at in path]
     if _off_horizontal(first) <= 8.0 and min(sides) >= -2.0:
         return pts
-    start_tan = Vec2(1.0, 0.0) if pts[(junction + step) % n].x >= origin.x - 0.5 else Vec2(-1.0, 0.0)
+    start_tan = (
+        Vec2(1.0, 0.0)
+        if pts[(junction + step) % n].x >= origin.x - 0.5
+        else Vec2(-1.0, 0.0)
+    )
     landing: int | None = None
     control: Vec2 | None = None
     for at in range(1, len(path)):
@@ -361,7 +410,9 @@ def _x_on(span: list[Vec2], y: float) -> float:
     return min(span, key=lambda point: abs(point.y - y)).x
 
 
-def deepen_outer_waist(points: list[Vec2], *, depth: float = 30.0, half: float = 40.0) -> list[Vec2]:
+def deepen_outer_waist(
+    points: list[Vec2], *, depth: float = 30.0, half: float = 40.0
+) -> list[Vec2]:
     """右の二つの山のあいだだけ、外側の谷を鋭く左へ寄せる。内周は動かさない。"""
     pts = _ring(points)
     n = len(pts)
@@ -374,7 +425,11 @@ def deepen_outer_waist(points: list[Vec2], *, depth: float = 30.0, half: float =
         return pts
     right = max(point.x for point in pts)
     mid = (ymin + ymax) / 2.0
-    band = [index for index, point in enumerate(pts) if point.x > right - 110.0 and abs(point.y - mid) < span * 0.28]
+    band = [
+        index
+        for index, point in enumerate(pts)
+        if point.x > right - 110.0 and abs(point.y - mid) < span * 0.28
+    ]
     if len(band) < 3:
         return pts
     waist_at = min(band, key=lambda index: pts[index].x)
@@ -412,11 +467,15 @@ def deepen_outer_waist(points: list[Vec2], *, depth: float = 30.0, half: float =
     bridge: list[Vec2] = []
     for step in range(1, steps):
         y = span_pts[0].y + (span_pts[-1].y - span_pts[0].y) * step / steps
-        bridge.append(Vec2(_x_on(span_pts, y) - depth * _notch((y - waist.y) / half), y))
+        bridge.append(
+            Vec2(_x_on(span_pts, y) - depth * _notch((y - waist.y) / half), y)
+        )
     return _replace_chain(pts, chain, bridge)
 
 
-def smooth_side_pinches(points: list[Vec2], *, turn_lim: float = -100.0, reach: float = 70.0) -> list[Vec2]:
+def smooth_side_pinches(
+    points: list[Vec2], *, turn_lim: float = -100.0, reach: float = 70.0
+) -> list[Vec2]:
     """横から入った鋭いくびれだけを弧で埋める。上下に開いた股は触らない。"""
     pts = _ring(points)
     if len(pts) < 8:
@@ -427,18 +486,32 @@ def smooth_side_pinches(points: list[Vec2], *, turn_lim: float = -100.0, reach: 
         for i in range(n):
             if _turn(pts[(i - 1) % n], pts[i], pts[(i + 1) % n]) > turn_lim:
                 continue
-            if _level_edge(pts[(i - 1) % n], pts[i]) or _level_edge(pts[i], pts[(i + 1) % n]):
+            if _level_edge(pts[(i - 1) % n], pts[i]) or _level_edge(
+                pts[i], pts[(i + 1) % n]
+            ):
                 # セリフの下面と画の付け根。くびれではない。
                 continue
-            chain = _chain_through(pts, _walk(pts, i, -1, reach), _walk(pts, i, 1, reach), i)
-            if chain is None or len(chain) < 3:
-                continue
-            start, end = pts[chain[0]], pts[chain[-1]]
+            back_from, back_to, back_t, start = _cut_at(pts, i, -1, reach)
+            fwd_from, fwd_to, fwd_t, end = _cut_at(pts, i, 1, reach)
             if abs(end.y - start.y) < abs(end.x - start.x) * 1.5:
                 continue
             if _chord_depth(pts[i], start, end) < 25.0:
                 continue
-            pts = _replace_chain(pts, chain, _tangent_bridge(pts, chain))
+            drop_first = back_to if back_t < 1.0 - 1e-9 else (back_to + 1) % n
+            drop_last = fwd_from if fwd_t > 1e-9 else (fwd_from - 1) % n
+            chain = _chain_through(pts, drop_first, drop_last, i)
+            if chain is None or i not in chain or len(chain) > n // 2:
+                continue
+            samples = _bridge(
+                start, pts[back_to] - pts[back_from], end, pts[fwd_to] - pts[fwd_from]
+            )
+            bridge: list[Vec2] = []
+            if (start - pts[(drop_first - 1) % n]).length() > 1e-6:
+                bridge.append(start)
+            bridge.extend(samples)
+            if (end - pts[(drop_last + 1) % n]).length() > 1e-6:
+                bridge.append(end)
+            pts = _drop_span(pts, drop_first, drop_last, bridge)
             replaced = True
             break
         if not replaced:
@@ -446,7 +519,9 @@ def smooth_side_pinches(points: list[Vec2], *, turn_lim: float = -100.0, reach: 
     return pts
 
 
-def blunt_inner_peak(points: list[Vec2], *, band: float = 50.0, gap: float = 6.0) -> list[Vec2]:
+def blunt_inner_peak(
+    points: list[Vec2], *, band: float = 50.0, gap: float = 6.0
+) -> list[Vec2]:
     """外の端より内側で、カウンターに突き出した尖りを隣との弦まで落とす。"""
     pts = _ring(points)
     n = len(pts)
@@ -461,8 +536,18 @@ def blunt_inner_peak(points: list[Vec2], *, band: float = 50.0, gap: float = 6.0
         nxt = pts[(index + 1) % n]
         if abs(_turn(prev, point, nxt)) < 30.0 or abs(nxt.x - prev.x) < 1.0:
             continue
-        high = point.y > ymax - band and point.y < ymax - gap and prev.y < point.y - 2.0 and nxt.y < point.y - 2.0
-        low = point.y < ymin + band and point.y > ymin + gap and prev.y > point.y + 2.0 and nxt.y > point.y + 2.0
+        high = (
+            point.y > ymax - band
+            and point.y < ymax - gap
+            and prev.y < point.y - 2.0
+            and nxt.y < point.y - 2.0
+        )
+        low = (
+            point.y < ymin + band
+            and point.y > ymin + gap
+            and prev.y > point.y + 2.0
+            and nxt.y > point.y + 2.0
+        )
         if not high and not low:
             continue
         t = (point.x - prev.x) / (nxt.x - prev.x)
@@ -471,7 +556,9 @@ def blunt_inner_peak(points: list[Vec2], *, band: float = 50.0, gap: float = 6.0
     return out
 
 
-def fill_crown_saddle(points: list[Vec2], *, depth: float = 40.0, gap: float = 30.0) -> list[Vec2]:
+def fill_crown_saddle(
+    points: list[Vec2], *, depth: float = 40.0, gap: float = 30.0
+) -> list[Vec2]:
     """上下の端で、2つの肩のあいだに浅く沈んだ所を肩から肩への直線で埋める。
 
     細い方向が水平のペンでは、ヘアラインの両側の太りが外へも膨らみ、頂が鞍形に凹む。
@@ -485,7 +572,11 @@ def fill_crown_saddle(points: list[Vec2], *, depth: float = 40.0, gap: float = 3
         top = max(range(n), key=height.__getitem__)
         best: list[int] | None = None
         for j in range(n):
-            if j == top or abs(pts[j].x - pts[top].x) < gap or height[j] < height[top] - depth:
+            if (
+                j == top
+                or abs(pts[j].x - pts[top].x) < gap
+                or height[j] < height[top] - depth
+            ):
                 continue
             if height[j] < height[j - 1] or height[j] < height[(j + 1) % n]:
                 continue
@@ -531,7 +622,10 @@ def bevel_apex_valley(points: list[Vec2]) -> list[Vec2]:
         return pts
     chains = [
         chain
-        for chain in (_chain_through(pts, left, right, left), _chain_through(pts, right, left, right))
+        for chain in (
+            _chain_through(pts, left, right, left),
+            _chain_through(pts, right, left, right),
+        )
         if chain is not None and len(chain) <= 4
     ]
     if not chains:
@@ -559,7 +653,9 @@ def _segment_angle(start: Vec2, end: Vec2) -> float | None:
 
 def _angle_spread(angles: list[float]) -> float:
     base = angles[0]
-    deltas = [((angle - base + math.pi) % (2.0 * math.pi)) - math.pi for angle in angles]
+    deltas = [
+        ((angle - base + math.pi) % (2.0 * math.pi)) - math.pi for angle in angles
+    ]
     return max(deltas) - min(deltas)
 
 
@@ -635,7 +731,9 @@ def _flatten_run(points: list[Vec2], start: int, end: int) -> list[Vec2]:
     return out
 
 
-def _stable_index(points: list[Vec2], start: int, step: int, limit_y: float, *, outward_x: float) -> int | None:
+def _stable_index(
+    points: list[Vec2], start: int, step: int, limit_y: float, *, outward_x: float
+) -> int | None:
     """先端から離れた外縁。外へ開く向きだけを外縁とみなす。"""
     n = len(points)
     for hop in range(1, 12):
@@ -675,7 +773,10 @@ def _drop_between(points: list[Vec2], start: int, end: int, step: int) -> list[V
         guard += 1
     if not middle or guard >= n:
         return points
-    if max(_chord_depth(points[index], points[start], points[end]) for index in middle) < 6.0:
+    if (
+        max(_chord_depth(points[index], points[start], points[end]) for index in middle)
+        < 6.0
+    ):
         return points
     if step > 0:
         chain = [start, *middle, end]

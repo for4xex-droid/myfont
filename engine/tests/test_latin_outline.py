@@ -9,6 +9,7 @@ from engine.latin.load import load_resolved
 from engine.latin.outline import _missing_extrema, fit_outline
 
 _GATES = (("modern", "H"), ("modern", "O"), ("pop", "H"), ("pop", "O"))
+_CLASSIC_FIT = (("classic", "O"), ("classic", "B"))
 
 
 def _area(points: list[tuple[float, float]]) -> float:
@@ -22,6 +23,31 @@ def _area(points: list[tuple[float, float]]) -> float:
 
 @pytest.mark.parametrize(("style", "glyph"), _GATES)
 def test_fit_stays_within_the_error_and_keeps_extrema(style, glyph):
+    resolved = load_resolved(glyph, style)
+    paths = fit_outline(build_glyph(resolved), resolved.style)
+    assert paths
+    assert all(_missing_extrema(path) == 0 for path in paths)
+
+
+@pytest.mark.parametrize(
+    ("style", "glyph", "limit"),
+    (
+        ("pop", "H", 16),
+        ("pop", "S", 32),
+        ("modern", "H", 12),
+        ("modern", "O", 12),
+        ("pop", "O", 12),
+    ),
+)
+def test_on_curve_points_stay_near_the_corners_and_extrema(style, glyph, limit):
+    resolved = load_resolved(glyph, style)
+    paths = fit_outline(build_glyph(resolved), resolved.style)
+    assert paths
+    assert all(len(path.segs) <= limit for path in paths)
+
+
+@pytest.mark.parametrize(("style", "glyph"), _CLASSIC_FIT)
+def test_classic_round_keeps_extrema_on_curve(style, glyph):
     resolved = load_resolved(glyph, style)
     paths = fit_outline(build_glyph(resolved), resolved.style)
     assert paths

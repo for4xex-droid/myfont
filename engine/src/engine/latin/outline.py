@@ -6,7 +6,12 @@ import math
 
 from pathops import Path, simplify
 
-from engine.curve_fit import ContourPath, fit_closed_contour, hausdorff_path_to_polyline
+from engine.curve_fit import (
+    ContourPath,
+    fit_closed_contour,
+    fit_pinned_contour,
+    hausdorff_path_to_polyline,
+)
 from engine.join_solver import count_contours
 from engine.latin.build import GlyphOutline
 from engine.latin.style import Style
@@ -44,7 +49,9 @@ def _near_axis(dx: float, dy: float, tol_deg: float) -> str | None:
     return None
 
 
-def _flat_enough(start: tuple[float, float], seg: tuple, end: tuple[float, float]) -> bool:
+def _flat_enough(
+    start: tuple[float, float], seg: tuple, end: tuple[float, float]
+) -> bool:
     """曲線でも、制御点が弦から 1 ユニット以内なら直線とみなす。"""
     if seg[0] == "L":
         return True
@@ -100,7 +107,9 @@ def _orient(path: ContourPath, *, hole: bool) -> ContourPath:
     return path
 
 
-def _lerp(a: tuple[float, float], b: tuple[float, float], t: float) -> tuple[float, float]:
+def _lerp(
+    a: tuple[float, float], b: tuple[float, float], t: float
+) -> tuple[float, float]:
     return (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
 
 
@@ -152,7 +161,17 @@ def _near(point: tuple[float, float], ring: list[tuple[float, float]]) -> float:
         start, end = ring[index], ring[(index + 1) % n]
         dx, dy = end[0] - start[0], end[1] - start[1]
         length = dx * dx + dy * dy
-        t = 0.0 if length < 1e-12 else max(0.0, min(1.0, ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / length))
+        t = (
+            0.0
+            if length < 1e-12
+            else max(
+                0.0,
+                min(
+                    1.0,
+                    ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / length,
+                ),
+            )
+        )
         qx, qy = start[0] + dx * t, start[1] + dy * t
         best = min(best, math.hypot(point[0] - qx, point[1] - qy))
     return best
@@ -164,7 +183,10 @@ def _shorter_chain(
     end: tuple[float, float],
 ) -> list[tuple[float, float]]:
     def index_of(point: tuple[float, float]) -> int:
-        return min(range(len(ring)), key=lambda i: math.hypot(ring[i][0] - point[0], ring[i][1] - point[1]))
+        return min(
+            range(len(ring)),
+            key=lambda i: math.hypot(ring[i][0] - point[0], ring[i][1] - point[1]),
+        )
 
     i0, i1 = index_of(start), index_of(end)
     chains: list[list[int]] = []
@@ -200,7 +222,10 @@ def _thin_chain(
     """弦から limit 以内の点を落とし、誤差を保ったまま節点を減らす。"""
     if len(chain) <= 2:
         return chain
-    index = max(range(1, len(chain) - 1), key=lambda i: _point_line_dist(chain[i], chain[0], chain[-1]))
+    index = max(
+        range(1, len(chain) - 1),
+        key=lambda i: _point_line_dist(chain[i], chain[0], chain[-1]),
+    )
     if _point_line_dist(chain[index], chain[0], chain[-1]) <= limit:
         return [chain[0], chain[-1]]
     left = _thin_chain(chain[: index + 1], limit)
@@ -208,7 +233,9 @@ def _thin_chain(
     return left[:-1] + right
 
 
-def _repair_strays(path: ContourPath, points: list[tuple[float, float]], limit: float) -> ContourPath:
+def _repair_strays(
+    path: ContourPath, points: list[tuple[float, float]], limit: float
+) -> ContourPath:
     """折れ線から limit より離れる cubic は、誤差以内まで間引いた折れ線に戻す。"""
     ring = points[:-1] if len(points) > 1 and points[0] == points[-1] else list(points)
     if len(ring) < 3:
@@ -216,12 +243,19 @@ def _repair_strays(path: ContourPath, points: list[tuple[float, float]], limit: 
     segs: list[tuple] = []
     cur = path.start
     for seg in path.segs:
-        end = (float(seg[1]), float(seg[2])) if seg[0] == "L" else (float(seg[5]), float(seg[6]))
+        end = (
+            (float(seg[1]), float(seg[2]))
+            if seg[0] == "L"
+            else (float(seg[5]), float(seg[6]))
+        )
         stray = False
         if seg[0] == "C":
             p1 = (float(seg[1]), float(seg[2]))
             p2 = (float(seg[3]), float(seg[4]))
-            stray = any(_near(_cubic_at(cur, p1, p2, end, t / 8.0), ring) > limit for t in range(1, 8))
+            stray = any(
+                _near(_cubic_at(cur, p1, p2, end, t / 8.0), ring) > limit
+                for t in range(1, 8)
+            )
         if stray:
             for point in _thin_chain(_shorter_chain(ring, cur, end), limit)[1:]:
                 segs.append(("L", point[0], point[1]))
@@ -233,14 +267,19 @@ def _repair_strays(path: ContourPath, points: list[tuple[float, float]], limit: 
     return ContourPath(start=path.start, segs=segs)
 
 
-def _flatten_true_lines(path: ContourPath, points: list[tuple[float, float]], tol: float = 1.0) -> ContourPath:
+def _flatten_true_lines(
+    path: ContourPath, points: list[tuple[float, float]], tol: float = 1.0
+) -> ContourPath:
     """元の折れ線が弦から tol 以内なら、膨らんだ cubic を直線に戻す。"""
     ring = points[:-1] if len(points) > 1 and points[0] == points[-1] else list(points)
     if len(ring) < 3:
         return path
 
     def index_of(point: tuple[float, float]) -> int:
-        return min(range(len(ring)), key=lambda i: math.hypot(ring[i][0] - point[0], ring[i][1] - point[1]))
+        return min(
+            range(len(ring)),
+            key=lambda i: math.hypot(ring[i][0] - point[0], ring[i][1] - point[1]),
+        )
 
     def straight(start: tuple[float, float], end: tuple[float, float]) -> bool:
         i0, i1 = index_of(start), index_of(end)
@@ -269,7 +308,11 @@ def _flatten_true_lines(path: ContourPath, points: list[tuple[float, float]], to
     segs: list[tuple] = []
     cur = path.start
     for seg in path.segs:
-        end = (float(seg[1]), float(seg[2])) if seg[0] == "L" else (float(seg[5]), float(seg[6]))
+        end = (
+            (float(seg[1]), float(seg[2]))
+            if seg[0] == "L"
+            else (float(seg[5]), float(seg[6]))
+        )
         if seg[0] == "C" and straight(cur, end):
             segs.append(("L", end[0], end[1]))
         else:
@@ -305,9 +348,29 @@ def _insert_extrema(path: ContourPath) -> ContourPath:
             if not 0.0 < local < 1.0:
                 continue
             left, piece = _split_cubic(*piece, local)
-            segs.append(("C", left[1][0], left[1][1], left[2][0], left[2][1], left[3][0], left[3][1]))
+            segs.append(
+                (
+                    "C",
+                    left[1][0],
+                    left[1][1],
+                    left[2][0],
+                    left[2][1],
+                    left[3][0],
+                    left[3][1],
+                )
+            )
             prev = root
-        segs.append(("C", piece[1][0], piece[1][1], piece[2][0], piece[2][1], piece[3][0], piece[3][1]))
+        segs.append(
+            (
+                "C",
+                piece[1][0],
+                piece[1][1],
+                piece[2][0],
+                piece[2][1],
+                piece[3][0],
+                piece[3][1],
+            )
+        )
         cur = p3
     return ContourPath(start=path.start, segs=segs)
 
@@ -319,7 +382,14 @@ def _skia(path: ContourPath) -> Path:
         if seg[0] == "L":
             skia.lineTo(float(seg[1]), float(seg[2]))
         else:
-            skia.cubicTo(float(seg[1]), float(seg[2]), float(seg[3]), float(seg[4]), float(seg[5]), float(seg[6]))
+            skia.cubicTo(
+                float(seg[1]),
+                float(seg[2]),
+                float(seg[3]),
+                float(seg[4]),
+                float(seg[5]),
+                float(seg[6]),
+            )
     skia.close()
     return skia
 
@@ -352,33 +422,68 @@ def _missing_extrema(path: ContourPath) -> int:
     return missing
 
 
+def _post(
+    path: ContourPath, points: list[tuple[float, float]], curve: dict, *, hole: bool
+) -> ContourPath:
+    path = _repair_strays(path, points, float(curve["max_error"]))
+    path = _flatten_true_lines(path, points)
+    path = _round(_rotate_start(_insert_extrema(_snap(path, 0.5))))
+    # 整数への丸めで、端から 1 単位をわずかに超える極値が生まれる。もう一度入れて丸める。
+    path = _round(_insert_extrema(path))
+    return _orient(_rotate_start(path), hole=hole)
+
+
+def _reject(
+    path: ContourPath, points: list[tuple[float, float]], limit: float, glyph: str
+) -> str | None:
+    error = hausdorff_path_to_polyline(path, points)
+    if error > limit:
+        return f"{glyph}: fit error {error:.3f} > {limit:.3f}"
+    skia = _skia(path)
+    simplified = simplify(skia, fix_winding=True)
+    if count_contours(skia) != count_contours(simplified):
+        return f"{glyph}: self-intersection after rounding"
+    if _missing_extrema(path) > 0:
+        return f"{glyph}: extrema are not on-curve points"
+    return None
+
+
 def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
-    """様式の誤差上限でフィットする。極値を入れ、丸め後に誤差と自己交差を見る。"""
+    """様式の誤差上限でフィットする。極値を入れ、丸め後に誤差と自己交差を見る。
+
+    角と極値を固定したフィットと、従来のフィットを比べ、オンカーブ点が少ない方を採る。
+    """
     curve = style.curve
     limit = float(curve["max_error"]) + 0.75
     fitted: list[tuple[tuple[float, float], ContourPath]] = []
     for contour, hole in zip(outline.contours, outline.holes):
         points = [(p.x, p.y) for p in contour]
-        path, _meta = fit_closed_contour(
+        primary, _meta = fit_closed_contour(
             points,
             max_error_upm=float(curve["max_error"]),
             corner_deg=float(curve["corner_deg"]),
             max_anchors=int(curve["max_anchors_per_contour"]),
         )
-        path = _repair_strays(path, points, float(curve["max_error"]))
-        path = _flatten_true_lines(path, points)
-        path = _round(_rotate_start(_insert_extrema(_snap(path, 0.5))))
-        path = _orient(_rotate_start(path), hole=hole)
-        error = hausdorff_path_to_polyline(path, points)
-        if error > limit:
-            raise ValueError(f"{outline.glyph}: fit error {error:.3f} > {limit:.3f}")
-        skia = _skia(path)
-        simplified = simplify(skia, fix_winding=True)
-        if count_contours(skia) != count_contours(simplified):
-            raise ValueError(f"{outline.glyph}: self-intersection after rounding")
-        if _missing_extrema(path) > 0:
-            raise ValueError(f"{outline.glyph}: extrema are not on-curve points")
-        origin = min(path.on_curve_points(), key=lambda p: (p[1], p[0]))
-        fitted.append((origin, path))
+        pinned = fit_pinned_contour(
+            points,
+            max_error_upm=float(curve["max_error"]),
+            corner_deg=float(curve["corner_deg"]),
+        )
+        chosen: ContourPath | None = None
+        reason = f"{outline.glyph}: fit failed"
+        for candidate in (primary, pinned):
+            if candidate is None:
+                continue
+            path = _post(candidate, points, curve, hole=hole)
+            rejection = _reject(path, points, limit, outline.glyph)
+            if rejection is not None:
+                reason = rejection
+                continue
+            if chosen is None or len(path.segs) < len(chosen.segs):
+                chosen = path
+        if chosen is None:
+            raise ValueError(reason)
+        origin = min(chosen.on_curve_points(), key=lambda p: (p[1], p[0]))
+        fitted.append((origin, chosen))
     fitted.sort(key=lambda item: (item[0][1], item[0][0]))
     return tuple(path for _origin, path in fitted)

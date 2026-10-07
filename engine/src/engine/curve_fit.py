@@ -72,9 +72,7 @@ class ContourPath:
                 new_segs.append(("L", dest[0], dest[1]))
             else:
                 c1, c2 = ctrls[i]  # type: ignore[misc]
-                new_segs.append(
-                    ("C", c2[0], c2[1], c1[0], c1[1], dest[0], dest[1])
-                )
+                new_segs.append(("C", c2[0], c2[1], c1[0], c1[1], dest[0], dest[1]))
         return ContourPath(start=pts[-1], segs=new_segs)
 
     def anchor_count(self) -> int:
@@ -293,7 +291,9 @@ def _reparam_newton(
     return out
 
 
-def _fit_cubic(pts: Sequence[Point], *, reparam_iters: int = 3) -> tuple[Point, Point, Point, Point] | None:
+def _fit_cubic(
+    pts: Sequence[Point], *, reparam_iters: int = 3
+) -> tuple[Point, Point, Point, Point] | None:
     """端点固定の最小二乗 cubic（弦長初期値＋Newton 再パラメータ）。"""
     if len(pts) < 2:
         return None
@@ -343,9 +343,7 @@ def _fit_open(
     # ほぼ共線なら直線
     if len(pts) >= 3:
         a, b = pts[0], pts[-1]
-        mid_err = max(
-            _perp_dist_local(p, a, b) for p in pts[1:-1]
-        )
+        mid_err = max(_perp_dist_local(p, a, b) for p in pts[1:-1])
         if mid_err <= max_error * 0.5:
             return [("L", b[0], b[1])]
 
@@ -358,11 +356,7 @@ def _fit_open(
     err, idx = _max_error_cubic(pts, cubic)
     if err <= max_error or depth >= max_depth or idx <= 0 or idx >= len(pts) - 1:
         p0, p1, p2, p3 = cubic
-        if (
-            _dist(p0, p1) < 0.25
-            and _dist(p2, p3) < 0.25
-            and _dist(p0, p3) > 1e-6
-        ):
+        if _dist(p0, p1) < 0.25 and _dist(p2, p3) < 0.25 and _dist(p0, p3) > 1e-6:
             return [("L", p3[0], p3[1])]
         return [("C", p1[0], p1[1], p2[0], p2[1], p3[0], p3[1])]
 
@@ -507,6 +501,52 @@ def _fit_once(
         "points_source": len(pts),
     }
     return path, meta
+
+
+def _polyline_extrema(pts: Sequence[Point]) -> list[int]:
+    """隣と符号が変わる x・y の極値。平らな辺の途中は含めない。"""
+    found: list[int] = []
+    count = len(pts)
+    for index in range(count):
+        prev, cur, nxt = pts[index - 1], pts[index], pts[(index + 1) % count]
+        for axis in (0, 1):
+            if (cur[axis] - prev[axis]) * (nxt[axis] - cur[axis]) < 0.0:
+                found.append(index)
+                break
+    return found
+
+
+def fit_pinned_contour(
+    points: Sequence[Point],
+    *,
+    max_error_upm: float,
+    corner_deg: float,
+) -> ContourPath | None:
+    """角と極値を固定し、その区間を誤差以内の三次曲線でつなぐ。
+
+    区間は誤差を超えたときだけ分割する。節点はオンカーブ点で数える。
+    """
+    pts = _open_ring(points)
+    if len(pts) < 3:
+        return None
+    pins = sorted(
+        set(detect_corners(pts, angle_deg=corner_deg, min_sep_upm=10.0))
+        | set(_polyline_extrema(pts))
+    )
+    if len(pins) < 2:
+        far = max(range(1, len(pts)), key=lambda index: _dist(pts[index], pts[0]))
+        pins = sorted({0, far})
+    segs: list[tuple] = []
+    for index, start_at in enumerate(pins):
+        end_at = pins[(index + 1) % len(pins)]
+        if end_at > start_at:
+            chain = pts[start_at : end_at + 1]
+        else:
+            chain = pts[start_at:] + pts[: end_at + 1]
+        segs.extend(_fit_open(chain, max_error=max_error_upm))
+    if not segs:
+        return None
+    return ContourPath(start=pts[pins[0]], segs=segs)
 
 
 def fit_closed_contour(
