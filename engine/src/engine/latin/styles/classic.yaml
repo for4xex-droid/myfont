@@ -1,4 +1,4 @@
-style_id: classic_v1
+style_id: classic_v2
 cap_height: 700
 overshoot: {round: 0.016, apex: 0.020}
 pen: {type: nib, stem: 0.145, bar_ratio: 0.42, hairline: 0.058, theta_deg: 30}
@@ -11,4 +11,4 @@ micro_area_floor: 400
 curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 groups:
   diagonal: {stem_ratio: 1.04}
-metrics: {serif_length: 0.22, serif_thick: 0.038, bracket: 0.04, round_frac: 0.5}
+metrics: {serif_length: 0.22, serif_thick: 0.038, bracket: 0.04, round_frac: 0.5, bar_y: 0.52, apex_flat: 0.30, apex_taper: 0.90}

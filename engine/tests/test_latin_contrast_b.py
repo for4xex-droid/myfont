@@ -482,7 +482,7 @@ def test_contrast_b_ignores_hug_and_sample_count(style):
 
 @pytest.mark.parametrize(("glyph", "style"), _UNCHANGED)
 def test_other_glyphs_keep_their_outline(glyph, style):
-    """形は保存した輪郭のまま。2026-10-07、字間を墨基準にしたので x だけ平行移動している。"""
+    """形は保存した輪郭のまま。2026-10-07、字間を墨基準にしたので x だけ平行移動し、H の横棒は 0.48 から 0.52 へ上げ、シックの右脚を幹の 0.40 にした。2026-10-08、V は外縁と切り口で先端を作り、脚全体を一次に細くし、斜画のセリフを水平な下面と垂直な端に変えた。"""
     saved = json.loads(_FIXTURE.read_text())[f"{style}/{glyph}"]
     outline = build_glyph(load_resolved(glyph, style))
     assert outline.contour_count == len(saved["contours"])

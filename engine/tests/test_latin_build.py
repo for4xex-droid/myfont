@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from itertools import pairwise
 
 import pytest
@@ -356,15 +357,17 @@ def _horizontal_chords(outline, y: float) -> list[float]:
     return [xs[index + 1] - xs[index] for index in range(0, len(xs) - 1, 2)]
 
 
-def test_chic_v_arms_have_the_same_weight():
-    """垂直軸のディドンでは、左右の斜めはステム幅。右脚をヘアラインにしない。"""
+def test_chic_v_right_leg_is_slanted_thin():
+    """右脚は幹の 0.40。ヘアラインの針にはしない。平らな切り口で脚は股より下で一つになる。"""
     resolved = load_resolved("V", "chic")
     outline = build_glyph(resolved)
-    stem = resolved.pen.stem * resolved.style.cap_height
+    hairline = resolved.style.pen.hairline * resolved.style.cap_height
     for y in (400.0, 600.0):
         left, right = _horizontal_chords(outline, y)
-        assert left == pytest.approx(right, rel=0.05)
-        assert left > stem
+        assert right == pytest.approx(left * 0.40, rel=0.08)
+        assert right > hairline * 3.0
+    assert len(_ink_runs(outline, 150.0)) == 1
+    assert len(_ink_runs(outline, 400.0)) == 2
 
 
 def test_classic_v_right_arm_follows_the_pen():
@@ -418,3 +421,65 @@ def test_pop_h_is_heavier_than_modern_and_chic_o_is_narrower():
         xs = [p.x for c in outline.contours for p in c]
         return max(xs) - min(xs)
     assert width(chic_o) < width(modern_o) * 0.85
+
+
+def _bar_band(outline) -> tuple[float, float]:
+    """字の左右の中央を縦に切った、横棒の下端と上端。"""
+    xs = [
+        point.x
+        for contour, hole in zip(outline.contours, outline.holes)
+        if not hole
+        for point in contour
+    ]
+    x = (min(xs) + max(xs)) / 2.0
+    ys = []
+    for contour in outline.contours:
+        ring = list(contour)
+        for start, end in pairwise(ring + ring[:1]):
+            if (start.x - x) * (end.x - x) > 0.0 or abs(end.x - start.x) < 1e-9:
+                continue
+            t = (x - start.x) / (end.x - start.x)
+            if 0.0 <= t < 1.0:
+                ys.append(start.y + (end.y - start.y) * t)
+    ys.sort()
+    assert len(ys) == 2
+    return ys[0], ys[1]
+
+
+@pytest.mark.parametrize("style", STYLES)
+def test_h_bar_sits_at_the_style_height(style):
+    """横棒の中心は様式の 0.52。上の空きは下の 0.88–0.95 倍。"""
+    outline = build_glyph(load_resolved("H", style))
+    bottom, top = _bar_band(outline)
+    cap = 700.0
+    assert (bottom + top) / 2.0 == pytest.approx(0.52 * cap, abs=1.0)
+    assert 0.88 <= (cap - top) / bottom <= 0.95
+    for y in (150.0, 250.0, 520.0, 620.0):
+        assert y < bottom or y > top
+
+
+def _ink_runs(outline, y: float) -> list[tuple[float, float]]:
+    xs: list[float] = []
+    for contour in outline.contours:
+        ring = list(contour)
+        for start, end in pairwise(ring + ring[:1]):
+            if (start.y - y) * (end.y - y) > 0.0 or abs(end.y - start.y) < 1e-9:
+                continue
+            t = (y - start.y) / (end.y - start.y)
+            if 0.0 <= t < 1.0:
+                xs.append(start.x + (end.x - start.x) * t)
+    xs.sort()
+    return [(xs[index], xs[index + 1]) for index in range(0, len(xs) - 1, 2)]
+
+
+def test_h_bar_ignores_the_skeleton_height():
+    resolved = load_resolved("H", "modern")
+    strokes = tuple(
+        replace(stroke, knots=tuple(replace(knot, y=0.30) for knot in stroke.knots))
+        if stroke.role == "bar"
+        else stroke
+        for stroke in resolved.skeleton.strokes
+    )
+    moved = replace(resolved, skeleton=replace(resolved.skeleton, strokes=strokes))
+    bottom, top = _bar_band(build_glyph(moved))
+    assert (bottom + top) / 2.0 == pytest.approx(0.52 * 700.0, abs=1.0)

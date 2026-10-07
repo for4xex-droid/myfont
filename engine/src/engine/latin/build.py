@@ -175,9 +175,16 @@ def _widths(
 ) -> list[float]:
     cap = resolved.style.cap_height
     widths: list[float] = []
+    slant = None
+    if stroke.role == "slant_thin":
+        if "slant_thin" not in resolved.style.metrics:
+            raise ValueError(f"{resolved.skeleton.glyph}: metrics.slant_thin required")
+        slant = float(resolved.style.metrics["slant_thin"])
     for _pos, tangent in samples:
         angle = math.atan2(tangent.y, tangent.x)
-        widths.append(half_width(resolved.pen, stroke.role, angle) * cap)
+        widths.append(
+            half_width(resolved.pen, stroke.role, angle, slant_ratio=slant) * cap
+        )
     factor = resolved.style.joins["crotch_thin"]
     ends = {stroke.ends[0], stroke.ends[1]}
     crotch = any(
@@ -567,6 +574,295 @@ def _stroke_paths(
     return paths
 
 
+def _metric(resolved: Resolved, key: str) -> float:
+    if key not in resolved.style.metrics:
+        raise ValueError(f"{resolved.skeleton.glyph}: metrics.{key} required")
+    return float(resolved.style.metrics[key])
+
+
+def _apex_join(resolved: Resolved):
+    for join in resolved.skeleton.joins:
+        if join.type in ("apex", "apex_cut"):
+            return join
+    return None
+
+
+def _at_y(start: Vec2, end: Vec2, y: float) -> Vec2:
+    if abs(end.y - start.y) < 1e-9:
+        return Vec2(end.x, y)
+    t = (y - start.y) / (end.y - start.y)
+    return start + (end - start) * t
+
+
+def _quad(a: Vec2, control: Vec2, b: Vec2, steps: int = 8) -> list[Vec2]:
+    points: list[Vec2] = []
+    for i in range(steps + 1):
+        t = i / steps
+        u = 1.0 - t
+        points.append(a * (u * u) + control * (2.0 * u * t) + b * (t * t))
+    return points
+
+
+def _leg_width(stroke: Stroke, resolved: Resolved, direction: Vec2) -> float:
+    angle = math.atan2(direction.y, direction.x)
+    slant = None
+    if stroke.role == "slant_thin":
+        slant = _metric(resolved, "slant_thin")
+    return half_width(resolved.pen, stroke.role, angle, slant_ratio=slant) * resolved.style.cap_height * 2.0
+
+
+def _outward(direction: Vec2, toward: float) -> Vec2:
+    normal = direction.perpendicular().normalized()
+    if normal.x * toward > 0.0:
+        normal = -normal
+    return normal
+
+
+def _apex_paths(resolved: Resolved, join) -> list[Path]:
+    """頂点は外縁と切り口で決める。脚の縁は直線で、太さは脚全体で一次に変わる。"""
+    by_id = {stroke.id: stroke for stroke in resolved.skeleton.strokes}
+    left = by_id[join.a]
+    right = by_id[join.b]
+    frame = _plain_frame(left, resolved)
+    cap = resolved.style.cap_height
+    tip_y = -resolved.style.overshoot["apex"] * cap
+    stem = resolved.style.pen.stem * cap
+    taper = _metric(resolved, "apex_taper")
+
+    def foot_of(stroke: Stroke) -> Vec2:
+        knot = stroke.knots[0] if stroke.ends[0] != "apex" else stroke.knots[-1]
+        x, y = frame((knot.x, knot.y))
+        return Vec2(x, y)
+
+    def apex_x(stroke: Stroke) -> float:
+        knot = stroke.knots[-1] if stroke.ends[1] == "apex" else stroke.knots[0]
+        return frame((knot.x, knot.y))[0]
+
+    axis = (apex_x(left) + apex_x(right)) / 2.0
+    kind = resolved.style.terminals["apex"]
+    if kind == "round":
+        radius = _metric(resolved, "apex_round") * stem
+        return _round_apex(resolved, left, right, foot_of, axis, tip_y, radius, taper, cap)
+    flat = _metric(resolved, "apex_flat") * stem
+    ends = (Vec2(axis - flat / 2.0, tip_y), Vec2(axis + flat / 2.0, tip_y))
+    legs = [
+        _straight_leg(left, resolved, foot_of(left), ends[0], -1.0, taper, cap),
+        _straight_leg(right, resolved, foot_of(right), ends[1], 1.0, taper, cap),
+    ]
+    covered = []
+    for leg, far in ((legs[0], ends[1]), (legs[1], ends[0])):
+        top, tip, inner, inner_top = leg.quad
+        covered.append(_to_path([top, tip, far, inner, inner_top]))
+    ink = _intersect(_union_all(covered), _to_path(_flat_envelope(legs, cap)))
+    return [ink, *(_serif_paths(leg, resolved, cap) for leg in legs)]
+
+
+@dataclass(frozen=True)
+class _Leg:
+    stroke: Stroke
+    quad: list[Vec2]
+    outer_top: Vec2
+    inner_top: Vec2
+    outer_line: tuple[Vec2, Vec2]
+    width: float
+    outward: float
+
+
+def _straight_leg(
+    stroke: Stroke,
+    resolved: Resolved,
+    foot: Vec2,
+    outer_tip: Vec2,
+    outward_x: float,
+    taper: float,
+    cap: float,
+) -> _Leg:
+    direction = (outer_tip - foot).normalized()
+    width = _leg_width(stroke, resolved, direction)
+    outward = _outward(direction, -outward_x)
+    outer_foot = foot + outward * (width / 2.0)
+    outer_line = (outer_foot, outer_tip)
+    inward = -_outward(outer_tip - outer_foot, -outward_x)
+    inner_foot = outer_foot + inward * width
+    inner_tip = outer_tip + inward * (width * taper)
+    outer_top = _at_y(outer_foot, outer_tip, cap)
+    inner_top = _at_y(inner_foot, inner_tip, cap)
+    quad = [outer_top, outer_tip, inner_tip, inner_top]
+    return _Leg(stroke, quad, outer_top, inner_top, outer_line, width, outward_x)
+
+
+def _flat_envelope(legs: list[_Leg], cap: float) -> list[Vec2]:
+    left, right = legs
+    return [left.outer_top, left.quad[1], right.quad[1], right.outer_top, Vec2(right.outer_top.x, cap), Vec2(left.outer_top.x, cap)]
+
+
+def _intersect(outer: Path, inner: Path) -> Path:
+    return op(outer, inner, PathOp.INTERSECTION)
+
+
+def _round_apex(
+    resolved: Resolved,
+    left: Stroke,
+    right: Stroke,
+    foot_of,
+    axis: float,
+    tip_y: float,
+    radius: float,
+    taper: float,
+    cap: float,
+) -> list[Path]:
+    """外縁は足の円と先端の円に接する直線。いちばん低い点は先端の円の底。"""
+    tip = Vec2(axis, tip_y + radius)
+    paths = [_to_path(_disk(tip, radius, -math.pi / 2.0))]
+    legs = []
+    for stroke, sign in ((left, -1.0), (right, 1.0)):
+        foot = foot_of(stroke)
+        direction = (Vec2(axis, tip_y) - foot).normalized()
+        width = _leg_width(stroke, resolved, direction)
+        center = Vec2(foot.x, cap - width / 2.0)
+        paths.append(_to_path(_disk(center, width / 2.0, math.pi / 2.0)))
+        legs.append(_round_leg(center, width, tip, radius, sign, taper))
+    crotch = _line_hit(legs[0][3], legs[0][4], legs[1][3], legs[1][4])
+    for center, outer_foot, outer_tip, inner_foot, _target in legs:
+        paths.append(_to_path([outer_foot, outer_tip, tip, crotch, inner_foot, center]))
+    return paths
+
+
+def _disk(center: Vec2, radius: float, lock_angle: float) -> list[Vec2]:
+    steps = 64
+    return [
+        Vec2(
+            center.x + radius * math.cos(lock_angle + 2.0 * math.pi * i / steps),
+            center.y + radius * math.sin(lock_angle + 2.0 * math.pi * i / steps),
+        )
+        for i in range(steps)
+    ]
+
+
+def _external_tangents(start: Vec2, start_r: float, end: Vec2, end_r: float) -> list[tuple[Vec2, Vec2]]:
+    delta = end - start
+    dist = delta.length()
+    if dist <= abs(start_r - end_r) + 1.0:
+        raise ValueError("apex round overlaps the foot")
+    vx, vy = delta.x / dist, delta.y / dist
+    ratio = (start_r - end_r) / dist
+    span = math.sqrt(max(0.0, 1.0 - ratio * ratio))
+    found = []
+    for sign in (-1.0, 1.0):
+        nx = vx * ratio - sign * span * vy
+        ny = vy * ratio + sign * span * vx
+        found.append(
+            (
+                Vec2(start.x + start_r * nx, start.y + start_r * ny),
+                Vec2(end.x + end_r * nx, end.y + end_r * ny),
+            )
+        )
+    return found
+
+
+def _round_leg(
+    foot: Vec2,
+    width: float,
+    tip: Vec2,
+    tip_r: float,
+    sign: float,
+    taper: float,
+) -> tuple[Vec2, Vec2, Vec2, Vec2, Vec2]:
+    radius = width / 2.0
+    tangents = _external_tangents(foot, radius, tip, tip_r)
+    outer = max(tangents, key=lambda seg: (seg[0].x - foot.x) * sign)
+    inward = -_outward(outer[1] - outer[0], -sign)
+    target = outer[1] + inward * (width * taper)
+    inner = _tangent_from(foot, radius, target, sign)
+    return foot, outer[0], outer[1], inner, target
+
+
+def _line_hit(a0: Vec2, a1: Vec2, b0: Vec2, b1: Vec2) -> Vec2:
+    da, db = a1 - a0, b1 - b0
+    det = da.cross(db)
+    if abs(det) < 1e-9:
+        return (a1 + b1) * 0.5
+    t = (b0 - a0).cross(db) / det
+    return a0 + da * t
+
+
+def _tangent_from(center: Vec2, radius: float, target: Vec2, sign: float) -> Vec2:
+    delta = target - center
+    dist2 = delta.dot(delta)
+    disc = dist2 - radius * radius
+    if disc <= 1.0:
+        return center + delta.normalized() * radius
+    root = math.sqrt(disc)
+    scale = radius / dist2
+    points = (
+        Vec2(
+            center.x + scale * (radius * delta.x + root * delta.y),
+            center.y + scale * (radius * delta.y - root * delta.x),
+        ),
+        Vec2(
+            center.x + scale * (radius * delta.x - root * delta.y),
+            center.y + scale * (radius * delta.y + root * delta.x),
+        ),
+    )
+    return max(points, key=lambda point: (point.x - center.x) * -sign)
+
+
+def _serif_paths(leg: _Leg, resolved: Resolved, cap: float) -> Path:
+    stroke = leg.stroke
+    tag = stroke.ends[0] if stroke.ends[0] != "apex" else stroke.ends[1]
+    kind = resolved.style.terminals[tag]
+    if kind not in _SERIF_KINDS:
+        return Path()
+    thick = max(resolved.style.metrics.get("serif_thick", 0.02) * cap, 1.0)
+    length = resolved.style.metrics.get("serif_length", 0.12) * cap
+    if kind == "spur":
+        length *= 0.45
+    underside = cap - thick
+    outer_edge = leg.outer_line
+    inner_edge = (leg.quad[3], leg.quad[2])
+    outer_xs = (_at_y(*outer_edge, cap).x, _at_y(*outer_edge, underside).x)
+    inner_xs = (_at_y(*inner_edge, cap).x, _at_y(*inner_edge, underside).x)
+    if leg.outward < 0.0:
+        outer_x, inner_x = min(outer_xs), max(inner_xs)
+    else:
+        outer_x, inner_x = max(outer_xs), min(inner_xs)
+    extra = max(length - abs(inner_x - outer_x), thick * 2.0)
+    outer_extra = extra * 0.62
+    inner_extra = extra - outer_extra
+    if leg.outward < 0.0:
+        lo = outer_x - outer_extra
+        hi = inner_x + inner_extra
+    else:
+        lo = inner_x - inner_extra
+        hi = outer_x + outer_extra
+    slab = [Vec2(lo, cap), Vec2(hi, cap), Vec2(hi, cap - thick), Vec2(lo, cap - thick)]
+    paths = [_to_path(slab)]
+    if kind == "serif_bracketed":
+        reach = resolved.style.metrics.get("bracket", 0.0) * cap
+        if reach > 1.0:
+            for edge in (leg.outer_line, (leg.quad[3], leg.quad[2])):
+                paths.append(_to_path(_bracket_fillet(edge, cap - thick, reach, lo, hi)))
+    return _union_all(paths)
+
+
+def _bracket_fillet(
+    edge: tuple[Vec2, Vec2], underside: float, reach: float, lo: float, hi: float
+) -> list[Vec2]:
+    """下面と脚の縁を、両端で接線がつながる凹の曲線でつなぐ。"""
+    start, end = edge
+    if abs(end.y - start.y) < 1e-6:
+        return [start, end]
+    corner = _at_y(start, end, underside)
+    direction = (end - start).normalized()
+    if direction.y > 0.0:
+        direction = -direction
+    along = corner + direction * reach
+    outward = -1.0 if corner.x <= (lo + hi) / 2.0 else 1.0
+    side = Vec2(max(lo, min(hi, corner.x + outward * reach)), underside)
+    curve = _quad(side, corner, along, 48)
+    return [*curve, corner]
+
+
 _CUT_KINDS = ("flat", "apex_sharp", "apex_cut")
 _SERIF_KINDS = ("serif_bracketed", "serif_hairline", "spur")
 
@@ -782,6 +1078,25 @@ def _contrast_path(
     return _to_path(polygon)
 
 
+def _raise_bars(resolved: Resolved) -> Resolved:
+    """横棒の中心は骨格の y ではなく、様式の metrics.bar_y。"""
+    strokes = []
+    changed = False
+    for stroke in resolved.skeleton.strokes:
+        if stroke.role != "bar":
+            strokes.append(stroke)
+            continue
+        if "bar_y" not in resolved.style.metrics:
+            raise ValueError(f"{resolved.skeleton.glyph}: metrics.bar_y required")
+        y = float(resolved.style.metrics["bar_y"])
+        knots = tuple(replace(knot, y=y) for knot in stroke.knots)
+        strokes.append(replace(stroke, knots=knots))
+        changed = True
+    if not changed:
+        return resolved
+    return replace(resolved, skeleton=replace(resolved.skeleton, strokes=tuple(strokes)))
+
+
 def _side_amount(style, name: str) -> float:
     return style.sidebearing["base"] * style.cap_height * style.sidebearing[name]
 
@@ -803,6 +1118,7 @@ def _seat_on_ink(contours, holes, left: float):
 
 
 def build_glyph(resolved: Resolved) -> GlyphOutline:
+    resolved = _raise_bars(resolved)
     strokes = resolved.skeleton.strokes
     samples: dict[str, list[tuple[Vec2, Vec2]]] = {}
     widths: dict[str, list[float]] = {}
@@ -814,8 +1130,12 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     _apply_joins(samples, widths, resolved)
     _extend_bowl_stems(samples, widths, resolved)
     contrast = any(_nib_bowl(stroke, resolved) for stroke in strokes)
-    paths = []
+    apex = _apex_join(resolved)
+    apex_ids = {apex.a, apex.b} if apex is not None else set()
+    paths = _apex_paths(resolved, apex) if apex is not None else []
     for stroke in strokes:
+        if stroke.id in apex_ids:
+            continue
         if _nib_bowl(stroke, resolved):
             paths.append(
                 _contrast_path(stroke, resolved, frames[stroke.id], samples, widths)
@@ -843,7 +1163,9 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     )
 
     def _finish(contour: list[Vec2]) -> list[Vec2]:
-        polished = trim_apex_stub(bevel_apex_valley(list(contour)))
+        polished = list(contour)
+        if _apex_join(resolved) is None:
+            polished = trim_apex_stub(bevel_apex_valley(polished))
         # 断面の碗が作る谷は、深い埋め直しをすると肩が太くなる。先に浅く面を取る。
         if contrast:
             polished = ease_outer_cusp(polished)

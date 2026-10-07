@@ -1,4 +1,4 @@
-style_id: chic_v1
+style_id: chic_v2
 cap_height: 700
 overshoot: {round: 0.020, apex: 0.028}
 pen: {type: nib, stem: 0.16, bar_ratio: 0.10, hairline: 0.018, theta_deg: 0}
@@ -12,4 +12,4 @@ micro_area_floor: 2000
 curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 groups:
   diagonal: {stem_ratio: 1.06}
-metrics: {serif_length: 0.22, serif_thick: 0.016, bracket: 0.0, round_frac: 0.45}
+metrics: {serif_length: 0.22, serif_thick: 0.016, bracket: 0.0, round_frac: 0.45, bar_y: 0.52, slant_thin: 0.40, apex_flat: 0.20, apex_taper: 1.0}

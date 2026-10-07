@@ -12,7 +12,8 @@ strokes:
     role: thick
     ends: {start: foot, end: foot}
   - id: bar
-    knots: [[0.08, 0.48, line], [0.92, 0.48, line]]
+    # 高さは使わない。様式の metrics.bar_y が中心になる。
+    knots: [[0.08, 0.52, line], [0.92, 0.52, line]]
     role: bar
     ends: {start: none, end: none}
 joins:

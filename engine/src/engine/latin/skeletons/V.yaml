@@ -21,7 +21,7 @@ variants:
     # 右脚はペン角に従う。thin だと水平画用のヘアラインになり、針になる。
     strokes:
       - {id: right, role: run}
-  # ディドンは垂直軸で左右対称。右脚をヘアラインにすると針になる。
+  # 右脚は斜めの細画。ヘアラインにすると針になる。
   chic:
     strokes:
-      - {id: right, role: thick}
+      - {id: right, role: slant_thin}

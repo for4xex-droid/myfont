@@ -113,7 +113,7 @@ def test_style_hash_changes_when_a_number_changes():
     first = load_style(styles_dir() / "modern.yaml")
     again = load_style(styles_dir() / "modern.yaml")
     assert first.content_hash == again.content_hash
-    assert first.style_id == "modern_v1"
+    assert first.style_id == "modern_v2"
     text = (styles_dir() / "modern.yaml").read_text(encoding="utf-8")
     assert "0.13" in text
     other = load_style(ROOT / "src" / "engine" / "latin" / "styles" / "pop.yaml")

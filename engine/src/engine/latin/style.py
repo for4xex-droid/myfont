@@ -38,7 +38,19 @@ _VERTICAL_KEYS = frozenset({"ascender", "descender"})
 _CURVE_KEYS = frozenset({"max_error", "corner_deg", "max_anchors_per_contour"})
 _GROUP_KEYS = frozenset({"stem_ratio", "bar_ratio", "hairline_ratio"})
 _JOIN_KEYS = frozenset({"crotch_thin"})
-_METRIC_KEYS = frozenset({"serif_length", "serif_thick", "round_frac", "bracket"})
+_METRIC_KEYS = frozenset(
+    {
+        "serif_length",
+        "serif_thick",
+        "round_frac",
+        "bracket",
+        "bar_y",
+        "slant_thin",
+        "apex_flat",
+        "apex_taper",
+        "apex_round",
+    }
+)
 _TERMINALS = frozenset(
     {
         "flat",

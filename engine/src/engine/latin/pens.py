@@ -15,13 +15,20 @@ class Pen:
     theta_deg: float
 
 
-def half_width(pen: Pen, role: str, tangent: float) -> float:
+def half_width(
+    pen: Pen, role: str, tangent: float, *, slant_ratio: float | None = None
+) -> float:
     """キャップハイト比の半幅。tangent は接線の絶対角（ラジアン）。
 
     nib は楕円ペン。θ は細い方向（長軸）。接線が θ と平行なとき hairline、
     直交するとき stem。幅は接線角について滑らかで、最細の所に角を作らない。
-    thick / thin / bar はこの式より優先する。run は式のまま。
+    thick / thin / bar / slant_thin はこの式より優先する。run は式のまま。
+    slant_thin は幹 × 様式の比。角度でもヘアラインでも決まらない。
     """
+    if role == "slant_thin":
+        if slant_ratio is None:
+            raise ValueError("slant_thin requires slant_ratio")
+        return pen.stem * slant_ratio / 2.0
     if pen.type == "mono":
         full = pen.stem * (pen.bar_ratio if role == "bar" else 1.0)
         return full / 2.0
