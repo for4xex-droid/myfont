@@ -79,8 +79,15 @@ def _nudge_apex(stroke: Stroke, resolved: Resolved) -> Stroke:
         knot = knots[index]
         reach = apex
         if kind in ("round", "ball"):
-            angle = math.atan2((knot.y - knots[other].y) * cap, (knot.x - knots[other].x) * width)
-            reach -= _round_radius(kind, half_width(resolved.pen, stroke.role, angle) * cap, resolved) / cap
+            angle = math.atan2(
+                (knot.y - knots[other].y) * cap, (knot.x - knots[other].x) * width
+            )
+            reach -= (
+                _round_radius(
+                    kind, half_width(resolved.pen, stroke.role, angle) * cap, resolved
+                )
+                / cap
+            )
         dy = -reach if knot.y <= knots[other].y else reach
         knots[index] = Knot(knot.x, knot.y + dy, knot.kind, knot.angle_deg)
 
@@ -92,7 +99,10 @@ def _nudge_apex(stroke: Stroke, resolved: Resolved) -> Stroke:
 
 
 def _bowl_joined(stroke: Stroke, resolved: Resolved) -> bool:
-    return any(join.type == "bowl_join" and join.a == stroke.id for join in resolved.skeleton.joins)
+    return any(
+        join.type == "bowl_join" and join.a == stroke.id
+        for join in resolved.skeleton.joins
+    )
 
 
 def _bowl_overshoot(stroke: Stroke, resolved: Resolved) -> float:
@@ -111,14 +121,19 @@ class _Frame:
     y_scale: float
 
     def __call__(self, point: tuple[float, float]) -> tuple[float, float]:
-        return (self.x_off + point[0] * self.x_scale, self.y_off + point[1] * self.y_scale)
+        return (
+            self.x_off + point[0] * self.x_scale,
+            self.y_off + point[1] * self.y_scale,
+        )
 
 
 def _plain_frame(stroke: Stroke, resolved: Resolved) -> _Frame:
     style = resolved.style
     cap = style.cap_height
     width = style.proportions[resolved.skeleton.glyph] * cap
-    left = style.sidebearing["base"] * cap * style.sidebearing[resolved.skeleton.sides[0]]
+    left = (
+        style.sidebearing["base"] * cap * style.sidebearing[resolved.skeleton.sides[0]]
+    )
     overshoot = _bowl_overshoot(stroke, resolved)
     return _Frame(left, width, -overshoot, cap + 2.0 * overshoot)
 
@@ -132,21 +147,32 @@ def _place(stroke: Stroke, resolved: Resolved, frame: _Frame | None = None):
         placed = tuple(Cubic(xy(c.p0), xy(c.c1), xy(c.c2), xy(c.p1)) for c in cubics)
         return prepared, placed
     # 開いた曲線は、縦横の縮尺が違ったあとの角度で Hobby を解く。
-    knots = tuple(Knot(xy((k.x, k.y))[0], xy((k.x, k.y))[1], k.kind, k.angle_deg) for k in prepared.knots)
+    knots = tuple(
+        Knot(xy((k.x, k.y))[0], xy((k.x, k.y))[1], k.kind, k.angle_deg)
+        for k in prepared.knots
+    )
     return replace(prepared, knots=knots), expand_stroke(replace(prepared, knots=knots))
 
 
 def _sample(cubics) -> list[tuple[Vec2, Vec2]]:
     samples: list[tuple[Vec2, Vec2]] = []
     for cubic in cubics:
-        seg = sample_cubic(Vec2(*cubic.p0), Vec2(*cubic.c1), Vec2(*cubic.c2), Vec2(*cubic.p1), n=_SAMPLES)
+        seg = sample_cubic(
+            Vec2(*cubic.p0),
+            Vec2(*cubic.c1),
+            Vec2(*cubic.c2),
+            Vec2(*cubic.p1),
+            n=_SAMPLES,
+        )
         if samples:
             seg = seg[1:]
         samples.extend(seg)
     return samples
 
 
-def _widths(samples: list[tuple[Vec2, Vec2]], resolved: Resolved, stroke: Stroke) -> list[float]:
+def _widths(
+    samples: list[tuple[Vec2, Vec2]], resolved: Resolved, stroke: Stroke
+) -> list[float]:
     cap = resolved.style.cap_height
     widths: list[float] = []
     for _pos, tangent in samples:
@@ -154,7 +180,10 @@ def _widths(samples: list[tuple[Vec2, Vec2]], resolved: Resolved, stroke: Stroke
         widths.append(half_width(resolved.pen, stroke.role, angle) * cap)
     factor = resolved.style.joins["crotch_thin"]
     ends = {stroke.ends[0], stroke.ends[1]}
-    crotch = any(join.type == "crotch" and stroke.id in (join.a, join.b) for join in resolved.skeleton.joins)
+    crotch = any(
+        join.type == "crotch" and stroke.id in (join.a, join.b)
+        for join in resolved.skeleton.joins
+    )
     if crotch and "apex" not in ends:
         if stroke.ends[0] != "none":
             taper_end(widths, at_start=True, factor=factor)
@@ -252,7 +281,9 @@ def _round_radius(kind: str, half: float, resolved: Resolved) -> float:
     if kind == "ball":
         return half * 1.15
     if kind == "round":
-        return half + half * max(0.0, resolved.style.metrics.get("round_frac", 1.0) - 1.0)
+        return half + half * max(
+            0.0, resolved.style.metrics.get("round_frac", 1.0) - 1.0
+        )
     return 0.0
 
 
@@ -299,7 +330,9 @@ def _serif_bar_half(resolved: Resolved) -> float:
     """セリフの下面まで届く、横棒の半幅。セリフがない様式は 0。"""
     if resolved.style.terminals.get("foot") not in _SERIF_KINDS:
         return 0.0
-    thick = max(resolved.style.metrics.get("serif_thick", 0.02) * resolved.style.cap_height, 1.0)
+    thick = max(
+        resolved.style.metrics.get("serif_thick", 0.02) * resolved.style.cap_height, 1.0
+    )
     return thick * 1.35 / 2.0
 
 
@@ -358,7 +391,11 @@ def _boxes(
     if level:
         flat = []
         for samples, widths in built:
-            kept = [(s, w) for s, w in zip(samples, widths) if abs(s[1].y) < abs(s[1].x) * 0.02]
+            kept = [
+                (s, w)
+                for s, w in zip(samples, widths)
+                if abs(s[1].y) < abs(s[1].x) * 0.02
+            ]
             if kept:
                 flat.append(([s for s, _w in kept], [w for _s, w in kept]))
         built = flat or built
@@ -380,10 +417,23 @@ def _boxes(
                 edge = pos + normal * (half * side)
                 oxs.append(edge.x)
                 oys.append(edge.y)
-    return (min(xs), max(xs), min(ys), max(ys)), (min(oxs), max(oxs), min(oys), max(oys))
+    return (min(xs), max(xs), min(ys), max(ys)), (
+        min(oxs),
+        max(oxs),
+        min(oys),
+        max(oys),
+    )
 
 
-def _refit(off: float, scale: float, lo: float, hi: float, out_lo: float, out_hi: float, target: tuple[float, float]):
+def _refit(
+    off: float,
+    scale: float,
+    lo: float,
+    hi: float,
+    out_lo: float,
+    out_hi: float,
+    target: tuple[float, float],
+):
     """外形が target に収まるよう、中心線の一次写像を直す。"""
     u_lo = (lo - off) / scale
     u_hi = (hi - off) / scale
@@ -425,12 +475,18 @@ def _fit_bowls(resolved: Resolved) -> tuple[dict[str, _Frame], float]:
         for _ in range(4):
             built = [_centerline(s, resolved, frame, hug=not contrast) for s in group]
             if contrast:
-                built = [(samples, [min(widths)] * len(widths)) for samples, widths in built]
+                built = [
+                    (samples, [min(widths)] * len(widths)) for samples, widths in built
+                ]
             line, ink = _boxes(built, level=_bowl_joined(group[0], resolved))
-            y_off, y_scale = _refit(frame.y_off, frame.y_scale, line[2], line[3], ink[2], ink[3], target_y)
+            y_off, y_scale = _refit(
+                frame.y_off, frame.y_scale, line[2], line[3], ink[2], ink[3], target_y
+            )
             x_off, x_scale = frame.x_off, frame.x_scale
             if target_x is not None:
-                x_off, x_scale = _refit(x_off, x_scale, line[0], line[1], ink[0], ink[1], target_x)
+                x_off, x_scale = _refit(
+                    x_off, x_scale, line[0], line[1], ink[0], ink[1], target_x
+                )
             frame = _Frame(x_off, x_scale, y_off, y_scale)
         for stroke in group:
             frames[stroke.id] = frame
@@ -459,7 +515,9 @@ def _bury(
 ) -> None:
     cur_s, cur_w = samples[joiner], widths[joiner]
     for at_start in (True, False):
-        cur_s, cur_w = retract_end(cur_s, cur_w, samples[partner], widths[partner], at_start=at_start)
+        cur_s, cur_w = retract_end(
+            cur_s, cur_w, samples[partner], widths[partner], at_start=at_start
+        )
     samples[joiner] = cur_s
     widths[joiner] = cur_w
 
@@ -546,7 +604,9 @@ def _beyond_box(origin: Vec2, tip: Vec2, unit: Vec2, half: float) -> list[Vec2]:
     return [Vec2(lo, y0), Vec2(hi, y0), Vec2(hi, y1), Vec2(lo, y1)]
 
 
-def _level_serif(origin: Vec2, unit: Vec2, half: float, kind: str, resolved: Resolved) -> list[list[Vec2]]:
+def _level_serif(
+    origin: Vec2, unit: Vec2, half: float, kind: str, resolved: Resolved
+) -> list[list[Vec2]]:
     """斜めの画に載せる水平なセリフ。張り出しは幹のセリフと同じ量にする。"""
     if kind not in _SERIF_KINDS:
         return []
@@ -571,7 +631,9 @@ def _level_serif(origin: Vec2, unit: Vec2, half: float, kind: str, resolved: Res
     # 画の傾きに沿った平行四辺形。水平な矩形だと、片側だけ垂直なくさびになる。
     top_lo, top_hi = center(face) - span, center(face) + span
     bot_lo, bot_hi = center(back) - span, center(back) + span
-    polys = [[Vec2(top_lo, face), Vec2(top_hi, face), Vec2(bot_hi, back), Vec2(bot_lo, back)]]
+    polys = [
+        [Vec2(top_lo, face), Vec2(top_hi, face), Vec2(bot_hi, back), Vec2(bot_lo, back)]
+    ]
     if kind == "serif_hairline":
         reach = max(thick * 2.5, 8.0)
     elif kind == "serif_bracketed":
@@ -581,7 +643,14 @@ def _level_serif(origin: Vec2, unit: Vec2, half: float, kind: str, resolved: Res
     if reach > 0.0:
         inner = back - sign * reach
         mid = center(inner)
-        polys.append([Vec2(bot_lo, back), Vec2(bot_hi, back), Vec2(mid + cross, inner), Vec2(mid - cross, inner)])
+        polys.append(
+            [
+                Vec2(bot_lo, back),
+                Vec2(bot_hi, back),
+                Vec2(mid + cross, inner),
+                Vec2(mid - cross, inner),
+            ]
+        )
     return polys
 
 
@@ -611,7 +680,13 @@ def _extend_bowl_stems(
             continue
         for at_start, tag in ((True, stroke.ends[0]), (False, stroke.ends[1])):
             kind = resolved.style.terminals[tag]
-            if kind not in ("flat", "round", "serif_bracketed", "serif_hairline", "spur"):
+            if kind not in (
+                "flat",
+                "round",
+                "serif_bracketed",
+                "serif_hairline",
+                "spur",
+            ):
                 continue
             index = 0 if at_start else -1
             origin, tangent = pts[index]
@@ -626,18 +701,31 @@ def _extend_bowl_stems(
             for bowl_id in partners:
                 bowl_widths = widths[bowl_id]
                 # 断面の碗の外形は一番細い幅だけ外へ出る。幹もそこまでで止める。
-                outer_half = min(bowl_widths) if _nib_bowl(strokes_by_id[bowl_id], resolved) else None
+                outer_half = (
+                    min(bowl_widths)
+                    if _nib_bowl(strokes_by_id[bowl_id], resolved)
+                    else None
+                )
                 for (pos, tang), half in zip(samples[bowl_id], bowl_widths):
                     if abs(pos.x - origin.x) > window:
                         continue
-                    edge = _bowl_edge(pos, tang, outer_half if outer_half is not None else half, low=low)
+                    edge = _bowl_edge(
+                        pos,
+                        tang,
+                        outer_half if outer_half is not None else half,
+                        low=low,
+                    )
                     if extreme is None or (edge < extreme if low else edge > extreme):
                         extreme = edge
             if extreme is None:
                 continue
             face = _round_radius(kind, ws[index], resolved)
             target_y = extreme - unit.y * face
-            reach = (target_y - origin.y) / unit.y if abs(unit.y) > 0.5 else (Vec2(0.0, target_y) - origin).dot(unit)
+            reach = (
+                (target_y - origin.y) / unit.y
+                if abs(unit.y) > 0.5
+                else (Vec2(0.0, target_y) - origin).dot(unit)
+            )
             if reach < 1.0:
                 continue
             moved = origin + unit * reach
@@ -650,24 +738,40 @@ def _extend_bowl_stems(
 
 
 def _nib_bowl(stroke: Stroke, resolved: Resolved) -> bool:
-    return resolved.pen.type == "nib" and stroke.role == "bowl" and _bowl_joined(stroke, resolved)
+    return (
+        resolved.pen.type == "nib"
+        and stroke.role == "bowl"
+        and _bowl_joined(stroke, resolved)
+    )
 
 
 def _facing_start(stroke: Stroke, resolved: Resolved) -> bool:
     """この端が、もう一方の碗と向かい合う横棒側か。"""
-    others = [other for other in resolved.skeleton.strokes if other.role == "bowl" and other.id != stroke.id]
+    others = [
+        other
+        for other in resolved.skeleton.strokes
+        if other.role == "bowl" and other.id != stroke.id
+    ]
     if not others:
         return True
     mid = (others[0].knots[0].y + others[0].knots[-1].y) / 2.0
     return abs(stroke.knots[0].y - mid) <= abs(stroke.knots[-1].y - mid)
 
 
-def _contrast_path(stroke: Stroke, resolved: Resolved, frame: _Frame, samples, widths) -> Path:
+def _contrast_path(
+    stroke: Stroke, resolved: Resolved, frame: _Frame, samples, widths
+) -> Path:
     """ペンでなぞらず、外形と穴を断面から描く。端は幹の中心線まで戻す。"""
     raw_s, raw_w = _centerline(stroke, resolved, frame, hug=False)
-    partner = next(join.b for join in resolved.skeleton.joins if join.type == "bowl_join" and join.a == stroke.id)
+    partner = next(
+        join.b
+        for join in resolved.skeleton.joins
+        if join.type == "bowl_join" and join.a == stroke.id
+    )
     for at_start in (True, False):
-        raw_s, raw_w = retract_end(raw_s, raw_w, samples[partner], widths[partner], at_start=at_start)
+        raw_s, raw_w = retract_end(
+            raw_s, raw_w, samples[partner], widths[partner], at_start=at_start
+        )
     polygon = contrast_polygon(
         raw_s,
         raw_w,
@@ -678,11 +782,31 @@ def _contrast_path(stroke: Stroke, resolved: Resolved, frame: _Frame, samples, w
     return _to_path(polygon)
 
 
+def _side_amount(style, name: str) -> float:
+    return style.sidebearing["base"] * style.cap_height * style.sidebearing[name]
+
+
+def _seat_on_ink(contours, holes, left: float):
+    """墨の左端を側面の位置まで平行移動する。戻り値は移動後の輪郭と墨の幅。"""
+    xs = [
+        point.x
+        for contour, hole in zip(contours, holes, strict=True)
+        if not hole
+        for point in contour
+    ]
+    x0, x1 = min(xs), max(xs)
+    dx = left - x0
+    moved = tuple(
+        tuple(Vec2(point.x + dx, point.y) for point in contour) for contour in contours
+    )
+    return moved, x1 - x0
+
+
 def build_glyph(resolved: Resolved) -> GlyphOutline:
     strokes = resolved.skeleton.strokes
     samples: dict[str, list[tuple[Vec2, Vec2]]] = {}
     widths: dict[str, list[float]] = {}
-    frames, shrink = _fit_bowls(resolved)
+    frames, _shrink = _fit_bowls(resolved)
     for stroke in strokes:
         samples[stroke.id], widths[stroke.id] = _centerline(
             stroke, resolved, frames.get(stroke.id), hug=not _nib_bowl(stroke, resolved)
@@ -693,11 +817,17 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     paths = []
     for stroke in strokes:
         if _nib_bowl(stroke, resolved):
-            paths.append(_contrast_path(stroke, resolved, frames[stroke.id], samples, widths))
+            paths.append(
+                _contrast_path(stroke, resolved, frames[stroke.id], samples, widths)
+            )
         else:
-            paths.extend(_stroke_paths(stroke, samples[stroke.id], widths[stroke.id], resolved))
+            paths.extend(
+                _stroke_paths(stroke, samples[stroke.id], widths[stroke.id], resolved)
+            )
     united = _union_all(paths)
-    raw = [tuple(Vec2(x, y) for x, y in contour_points(c)) for c in split_contours(united)]
+    raw = [
+        tuple(Vec2(x, y) for x, y in contour_points(c)) for c in split_contours(united)
+    ]
     floor = resolved.style.micro_area_floor
     raw = tuple(c for c in raw if len(c) >= 3 and abs(_signed_area(c)) >= floor)
     if not raw:
@@ -706,7 +836,11 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     sign = 1.0 if _signed_area(raw[largest]) >= 0.0 else -1.0
     holes = tuple(_signed_area(c) * sign < 0.0 for c in raw)
     # 閉じた碗（O・0）の頂のヘアラインは、凍結したコントラストの計測そのものなので埋めない。
-    crown = (lambda pts: pts) if any(stroke.closed for stroke in strokes) else fill_crown_saddle
+    crown = (
+        (lambda pts: pts)
+        if any(stroke.closed for stroke in strokes)
+        else fill_crown_saddle
+    )
 
     def _finish(contour: list[Vec2]) -> list[Vec2]:
         polished = trim_apex_stub(bevel_apex_valley(list(contour)))
@@ -715,7 +849,9 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
             polished = ease_outer_cusp(polished)
         polished = crown(smooth_side_pinches(polished))
         # 閉じた碗の頂はコントラストの計測そのものなので、尖りも埋めない。
-        polished = blunt_inner_peak(polished) if crown is fill_crown_saddle else polished
+        polished = (
+            blunt_inner_peak(polished) if crown is fill_crown_saddle else polished
+        )
         if resolved.style.name == "modern" and resolved.skeleton.glyph == "B":
             polished = deepen_outer_waist(polished)
         return polished
@@ -731,7 +867,10 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
         for contour, hole in zip(raw, holes)
     )
     style = resolved.style
-    width = style.proportions[resolved.skeleton.glyph] * style.cap_height
-    right = style.sidebearing["base"] * style.cap_height * style.sidebearing[resolved.skeleton.sides[1]]
-    left = style.sidebearing["base"] * style.cap_height * style.sidebearing[resolved.skeleton.sides[0]]
-    return GlyphOutline(resolved.skeleton.glyph, left + width + right - shrink, raw, holes)
+    # 側面は骨格の箱ではなく、できた墨の外側に足す。碗を細くした分は墨の幅に入っている。
+    left = _side_amount(style, resolved.skeleton.sides[0])
+    right = _side_amount(style, resolved.skeleton.sides[1])
+    seated, ink_width = _seat_on_ink(raw, holes, left)
+    return GlyphOutline(
+        resolved.skeleton.glyph, left + ink_width + right, seated, holes
+    )

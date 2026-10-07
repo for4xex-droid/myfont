@@ -12,6 +12,8 @@ from engine.latin.load import load_resolved
 
 GLYPHS = ("H", "O", "B", "V", "S", "zero")
 STYLES = ("modern", "classic", "chic", "pop")
+TEXT_LINES = ("HOHOH", "OHOHO", "HVHVH", "SOS", "0H0H0")
+_TEXT_SCALE = 0.2
 _LABELS = {
     "modern": "モダン",
     "classic": "クラシック",
@@ -33,7 +35,13 @@ def _font(size: int) -> ImageFont.ImageFont:
     return ImageFont.load_default()
 
 
-def _paint(draw: ImageDraw.ImageDraw, outline: GlyphOutline, ox: float, baseline: float, scale: float) -> None:
+def _paint(
+    draw: ImageDraw.ImageDraw,
+    outline: GlyphOutline,
+    ox: float,
+    baseline: float,
+    scale: float,
+) -> None:
     def xy(point):
         return (ox + point.x * scale, baseline - point.y * scale)
 
@@ -47,41 +55,91 @@ def _paint(draw: ImageDraw.ImageDraw, outline: GlyphOutline, ox: float, baseline
         draw.polygon([xy(p) for p in contour], fill=(255, 255, 255))
 
 
+def text_origins(advances: list[float]) -> list[float]:
+    """各字の左端。次の字は、前の字の送り幅のちょうど先から始まる。"""
+    origin = 0.0
+    found: list[float] = []
+    for advance in advances:
+        found.append(origin)
+        origin += advance
+    return found
+
+
+def _glyph_of(char: str) -> str:
+    return "zero" if char == "0" else char
+
+
 def render_pilot_sheet(path: Path) -> Path:
-    """6字×4様式を1枚の PNG にする。返り値は書き出したパス。"""
+    """6字×4様式と、送り幅で並べた組見本を1枚の PNG にする。"""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    outlines = {(style, glyph): build_glyph(load_resolved(glyph, style)) for style in STYLES for glyph in GLYPHS}
+    outlines = {
+        (style, glyph): build_glyph(load_resolved(glyph, style))
+        for style in STYLES
+        for glyph in GLYPHS
+    }
     scale = 0.42
     label_w = 168
     head_h = 56
     max_advance = max(item.advance for item in outlines.values())
     cell_w = int(max_advance * scale) + 36
     cell_h = int(920 * scale) + 28
-    width = label_w + cell_w * len(GLYPHS)
-    height = head_h + cell_h * len(STYLES)
+    line_h = int(920 * _TEXT_SCALE)
+    text_width = max(
+        sum(outlines[(style, _glyph_of(char))].advance for char in text) * _TEXT_SCALE
+        for style in STYLES
+        for text in TEXT_LINES
+    )
+    width = max(label_w + cell_w * len(GLYPHS), int(label_w + text_width) + 24)
+    height = head_h + cell_h * len(STYLES) + line_h * len(STYLES) * len(TEXT_LINES) + 16
     image = Image.new("RGB", (width, height), (255, 255, 255))
     draw = ImageDraw.Draw(image)
     font = _font(22)
     small = _font(18)
     for col, glyph in enumerate(GLYPHS):
         title = _LABELS.get(glyph, glyph)
-        draw.text((label_w + col * cell_w + 16, 12), title, fill=(40, 40, 40), font=font)
+        draw.text(
+            (label_w + col * cell_w + 16, 12), title, fill=(40, 40, 40), font=font
+        )
     for row, style in enumerate(STYLES):
         top = head_h + row * cell_h
-        draw.text((16, top + cell_h / 2 - 14), _LABELS[style], fill=(40, 40, 40), font=small)
+        draw.text(
+            (16, top + cell_h / 2 - 14), _LABELS[style], fill=(40, 40, 40), font=small
+        )
         for col, glyph in enumerate(GLYPHS):
             outline = outlines[(style, glyph)]
             ox = label_w + col * cell_w + (cell_w - outline.advance * scale) / 2
             baseline = top + cell_h - 36
             _paint(draw, outline, ox, baseline, scale)
+    top = head_h + cell_h * len(STYLES) + 8
+    for style in STYLES:
+        for text in TEXT_LINES:
+            draw.text(
+                (16, top + 6), f"{_LABELS[style]} {text}", fill=(80, 80, 80), font=small
+            )
+            names = [_glyph_of(char) for char in text]
+            advances = [outlines[(style, name)].advance for name in names]
+            baseline = top + line_h - 28
+            draw.line(
+                (label_w, baseline, label_w + text_width, baseline),
+                fill=(230, 230, 230),
+            )
+            for name, origin in zip(names, text_origins(advances), strict=True):
+                ox = label_w + origin * _TEXT_SCALE
+                _paint(draw, outlines[(style, name)], ox, baseline, _TEXT_SCALE)
+                draw.line((ox, baseline + 8, ox, baseline - 18), fill=(190, 60, 60))
+            top += line_h
     image.save(path)
     return path
 
 
 def _ring(contour):
     pts = list(contour)
-    if len(pts) > 1 and abs(pts[0].x - pts[-1].x) < 1e-9 and abs(pts[0].y - pts[-1].y) < 1e-9:
+    if (
+        len(pts) > 1
+        and abs(pts[0].x - pts[-1].x) < 1e-9
+        and abs(pts[0].y - pts[-1].y) < 1e-9
+    ):
         pts = pts[:-1]
     return pts
 
@@ -95,7 +153,12 @@ def _resample(pts, step: float):
             continue
         t = step - carry
         while t <= length:
-            out.append(type(start)(start.x + (end.x - start.x) * t / length, start.y + (end.y - start.y) * t / length))
+            out.append(
+                type(start)(
+                    start.x + (end.x - start.x) * t / length,
+                    start.y + (end.y - start.y) * t / length,
+                )
+            )
             t += step
         carry = length - (t - step)
     return out[:-1]
@@ -152,6 +215,10 @@ def render_b_curvature(path: Path) -> Path:
                 length = kappa * 1.6 * scale
                 x0, y0 = ox + point.x * scale, baseline - point.y * scale
                 color = (180, 40, 40) if kappa < 0.0 else (30, 90, 160)
-                draw.line((x0, y0, x0 + left_x * length, y0 - left_y * length), fill=color, width=1)
+                draw.line(
+                    (x0, y0, x0 + left_x * length, y0 - left_y * length),
+                    fill=color,
+                    width=1,
+                )
     image.save(path)
     return path

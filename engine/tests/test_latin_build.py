@@ -390,13 +390,11 @@ def test_modern_b_stem_reaches_the_bowl_ends():
 
 
 def test_modern_b_bowls_do_not_stick_out_of_the_stem():
-    resolved = load_resolved("B", "modern")
-    outline = build_glyph(resolved)
-    style = resolved.style
-    width = style.proportions["B"] * style.cap_height
-    left = style.sidebearing["base"] * style.cap_height * style.sidebearing["straight"]
-    stem_left = left + 0.18 * width - (style.cap_height * resolved.pen.stem / 2.0)
+    """碗が幹の左より外へ出ない。幹の位置は、天地の左端で見る。"""
+    outline = build_glyph(load_resolved("B", "modern"))
     outer = next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
+    ends = [point for point in outer if point.y <= 2.0 or point.y >= 698.0]
+    stem_left = min(point.x for point in ends)
     assert min(point.x for point in outer) >= stem_left - 2.0
 
 

@@ -74,14 +74,20 @@ def _curvature(pts):
 
 
 def _stem_right(resolved) -> float:
-    cap = resolved.style.cap_height
-    width = resolved.style.proportions["B"] * cap
-    left = (
-        resolved.style.sidebearing["base"]
-        * cap
-        * resolved.style.sidebearing["straight"]
-    )
-    return left + 0.18 * width + cap * resolved.pen.stem / 2.0
+    """下の碗の高さで、左の墨の右縁。字間で輪郭が動いても幹の右を指す。"""
+    outline = build_glyph(resolved)
+    y = 120.0
+    xs = []
+    for contour in outline.contours:
+        ring = list(contour)
+        for start, end in zip(ring, ring[1:] + ring[:1]):
+            if (start.y - y) * (end.y - y) > 0.0 or abs(end.y - start.y) < 1e-9:
+                continue
+            t = (y - start.y) / (end.y - start.y)
+            if 0.0 <= t < 1.0:
+                xs.append(start.x + (end.x - start.x) * t)
+    xs.sort()
+    return xs[1]
 
 
 def _holes(outline):
@@ -476,7 +482,7 @@ def test_contrast_b_ignores_hug_and_sample_count(style):
 
 @pytest.mark.parametrize(("glyph", "style"), _UNCHANGED)
 def test_other_glyphs_keep_their_outline(glyph, style):
-    """クラシックとシックの B 以外のパイロット字は、輪郭を動かさない。"""
+    """形は保存した輪郭のまま。2026-10-07、字間を墨基準にしたので x だけ平行移動している。"""
     saved = json.loads(_FIXTURE.read_text())[f"{style}/{glyph}"]
     outline = build_glyph(load_resolved(glyph, style))
     assert outline.contour_count == len(saved["contours"])
