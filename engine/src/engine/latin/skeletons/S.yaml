@@ -4,7 +4,7 @@ structure: spine
 groups: [round]
 strokes:
   - id: spine
-    # 両端は立ち気味に入り、切り口が水平になる。
+    # モダンとポップは立ち気味に入り、切り口が水平になる。
     knots:
       - [0.86, 0.78, smooth, 105]
       - [0.50, 1.00, smooth, 180]
@@ -20,15 +20,29 @@ joins: []
 sides: {left: open, right: open}
 expect: {contours: 1, holes: 0}
 variants:
-  # 細い方向が水平のペンでは、上下の頂を平らにしないとヘアラインが点になる。
-  chic:
+  # 腕は天地の線に沿い、端の接線は腕の弦に沿う。くちばしは端から字の内側へ垂れる。
+  # 下半分は上半分の点対称（x, y を 1 から引き、角度はそのまま）。
+  # クラシックの頂は 0.50 から 0.01 寄せる。太さを弧の長さで均すと、墨の頂が外へ 0.02 ずれるため。
+  classic:
     strokes:
       - id: spine
         knots:
-          - [0.88, 0.78, smooth, 100]
-          - [0.50, 1.00, smooth, 180]
-          - [0.14, 0.74, smooth, 270]
+          - [0.88, 0.96, smooth, 160]
+          - [0.49, 1.00, smooth, 180]
+          - [0.14, 0.76, smooth, 270]
           - [0.50, 0.52, smooth]
-          - [0.86, 0.26, smooth, 270]
-          - [0.50, 0.00, smooth, 180]
-          - [0.12, 0.22, smooth, 100]
+          - [0.86, 0.24, smooth, 270]
+          - [0.51, 0.00, smooth, 180]
+          - [0.12, 0.04, smooth, 160]
+  chic:
+    strokes:
+      - id: spine
+        tension: 0.9
+        knots:
+          - [0.90, 0.99, smooth, 172]
+          - [0.50, 1.00, smooth, 185]
+          - [0.12, 0.80, smooth, 270]
+          - [0.50, 0.52, smooth]
+          - [0.88, 0.20, smooth, 270]
+          - [0.50, 0.00, smooth, 185]
+          - [0.10, 0.01, smooth, 172]

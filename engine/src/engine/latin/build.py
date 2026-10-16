@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, replace
+from itertools import pairwise
 
 from pathops import Path, PathOp, op, simplify
 
@@ -36,7 +37,7 @@ from engine.latin.joins import (
 from engine.latin.load import Resolved
 from engine.latin.pens import half_width
 from engine.latin.schema import Knot, Stroke
-from engine.latin.terminals import terminal_polygon
+from engine.latin.terminals import Beak, terminal_polygon
 
 _SAMPLES = 96
 
@@ -47,6 +48,8 @@ class GlyphOutline:
     advance: float
     contours: tuple[tuple[Vec2, ...], ...]
     holes: tuple[bool, ...]
+    # 当て直しのあと、節点で接線と曲がりを揃える。くちばしの端を持つ字（S）だけ。
+    fair: bool = False
 
     @property
     def contour_count(self) -> int:
@@ -196,7 +199,65 @@ def _widths(
             taper_end(widths, at_start=True, factor=factor)
         if stroke.ends[1] != "none":
             taper_end(widths, at_start=False, factor=factor)
+    if ends == {"open"} and resolved.style.terminals["open"] == "beak":
+        metrics = resolved.style.metrics
+        if "spine_weight" in metrics:
+            _hold_spine(samples, widths, resolved.pen.stem * cap / 2.0, metrics["spine_weight"])
+        if "spine_smooth" in metrics:
+            widths = _smooth_along(samples, widths, metrics["spine_smooth"] * cap)
     return widths
+
+
+def _hold_spine(
+    samples: list[tuple[Vec2, Vec2]], widths: list[float], stem_half: float, weight: float
+) -> None:
+    """上の碗の左端から下の碗の右端まで（接線の x が負から正、正から負へ変わる間）を、
+    幹の半幅 × (1 + (weight − 1) sin πu) より細くしない。ペン角 0 の斜めの背が細るのを止める。"""
+    xs = [tangent.x for _pos, tangent in samples]
+    start = next((i for i in range(1, len(xs)) if xs[i - 1] < 0.0 <= xs[i]), None)
+    if start is None:
+        return
+    end = next((i for i in range(start + 1, len(xs)) if xs[i - 1] > 0.0 >= xs[i]), None)
+    if end is None:
+        return
+    for i in range(start, end + 1):
+        u = (i - start) / (end - start)
+        widths[i] = max(widths[i], stem_half * (1.0 + (weight - 1.0) * math.sin(math.pi * u)))
+
+
+def _smooth_along(
+    samples: list[tuple[Vec2, Vec2]], widths: list[float], sigma: float
+) -> list[float]:
+    """半幅を弧の長さのガウスで均す。点の番号で均すと、節点で点の間隔が飛んで角ができる。
+    端の外は端の値が続くとみなす（端で細らない）。"""
+    if sigma <= 0.0 or len(widths) < 3:
+        return widths
+    arc = [0.0]
+    for (a, _ta), (b, _tb) in pairwise(samples):
+        arc.append(arc[-1] + (b - a).length())
+    n = len(widths)
+    ds = [(arc[min(n - 1, k + 1)] - arc[max(0, k - 1)]) / 2.0 for k in range(n)]
+    reach = 3.0 * sigma
+    out: list[float] = []
+    for i in range(n):
+        acc = total = 0.0
+        for k in range(n):
+            dist = arc[k] - arc[i]
+            if abs(dist) > reach:
+                continue
+            weight = math.exp(-0.5 * (dist / sigma) ** 2) * ds[k]
+            acc += widths[k] * weight
+            total += weight
+        for value, start, stop in (
+            (widths[0], arc[i] - reach, 0.0),
+            (widths[-1], arc[-1], arc[i] + reach),
+        ):
+            for j in range(int(max(0.0, stop - start))):
+                weight = math.exp(-0.5 * ((start + j + 0.5 - arc[i]) / sigma) ** 2)
+                acc += value * weight
+                total += weight
+        out.append(acc / total)
+    return out
 
 
 def _to_path(poly: list[Vec2]) -> Path:
@@ -229,6 +290,16 @@ def _terminal_paths(
     metrics = style.metrics
     length = metrics.get("serif_length", 0.12) * style.cap_height
     thick = metrics.get("serif_thick", 0.02) * style.cap_height
+    beak = None
+    if "beak_drop" in metrics:
+        cap = style.cap_height
+        beak = Beak(
+            drop=metrics["beak_drop"] * cap,
+            thick=thick,
+            bracket=metrics.get("beak_bracket", 0.0) * cap,
+            sweep=metrics.get("beak_sweep", 0.0) * cap,
+            tip=metrics.get("beak_tip", 0.0) * cap,
+        )
     paths: list[Path] = []
     ends = ((0, -1.0, stroke.ends[0]), (len(samples) - 1, 1.0, stroke.ends[1]))
     for index, sign, tag in ends:
@@ -246,6 +317,10 @@ def _terminal_paths(
             serif_thick=thick,
             round_frac=metrics.get("round_frac", 1.0),
             bracket=metrics.get("bracket", 0.0) * style.cap_height,
+            samples=samples,
+            widths=widths,
+            index=index,
+            beak=beak,
         )
         if poly:
             paths.append(_to_path(poly))
@@ -1193,6 +1268,9 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     left = _side_amount(style, resolved.skeleton.sides[0])
     right = _side_amount(style, resolved.skeleton.sides[1])
     seated, ink_width = _seat_on_ink(raw, holes, left)
+    beak = style.terminals.get("open") == "beak" and any(
+        "open" in stroke.ends for stroke in resolved.skeleton.strokes
+    )
     return GlyphOutline(
-        resolved.skeleton.glyph, left + ink_width + right, seated, holes
+        resolved.skeleton.glyph, left + ink_width + right, seated, holes, fair=beak
     )

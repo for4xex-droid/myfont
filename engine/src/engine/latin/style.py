@@ -49,6 +49,12 @@ _METRIC_KEYS = frozenset(
         "apex_flat",
         "apex_taper",
         "apex_round",
+        "beak_drop",
+        "beak_bracket",
+        "beak_sweep",
+        "beak_tip",
+        "spine_weight",
+        "spine_smooth",
     }
 )
 _TERMINALS = frozenset(
@@ -61,6 +67,7 @@ _TERMINALS = frozenset(
         "apex_cut",
         "ball",
         "spur",
+        "beak",
         "none",
     }
 )

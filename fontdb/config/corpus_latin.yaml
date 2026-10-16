@@ -1,0 +1,54 @@
+# ラテン参照の取得台帳。バイナリは git に置かない（掟10）。座標は保存しない（掟9）。
+# 01_fetch.py の明朝5書体には入れていない。取得は source_url から data/fonts/latin_ref/ へ。
+# ライセンスは 2026-10-13 に、各 OFL.txt が SIL Open Font License 1.1 であり、
+# 著作権表示がその書体名であることを確認した（掟12）。
+protocol:
+  variable_policy: 計測前に fontTools.varLib.instancer で下の instance_coords に固定する。インスタンスは保存しない
+  measured: 2026-10-13
+families:
+- family_id: eb_garamond
+  display_name: EB Garamond
+  license: OFL-1.1
+  license_confirmed: 2026-10-13
+  vendor: google/fonts
+  source_url: https://github.com/google/fonts/raw/main/ofl/ebgaramond/EBGaramond[wght].ttf
+  sha256_measured: ef9512f92f6d579e5dc75af59a5a4b1b8b47d2eda89e00b954d44520e5369027
+  path_rel: data/fonts/latin_ref/ebgaramond__EBGaramond[wght].ttf
+  role: classic
+  instance_coords: {wght: 400}
+  units_per_em: 1000
+- family_id: libre_caslon_text
+  display_name: Libre Caslon Text
+  license: OFL-1.1
+  license_confirmed: 2026-10-13
+  vendor: google/fonts
+  source_url: https://github.com/google/fonts/raw/main/ofl/librecaslontext/LibreCaslonText[wght].ttf
+  sha256_measured: c11809dbfd5445886293d89b32bfc2584075c80e77750cf1c284113e36b8b3f4
+  path_rel: data/fonts/latin_ref/librecaslontext__LibreCaslonText[wght].ttf
+  role: classic
+  instance_coords: {wght: 400}
+  units_per_em: 2000
+- family_id: playfair_display
+  display_name: Playfair Display
+  license: OFL-1.1
+  license_confirmed: 2026-10-13
+  vendor: google/fonts
+  source_url: https://github.com/google/fonts/raw/main/ofl/playfairdisplay/PlayfairDisplay[wght].ttf
+  sha256_measured: c40f2293766a503bc70cce9e512ef844a4ccb7cbcde792fe2ea31d191917d8d6
+  path_rel: data/fonts/latin_ref/playfairdisplay__PlayfairDisplay[wght].ttf
+  role: chic
+  instance_coords: {wght: 400}
+  units_per_em: 1000
+  notes: 端は玉。くちばしの帯には入れない
+- family_id: bodoni_moda
+  display_name: Bodoni Moda
+  license: OFL-1.1
+  license_confirmed: 2026-10-13
+  vendor: google/fonts
+  source_url: https://github.com/google/fonts/raw/main/ofl/bodonimoda/BodoniModa[opsz,wght].ttf
+  sha256_measured: 550f5e34ee0a828d7941b1fe9bc58b34e5260d3f33a61532e6d0a0114e79a5cf
+  path_rel: data/fonts/latin_ref/bodonimoda__BodoniModa[opsz,wght].ttf
+  role: chic
+  instance_coords: {wght: 400, opsz: 72}
+  instance_coords_text: {wght: 400, opsz: 11}
+  units_per_em: 2000

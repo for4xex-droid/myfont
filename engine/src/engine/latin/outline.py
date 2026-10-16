@@ -14,6 +14,7 @@ from engine.curve_fit import (
 )
 from engine.join_solver import count_contours
 from engine.latin.build import GlyphOutline
+from engine.latin.fair import fair_contour
 from engine.latin.style import Style
 
 
@@ -423,10 +424,15 @@ def _missing_extrema(path: ContourPath) -> int:
 
 
 def _post(
-    path: ContourPath, points: list[tuple[float, float]], curve: dict, *, hole: bool
+    path: ContourPath,
+    points: list[tuple[float, float]],
+    curve: dict,
+    *,
+    hole: bool,
+    line_tol: float = 1.0,
 ) -> ContourPath:
     path = _repair_strays(path, points, float(curve["max_error"]))
-    path = _flatten_true_lines(path, points)
+    path = _flatten_true_lines(path, points, line_tol)
     path = _round(_rotate_start(_insert_extrema(_snap(path, 0.5))))
     # 整数への丸めで、端から 1 単位をわずかに超える極値が生まれる。もう一度入れて丸める。
     path = _round(_insert_extrema(path))
@@ -455,6 +461,8 @@ def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
     """
     curve = style.curve
     limit = float(curve["max_error"]) + 0.75
+    # 後処理をかける字は、ゆるい曲線を直線にしない（弦から 1.0 では 41 UPM の弦で曲率 0.005 まで直線になる）。
+    line_tol = 0.25 if outline.fair else 1.0
     fitted: list[tuple[tuple[float, float], ContourPath]] = []
     for contour, hole in zip(outline.contours, outline.holes):
         points = [(p.x, p.y) for p in contour]
@@ -474,7 +482,7 @@ def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
         for candidate in (primary, pinned):
             if candidate is None:
                 continue
-            path = _post(candidate, points, curve, hole=hole)
+            path = _post(candidate, points, curve, hole=hole, line_tol=line_tol)
             rejection = _reject(path, points, limit, outline.glyph)
             if rejection is not None:
                 reason = rejection
@@ -483,6 +491,10 @@ def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
                 chosen = path
         if chosen is None:
             raise ValueError(reason)
+        if outline.fair:
+            faired = fair_contour(chosen, points)
+            if _reject(faired, points, limit, outline.glyph) is None:
+                chosen = faired
         origin = min(chosen.on_curve_points(), key=lambda p: (p[1], p[0]))
         fitted.append((origin, chosen))
     fitted.sort(key=lambda item: (item[0][1], item[0][0]))
