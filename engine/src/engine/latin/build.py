@@ -26,9 +26,10 @@ from engine.latin.hobby import Cubic, expand_stroke
 from engine.latin.joins import (
     bevel_apex_valley,
     blunt_inner_peak,
-    deepen_outer_waist,
+    ease_level_shoulders,
     fair_bar_joins,
     fill_crown_saddle,
+    fillet_bowl_waist,
     retract_end,
     smooth_side_pinches,
     taper_end,
@@ -570,9 +571,30 @@ def _fit_bowls(resolved: Resolved) -> tuple[dict[str, _Frame], float]:
                     x_off, x_scale, line[0], line[1], ink[0], ink[1], target_x
                 )
             frame = _Frame(x_off, x_scale, y_off, y_scale)
+        narrowed = _narrow_upper_bowl(frame, group, resolved)
         for stroke in group:
-            frames[stroke.id] = frame
+            frames[stroke.id] = narrowed.get(stroke.id, frame)
     return frames, shrink
+
+
+def _narrow_upper_bowl(
+    frame: _Frame, group: list[Stroke], resolved: Resolved
+) -> dict[str, _Frame]:
+    """上の碗だけ、左端を軸に upper_bowl 倍へ縮める。下の碗と幹は動かさない。"""
+    factor = resolved.style.metrics.get("upper_bowl")
+    if factor is None or len(group) < 2:
+        return {}
+    upper = max(group, key=lambda stroke: sum(knot.y for knot in stroke.knots))
+    anchor_u = min(knot.x for knot in upper.knots)
+    anchor = frame.x_off + anchor_u * frame.x_scale
+    return {
+        upper.id: _Frame(
+            anchor + factor * (frame.x_off - anchor),
+            frame.x_scale * factor,
+            frame.y_off,
+            frame.y_scale,
+        )
+    }
 
 
 def _apply_joins(
@@ -1249,8 +1271,11 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
         polished = (
             blunt_inner_peak(polished) if crown is fill_crown_saddle else polished
         )
-        if resolved.style.name == "modern" and resolved.skeleton.glyph == "B":
-            polished = deepen_outer_waist(polished)
+        if sum(join.type == "bowl_join" for join in resolved.skeleton.joins) >= 2:
+            polished = fillet_bowl_waist(
+                polished, pinch=0.08 * resolved.style.cap_height
+            )
+            polished = ease_level_shoulders(polished)
         return polished
 
     mid_y = resolved.style.cap_height / 2.0

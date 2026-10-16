@@ -297,23 +297,27 @@ def _peak_x(contour, low: float, high: float) -> float:
 
 
 @pytest.mark.parametrize("style", STYLES)
-def test_b_bowls_swell_the_same_way(style):
-    """上下の山は、右への出方が揃っていないと別の形に見える。"""
-    outline = build_glyph(load_resolved("B", style))
+def test_upper_bowl_is_narrower_than_the_lower(style):
+    """上の碗の右端は下の碗より内側。幅の比は様式の upper_bowl（0.92–0.95）。"""
+    resolved = load_resolved("B", style)
+    outline = build_glyph(resolved)
     outer = next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
+    left = min(point.x for point in outer)
     lower = _peak_x(outer, 100.0, 280.0)
     upper = _peak_x(outer, 480.0, 640.0)
-    assert abs(lower - upper) <= 8.0
+    assert upper < lower
+    ratio = (upper - left) / (lower - left)
+    assert ratio == pytest.approx(resolved.style.metrics["upper_bowl"], abs=0.015)
 
 
-def test_modern_b_valley_is_sharp():
-    """腰の外側の谷が丸いと、二つの山の境が締まらない。内周は動かさない。"""
+def test_modern_b_waist_is_a_fillet():
+    """二つの山の境は、接線がつながる凹みで、尖らない。上の穴も下の穴より内側。"""
     outline = build_glyph(load_resolved("B", "modern"))
     outer = next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
     crown = _peak_x(outer, 480.0, 640.0)
     waist = min(_right_extent(outer, y) for y in (350.0, 360.0, 370.0))
-    assert 55.0 <= crown - waist <= 90.0
-    assert min(_turns(outer)) > -60.0
+    assert 30.0 <= crown - waist <= 90.0
+    assert min(_turns(outer)) > -20.0
     upper = max(
         (contour for contour, hole in zip(outline.contours, outline.holes) if hole),
         key=lambda contour: max(point.y for point in contour),
@@ -322,7 +326,7 @@ def test_modern_b_valley_is_sharp():
         (contour for contour, hole in zip(outline.contours, outline.holes) if hole),
         key=lambda contour: max(point.y for point in contour),
     )
-    assert abs(_peak_x(upper, 480.0, 620.0) - _peak_x(lower, 140.0, 280.0)) <= 8.0
+    assert _peak_x(upper, 480.0, 620.0) < _peak_x(lower, 140.0, 280.0)
 
 
 @pytest.mark.parametrize("style", ("classic", "chic"))

@@ -55,6 +55,7 @@ _METRIC_KEYS = frozenset(
         "beak_tip",
         "spine_weight",
         "spine_smooth",
+        "upper_bowl",
     }
 )
 _TERMINALS = frozenset(

@@ -12,4 +12,4 @@ micro_area_floor: 2000
 curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 groups:
   diagonal: {stem_ratio: 1.06}
-metrics: {serif_length: 0.22, serif_thick: 0.016, bracket: 0.0, round_frac: 0.45, bar_y: 0.52, slant_thin: 0.40, apex_flat: 0.20, apex_taper: 1.0, beak_drop: 0.27, beak_sweep: 0.20, beak_tip: 0.0115, spine_weight: 1.0, spine_smooth: 0.1286}
+metrics: {serif_length: 0.22, serif_thick: 0.016, bracket: 0.0, round_frac: 0.45, bar_y: 0.52, slant_thin: 0.40, apex_flat: 0.20, apex_taper: 1.0, beak_drop: 0.27, beak_sweep: 0.20, beak_tip: 0.0115, spine_weight: 1.0, spine_smooth: 0.1286, upper_bowl: 0.94}

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import math
-from itertools import pairwise
 
 from engine.geometry import Vec2
+
+# 尖った谷を丸める区間。山の曲がりを残しつつ、先端が針にならない長さ。
+_TIP_REACH = 22.0
 
 
 def taper_end(
@@ -393,27 +395,12 @@ def _level_edge(a: Vec2, b: Vec2) -> bool:
     return dx > 6.0 and abs(b.y - a.y) < dx * 0.05
 
 
-def _notch(t: float) -> float:
-    """端では傾きを戻し、底だけを狭く曲げる。"""
-    if abs(t) >= 1.0:
-        return 0.0
-    return math.cos(math.pi * t / 2.0) ** 3
+def fillet_bowl_waist(points: list[Vec2], *, pinch: float = 56.0) -> list[Vec2]:
+    """右の二つの山の接合を、両端の接線につながる凹の曲線にする。内周は動かさない。
 
-
-def _x_on(span: list[Vec2], y: float) -> float:
-    for left, right in pairwise(span):
-        if abs(right.y - left.y) < 1e-6:
-            continue
-        if (left.y - y) * (right.y - y) <= 0.0:
-            along = (y - left.y) / (right.y - left.y)
-            return left.x + (right.x - left.x) * along
-    return min(span, key=lambda point: abs(point.y - y)).x
-
-
-def deepen_outer_waist(
-    points: list[Vec2], *, depth: float = 30.0, half: float = 40.0
-) -> list[Vec2]:
-    """右の二つの山のあいだだけ、外側の谷を鋭く左へ寄せる。内周は動かさない。"""
+    区間は高さで取る。サンプル数が変わっても同じ高さになる。
+    尖った谷は先端だけを丸め、山の曲線は残す。浅い谷は上下 64 で掘る。
+    """
     pts = _ring(points)
     n = len(pts)
     if n < 8:
@@ -428,7 +415,7 @@ def deepen_outer_waist(
     band = [
         index
         for index, point in enumerate(pts)
-        if point.x > right - 110.0 and abs(point.y - mid) < span * 0.28
+        if point.x > right - 140.0 and abs(point.y - mid) < span * 0.28
     ]
     if len(band) < 3:
         return pts
@@ -438,39 +425,228 @@ def deepen_outer_waist(
         return pts
     if not any(point.y < waist.y - 50.0 and point.x > waist.x + 16.0 for point in pts):
         return pts
+    upper_x = max(point.x for point in pts if point.y > waist.y + 50.0)
+    target = max(upper_x - pinch, waist.x - 36.0)
+    # すでに十分深い谷は、これ以上掘らない。尖っていれば角だけ丸める。
+    rounding = waist.x <= target + 1.0
+    if rounding:
+        target = waist.x
 
-    def outside(index: int) -> bool:
-        point = pts[index]
-        return abs(point.y - waist.y) > half or point.x < waist.x - 10.0
+    # 尖った谷は先端だけ丸める。長く取ると山の曲線を弦が横切る。
+    corner = abs(_turn(pts[(waist_at - 1) % n], waist, pts[(waist_at + 1) % n]))
+    reach = _TIP_REACH if rounding or corner >= 40.0 else 64.0
 
-    def edge(step: int) -> int:
-        cursor = waist_at
-        for _ in range(n // 3):
-            nxt = (cursor + step) % n
-            if outside(nxt):
-                return nxt
-            cursor = nxt
-        return cursor
+    def crossing(y: float) -> tuple[int, float, Vec2] | None:
+        best: tuple[float, int, float, Vec2] | None = None
+        for index in range(n):
+            start, end = pts[index], pts[(index + 1) % n]
+            dy = end.y - start.y
+            if abs(dy) < 1e-9 or (start.y - y) * (end.y - y) > 0.0:
+                continue
+            t = (y - start.y) / dy
+            x = start.x + (end.x - start.x) * t
+            if x < right - 200.0:
+                continue
+            if best is None or x > best[0]:
+                best = (x, index, t, Vec2(x, y))
+        if best is None:
+            return None
+        return best[1], best[2], best[3]
 
-    start, end = edge(-1), edge(1)
+    low = crossing(waist.y - reach)
+    high = crossing(waist.y + reach)
+    below = crossing(waist.y - reach - 14.0)
+    above = crossing(waist.y + reach + 14.0)
+    if low is None or high is None or below is None or above is None:
+        return pts
+    start = low[0]
+    step = 1 if pts[(start + 1) % n].y >= pts[start].y else -1
     chain = [start]
     cursor = start
-    while cursor != end:
-        cursor = (cursor + 1) % n
+    end_seg = high[0]
+    while True:
+        cursor = (cursor + step) % n
         chain.append(cursor)
+        if cursor == end_seg:
+            cursor = (cursor + step) % n
+            chain.append(cursor)
+            break
         if len(chain) > n // 2:
             return pts
-    span_pts = [pts[index] for index in chain]
-    if abs(span_pts[-1].y - span_pts[0].y) < 12.0:
+    if waist_at not in chain:
         return pts
-    steps = max(10, int(abs(span_pts[-1].y - span_pts[0].y) / 4.0))
-    bridge: list[Vec2] = []
-    for step in range(1, steps):
-        y = span_pts[0].y + (span_pts[-1].y - span_pts[0].y) * step / steps
-        bridge.append(
-            Vec2(_x_on(span_pts, y) - depth * _notch((y - waist.y) / half), y)
-        )
+    origin, finish = low[2], high[2]
+    into = origin - below[2]
+    out = above[2] - finish
+    if into.length() < 1e-6 or out.length() < 1e-6:
+        return pts
+    into, out = into.normalized(), out.normalized()
+
+    def curve(handle: float) -> list[Vec2]:
+        c1 = origin + into * handle
+        c2 = finish - out * handle
+        samples: list[Vec2] = []
+        for index in range(1, 17):
+            t = index / 17.0
+            u = 1.0 - t
+            samples.append(
+                origin * (u**3)
+                + c1 * (3 * u * u * t)
+                + c2 * (3 * u * t * t)
+                + finish * (t**3)
+            )
+        return samples
+
+    def gentle(samples: list[Vec2]) -> bool:
+        ring = [below[2], origin, *samples, finish, above[2]]
+        for index in range(1, len(ring) - 1):
+            v1 = ring[index] - ring[index - 1]
+            v2 = ring[index + 1] - ring[index]
+            if v1.length() < 1e-6 or v2.length() < 1e-6:
+                return False
+            turn = abs(math.degrees(math.atan2(v1.cross(v2), v1.dot(v2))))
+            if turn > 16.0:
+                return False
+        return True
+
+    def ordered(samples: list[Vec2]) -> bool:
+        ys = [point.y for point in samples]
+        if ys[0] <= ys[-1]:
+            return all(ys[index] <= ys[index + 1] + 0.5 for index in range(len(ys) - 1))
+        return all(ys[index] >= ys[index + 1] - 0.5 for index in range(len(ys) - 1))
+
+    def peak(samples: list[Vec2]) -> float:
+        """曲がりが一点に集まるほど大きい。角や逆向きは使わない。"""
+        if not ordered(samples) or min(point.x for point in samples) < target - 1.0:
+            return 1e9
+        ring = [below[2], origin, *samples, finish, above[2]]
+        worst = 0.0
+        for index in range(1, len(ring) - 1):
+            v1 = ring[index] - ring[index - 1]
+            v2 = ring[index + 1] - ring[index]
+            if v1.length() < 1e-6 or v2.length() < 1e-6:
+                return 1e9
+            turn = abs(math.degrees(math.atan2(v1.cross(v2), v1.dot(v2))))
+            if turn > 16.0:
+                return 1e9
+            worst = max(worst, turn / ((v1.length() + v2.length()) / 2.0) * 10.0)
+        return worst
+
+    best: list[Vec2] | None = None
+    best_x = 1e9
+    if rounding or corner >= 40.0:
+        # 一番深い曲線は先端だけが急に曲がる。山の曲がりに近い長さを取る。
+        span = (finish - origin).length()
+        lo, hi = span * 0.15, span * 1.1
+        for _ in range(12):
+            left = lo + (hi - lo) / 3.0
+            right = hi - (hi - lo) / 3.0
+            if peak(curve(left)) <= peak(curve(right)):
+                hi = right
+            else:
+                lo = left
+        chosen = curve((lo + hi) / 2.0)
+        if peak(chosen) < 1e8:
+            best = chosen
+            best_x = min(point.x for point in chosen)
+    else:
+        lo, hi = 16.0, 160.0
+        for _ in range(14):
+            handle = (lo + hi) / 2.0
+            samples = curve(handle)
+            deepest = min(point.x for point in samples)
+            if ordered(samples) and gentle(samples) and deepest >= target - 1.0:
+                if deepest < best_x:
+                    best, best_x = samples, deepest
+                lo = handle
+            else:
+                hi = handle
+    if best is None:
+        return pts
+    if best_x > waist.x + 1.0:
+        sharpest = 0.0
+        for index in chain[1:-1]:
+            v1 = pts[index] - pts[(index - 1) % n]
+            v2 = pts[(index + 1) % n] - pts[index]
+            if v1.length() < 1e-6 or v2.length() < 1e-6:
+                continue
+            sharpest = max(
+                sharpest, abs(math.degrees(math.atan2(v1.cross(v2), v1.dot(v2))))
+            )
+        if sharpest < 25.0:
+            return pts
+    bridge = [origin, *best, finish]
+    if (bridge[0] - pts[chain[0]]).length() < 0.05:
+        bridge = bridge[1:]
+    if bridge and (bridge[-1] - pts[chain[-1]]).length() < 0.05:
+        bridge = bridge[:-1]
     return _replace_chain(pts, chain, bridge)
+
+
+def ease_level_shoulders(points: list[Vec2]) -> list[Vec2]:
+    """天と地の横画が山へ入る角を、両方の接線でつなぐ。幹の角は残す。"""
+    pts = _ring(points)
+    if len(pts) < 8:
+        return pts
+    for _ in range(4):
+        n = len(pts)
+        ymin = min(point.y for point in pts)
+        ymax = max(point.y for point in pts)
+        replaced = False
+        for index in range(n):
+            prev, cur, nxt = pts[index - 1], pts[index], pts[(index + 1) % n]
+            turn = abs(_turn(prev, cur, nxt))
+            if not 12.0 < turn < 70.0:
+                continue
+            if min(abs(cur.y - ymin), abs(cur.y - ymax)) > 1.5:
+                continue
+            flat_next = abs(nxt.y - cur.y) < 1.2 and abs(nxt.x - cur.x) > 40.0
+            flat_prev = abs(cur.y - prev.y) < 1.2 and abs(cur.x - prev.x) > 40.0
+            if flat_next == flat_prev:
+                continue
+            curve_back = flat_next
+            back_len = 24.0 if curve_back else 16.0
+            fwd_len = 16.0 if curve_back else 24.0
+            back_from, back_to, back_t, start = _cut_at(pts, index, -1, back_len)
+            fwd_from, fwd_to, fwd_t, end = _cut_at(pts, index, 1, fwd_len)
+            curve_at = start if curve_back else end
+            if abs(curve_at.x - cur.x) < abs(curve_at.y - cur.y) * 0.75:
+                continue
+            drop_first = back_to if back_t < 1.0 - 1e-9 else (back_to + 1) % n
+            drop_last = fwd_from if fwd_t > 1e-9 else (fwd_from - 1) % n
+            chain = _chain_through(pts, drop_first, drop_last, index)
+            if chain is None or len(chain) > n // 3:
+                continue
+            into_raw = pts[back_to] - pts[back_from]
+            out_raw = pts[fwd_to] - pts[fwd_from]
+            if into_raw.length() < 1e-6 or out_raw.length() < 1e-6:
+                continue
+            into, out = into_raw.normalized(), out_raw.normalized()
+            control = _tangent_corner(start, into, end, out)
+            samples = _quadratic(start, control, end) if control is not None else []
+            flat_y = end.y if flat_next else start.y
+            bulges = flat_next and any(point.y > flat_y + 0.25 for point in samples)
+            bulges = bulges or (flat_prev and any(point.y < flat_y - 0.25 for point in samples))
+            if not samples or bulges:
+                samples = _bridge(start, into, end, out)
+                bulges = flat_next and any(point.y > flat_y + 0.25 for point in samples)
+                bulges = bulges or (
+                    flat_prev and any(point.y < flat_y - 0.25 for point in samples)
+                )
+            if not samples or bulges:
+                continue
+            bridge: list[Vec2] = []
+            if (start - pts[(drop_first - 1) % n]).length() > 1e-6:
+                bridge.append(start)
+            bridge.extend(samples)
+            if (end - pts[(drop_last + 1) % n]).length() > 1e-6:
+                bridge.append(end)
+            pts = _drop_span(pts, drop_first, drop_last, bridge)
+            replaced = True
+            break
+        if not replaced:
+            break
+    return pts
 
 
 def smooth_side_pinches(
@@ -496,6 +672,10 @@ def smooth_side_pinches(
             if abs(end.y - start.y) < abs(end.x - start.x) * 1.5:
                 continue
             if _chord_depth(pts[i], start, end) < 25.0:
+                continue
+            # 上下が同じ側へ開く谷は二つの山の境。横から入った棘ではない。
+            opened = (start.x - pts[i].x) * (end.x - pts[i].x)
+            if opened > 0.0 and min(abs(start.x - pts[i].x), abs(end.x - pts[i].x)) > 16.0:
                 continue
             drop_first = back_to if back_t < 1.0 - 1e-9 else (back_to + 1) % n
             drop_last = fwd_from if fwd_t > 1e-9 else (fwd_from - 1) % n

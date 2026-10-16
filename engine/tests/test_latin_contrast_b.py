@@ -439,7 +439,7 @@ def _outline_gap(left, right) -> float:
 
 
 def test_modern_b_keeps_its_outline_when_samples_change():
-    """モダン B のくびれは弧長で決める。サンプル 24 と 160 の差は 0.6 以内。"""
+    """モダン B の谷は山の曲線に沿って先端だけ丸める。サンプル 24 と 160 の差は 0.6 以内。"""
     resolved = load_resolved("B", "modern")
     original = build._SAMPLES
     try:
@@ -480,9 +480,27 @@ def test_contrast_b_ignores_hug_and_sample_count(style):
         build._SAMPLES = original_samples
 
 
+@pytest.mark.parametrize("style", _CONTRAST)
+def test_contrast_b_shoulders_meet_the_flat(style):
+    """天地の横画から山へ、段を立てずに入る。"""
+    pts = _ring(_outer(build_glyph(load_resolved("B", style))))
+    count = len(pts)
+    ymin = min(point.y for point in pts)
+    ymax = max(point.y for point in pts)
+    for index, point in enumerate(pts):
+        if min(abs(point.y - ymin), abs(point.y - ymax)) > 6.0 or point.x < 150.0:
+            continue
+        before, after = pts[index - 1], pts[(index + 1) % count]
+        turn = math.atan2(after.y - point.y, after.x - point.x) - math.atan2(
+            point.y - before.y, point.x - before.x
+        )
+        turn = (turn + math.pi) % (2 * math.pi) - math.pi
+        assert abs(math.degrees(turn)) < 12.0
+
+
 @pytest.mark.parametrize(("glyph", "style"), _UNCHANGED)
 def test_other_glyphs_keep_their_outline(glyph, style):
-    """形は保存した輪郭のまま。2026-10-07、字間を墨基準にしたので x だけ平行移動し、H の横棒は 0.48 から 0.52 へ上げ、シックの右脚を幹の 0.40 にした。2026-10-08、V は外縁と切り口で先端を作り、脚全体を一次に細くし、斜画のセリフを水平な下面と垂直な端に変えた。2026-10-13、クラシックとシックの S を7節点の骨格にし、くちばしを腕の端から内側へ下ろした（クラシックはブラケット 45・出 0.20、シックはつなぎの曲線・出 0.27）。シックは背を幹の太さに保ち、太さを弧の長さで均した（90 UPM）。クラシックも碗の内側の段を消すため 45 UPM で均し、ずれた頂を戻すため頂の節点を 0.49 と 0.51 にした。この2字の輪郭だけ差し替えた。"""
+    """形は保存した輪郭のまま。2026-10-07、字間を墨基準にしたので x だけ平行移動し、H の横棒は 0.48 から 0.52 へ上げ、シックの右脚を幹の 0.40 にした。2026-10-08、V は外縁と切り口で先端を作り、脚全体を一次に細くし、斜画のセリフを水平な下面と垂直な端に変えた。2026-10-13、クラシックとシックの S を7節点の骨格にし、くちばしを腕の端から内側へ下ろした（クラシックはブラケット 45・出 0.20、シックはつなぎの曲線・出 0.27）。シックは背を幹の太さに保ち、太さを弧の長さで均した（90 UPM）。クラシックも碗の内側の段を消すため 45 UPM で均し、ずれた頂を戻すため頂の節点を 0.49 と 0.51 にした。2026-10-16、B の上の碗を様式の upper_bowl 0.94 で左端を軸に狭め、谷は山の曲線に沿うよう先端だけを丸め、クラシックとシックの天地の段を接線でつないだ。モダンとポップの B だけ差し替えた。"""
     saved = json.loads(_FIXTURE.read_text())[f"{style}/{glyph}"]
     outline = build_glyph(load_resolved(glyph, style))
     assert outline.contour_count == len(saved["contours"])

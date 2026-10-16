@@ -10,4 +10,4 @@ vertical: {ascender: 820, descender: -180}
 micro_area_floor: 400
 curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
 groups: {}
-metrics: {bar_y: 0.52, apex_flat: 0.45, apex_taper: 0.85}
+metrics: {bar_y: 0.52, apex_flat: 0.45, apex_taper: 0.85, upper_bowl: 0.94}

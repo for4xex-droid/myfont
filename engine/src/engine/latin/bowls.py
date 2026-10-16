@@ -13,6 +13,8 @@ from itertools import pairwise
 from engine.geometry import Vec2
 
 _FLAT_PAST_STEM = 42.0
+# 空きが 80 未満の碗だけ、端の縮めを弱める。一様に縮めると横画を離れる曲率が段になる。
+_NARROW_EASE = 1.8
 
 
 def contrast_polygon(
@@ -192,7 +194,20 @@ def _pen_bow(
         if span < 1.0 or room < 8.0:
             return []
         factor = room / span
-        placed = [Vec2(x_right + (point.x - x_right) * factor, point.y) for point in placed]
+        # 横に強く縮めると、平らな横画を離れる曲率が段になる。狭い碗だけ端の縮めを弱める。
+        if room >= 80.0:
+            placed = [
+                Vec2(x_right + (point.x - x_right) * factor, point.y) for point in placed
+            ]
+        else:
+            power = 1.0 + (80.0 - room) / 40.0 * _NARROW_EASE
+            placed = [
+                Vec2(
+                    x_right - room * max(0.0, (x_right - point.x) / span) ** power,
+                    point.y,
+                )
+                for point in placed
+            ]
     points = [Vec2(x_left, y0), Vec2(placed[0].x, y0)]
     points.extend(placed[1:])
     points.append(Vec2(x_left, y1))
