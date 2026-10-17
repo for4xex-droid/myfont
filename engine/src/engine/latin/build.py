@@ -10,6 +10,7 @@ from pathops import Path, PathOp, op, simplify
 
 from engine.geometry import (
     Vec2,
+    limit_half_to_curvature,
     sample_cubic,
     variable_width_outline,
     variable_width_ring_outlines,
@@ -207,7 +208,7 @@ def _widths(
             _hold_spine(samples, widths, resolved.pen.stem * cap / 2.0, metrics["spine_weight"])
         if "spine_smooth" in metrics:
             widths = _smooth_along(samples, widths, metrics["spine_smooth"] * cap)
-    return widths
+    return limit_half_to_curvature(samples, widths)
 
 
 def _hold_spine(

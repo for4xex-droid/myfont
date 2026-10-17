@@ -266,6 +266,24 @@ def curvature_radii(
     return out
 
 
+def limit_half_to_curvature(
+    samples: Sequence[tuple[Vec2, Vec2]],
+    half_widths: Sequence[float],
+) -> list[float]:
+    """半幅が局所の曲率半径を超える点は、半径まで落とす。
+
+    端の曲率は隣の点を使う。半径を超えたペンは内周が折り返し、壁が棘になる。
+    """
+    radii = curvature_radii(samples)
+    if len(radii) >= 3:
+        radii[0] = radii[1]
+        radii[-1] = radii[-2]
+    return [
+        min(width, radius)
+        for width, radius in zip(half_widths, radii, strict=True)
+    ]
+
+
 def min_curvature_radius(
     samples: Sequence[tuple[Vec2, Vec2]],
 ) -> float:

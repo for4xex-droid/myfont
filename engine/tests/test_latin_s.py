@@ -7,7 +7,7 @@ from itertools import pairwise
 
 import pytest
 
-from engine.geometry import Vec2
+from engine.geometry import Vec2, limit_half_to_curvature
 from engine.latin.build import _centerline, _fit_bowls, build_glyph
 from engine.latin.joins import fill_crown_saddle
 from engine.latin.load import load_resolved
@@ -459,3 +459,78 @@ def test_crown_saddle_fill_is_a_shallow_arc():
     assert _longest_crown_straight(filled, band=40.0) <= 30.0
     crown = [point for point in filled if point.y > 100.0]
     assert crown
+
+
+def _arc(radius: float, start: float, step: float, count: int):
+    samples = []
+    for index in range(count):
+        angle = start + step * index
+        samples.append(
+            (
+                Vec2(radius * math.cos(angle), radius * math.sin(angle)),
+                Vec2(-math.sin(angle), math.cos(angle)),
+            )
+        )
+    return samples
+
+
+def test_half_width_drops_on_a_curve_tighter_than_the_pen():
+    """半幅が曲率半径を超えた区間は、半径まで落とす。"""
+    radius = 40.0
+    samples = _arc(radius, 0.4, 0.05, 40)
+    limited = limit_half_to_curvature(samples, [70.0] * len(samples))
+    assert max(limited) <= radius * 1.15
+    assert min(limited) >= radius * 0.85
+
+
+def test_half_width_on_a_straight_span_stays():
+    samples = [(Vec2(float(i * 10), 0.0), Vec2(1.0, 0.0)) for i in range(8)]
+    widths = [55.0] * len(samples)
+    assert limit_half_to_curvature(samples, widths) == pytest.approx(widths)
+
+
+def _ink_along_normal(origin, normal, contour) -> float | None:
+    """法線が輪郭を切る、原点の両側でいちばん近い交点の間隔。"""
+    cuts: list[float] = []
+    ring = _ring(contour)
+    for start, end in pairwise([*ring, ring[0]]):
+        edge = end - start
+        den = normal.x * edge.y - normal.y * edge.x
+        if abs(den) < 1e-9:
+            continue
+        offset = start - origin
+        distance = (offset.x * edge.y - offset.y * edge.x) / den
+        share = (offset.x * normal.y - offset.y * normal.x) / den
+        if 0.0 <= share <= 1.0 and abs(distance) > 0.5:
+            cuts.append(distance)
+    pos = [item for item in cuts if item > 0.0]
+    neg = [-item for item in cuts if item < 0.0]
+    if not pos or not neg:
+        return None
+    return min(pos) + min(neg)
+
+
+def test_pop_s_wall_is_at_least_85_percent_of_the_stem():
+    """ポップの S の壁は幹の 0.85 倍以上。
+
+    y=200 の最も細い墨は丸い端の天をかすめる弦で、壁ではない。
+    壁は中心線に直交する墨の厚さ。半幅が曲率半径を超える区間だけ細くする。
+    """
+    resolved = load_resolved("S", "pop")
+    stem = resolved.pen.stem * resolved.style.cap_height
+    frame = _fit_bowls(resolved)[0]["spine"]
+    stroke = resolved.skeleton.strokes[0]
+    samples, _widths = _centerline(stroke, resolved, frame)
+    contour = build_glyph(resolved).contours[0]
+    walls = []
+    for index, (pos, tangent) in enumerate(samples):
+        if index % 4:
+            continue
+        normal = tangent.perpendicular().normalized()
+        if normal.length() < 1e-9:
+            continue
+        thickness = _ink_along_normal(pos, normal, contour)
+        if thickness is not None:
+            walls.append(thickness)
+    assert walls
+    assert min(walls) >= 0.85 * stem
