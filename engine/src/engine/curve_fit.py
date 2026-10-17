@@ -549,6 +549,41 @@ def fit_pinned_contour(
     return ContourPath(start=pts[pins[0]], segs=segs)
 
 
+def fit_crown_pinned_contour(
+    points: Sequence[Point],
+    *,
+    max_error_upm: float,
+    corner_deg: float,
+) -> ContourPath | None:
+    """角と天地の極値を固定してフィットする。
+
+    開いた腕の浅い弧は、頂点を節にしないと一本の三次曲線に入る。
+    すると頂点の先で曲率が折れる。
+    """
+    pts = _open_ring(points)
+    if len(pts) < 3:
+        return None
+    pins = set(detect_corners(pts, angle_deg=corner_deg, min_sep_upm=10.0))
+    pins.add(max(range(len(pts)), key=lambda index: pts[index][1]))
+    pins.add(min(range(len(pts)), key=lambda index: pts[index][1]))
+    ordered = sorted(pins)
+    segs: list[tuple] = []
+    start = pts[ordered[0]]
+    for index, start_at in enumerate(ordered):
+        end_at = ordered[(index + 1) % len(ordered)]
+        if end_at > start_at:
+            chain = pts[start_at : end_at + 1]
+        else:
+            chain = pts[start_at:] + pts[: end_at + 1]
+        if len(chain) < 2:
+            continue
+        segs.extend(_fit_open(chain, max_error=max_error_upm * 0.85))
+    if not segs:
+        return None
+    segs = _try_merge_segs(start, segs, pts, max_error_upm=max_error_upm)
+    return ContourPath(start=start, segs=segs)
+
+
 def fit_closed_contour(
     points: Sequence[Point],
     *,

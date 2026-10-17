@@ -24,6 +24,7 @@ from engine.join_solver import (
 from engine.latin.bowls import contrast_polygon, ease_outer_cusp
 from engine.latin.hobby import Cubic, expand_stroke
 from engine.latin.joins import (
+    arc_open_crown,
     bevel_apex_valley,
     blunt_inner_peak,
     ease_level_shoulders,
@@ -1138,6 +1139,15 @@ def _nib_bowl(stroke: Stroke, resolved: Resolved) -> bool:
     )
 
 
+def _open_nib_arm(resolved: Resolved) -> bool:
+    """接合のない開いた碗。クラシックとシックの S がこれで、閉じた O や B は違う。"""
+    strokes = resolved.skeleton.strokes
+    if resolved.pen.type != "nib" or len(strokes) != 1 or resolved.skeleton.joins:
+        return False
+    stroke = strokes[0]
+    return not stroke.closed and stroke.role == "bowl" and "open" in stroke.ends
+
+
 def _facing_start(stroke: Stroke, resolved: Resolved) -> bool:
     """この端が、もう一方の碗と向かい合う横棒側か。"""
     others = [
@@ -1267,6 +1277,9 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
         if contrast:
             polished = ease_outer_cusp(polished)
         polished = crown(smooth_side_pinches(polished))
+        # 開いた高コントラストの腕（S。のちに C G 2 3 5）だけ、天地の直線を弧にする。
+        if _open_nib_arm(resolved):
+            polished = arc_open_crown(polished)
         # 閉じた碗の頂はコントラストの計測そのものなので、尖りも埋めない。
         polished = (
             blunt_inner_peak(polished) if crown is fill_crown_saddle else polished

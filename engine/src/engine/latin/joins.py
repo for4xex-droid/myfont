@@ -739,7 +739,7 @@ def blunt_inner_peak(
 def fill_crown_saddle(
     points: list[Vec2], *, depth: float = 40.0, gap: float = 30.0
 ) -> list[Vec2]:
-    """上下の端で、2つの肩のあいだに浅く沈んだ所を肩から肩への直線で埋める。
+    """上下の端で、2つの肩のあいだに浅く沈んだ所を肩から肩への浅い弧で埋める。
 
     細い方向が水平のペンでは、ヘアラインの両側の太りが外へも膨らみ、頂が鞍形に凹む。
     """
@@ -775,8 +775,114 @@ def fill_crown_saddle(
                 if best is None or len(chain) < len(best):
                     best = chain
         if best is not None:
-            pts = _replace_chain(pts, best, [])
+            pts = _replace_chain(
+                pts, best, _crown_arc(pts[best[0]], pts[best[-1]], sign)
+            )
     return pts
+
+
+# 弦から 0.5 以内の直線が 30 を超えない半径。
+_CROWN_RADIUS = 200.0
+
+
+def _crown_arc(start: Vec2, end: Vec2, sign: float) -> list[Vec2]:
+    """肩から肩への弦を、外へ膨らむ浅い円弧にする。30 以内の弦はそのまま。"""
+    chord = end - start
+    length = chord.length()
+    if length <= 30.0 or length >= 2.0 * _CROWN_RADIUS:
+        return []
+    half = length / 2.0
+    sagitta = _CROWN_RADIUS - math.sqrt(_CROWN_RADIUS * _CROWN_RADIUS - half * half)
+    normal = Vec2(-chord.y / length, chord.x / length)
+    if normal.y * sign < 0.0:
+        normal = -normal
+    mid = start + chord * 0.5
+    center = mid - normal * (_CROWN_RADIUS - sagitta)
+    ang_start = math.atan2(start.y - center.y, start.x - center.x)
+    ang_end = math.atan2(end.y - center.y, end.x - center.x)
+    sweep = ang_end - ang_start
+    while sweep > math.pi:
+        sweep -= 2.0 * math.pi
+    while sweep < -math.pi:
+        sweep += 2.0 * math.pi
+    count = max(8, int(abs(sweep) * _CROWN_RADIUS / 4.0))
+    arc = []
+    for step in range(1, count):
+        angle = ang_start + sweep * step / count
+        arc.append(
+            Vec2(
+                center.x + _CROWN_RADIUS * math.cos(angle),
+                center.y + _CROWN_RADIUS * math.sin(angle),
+            )
+        )
+    return arc
+
+
+def arc_open_crown(points: list[Vec2]) -> list[Vec2]:
+    """開いた腕の天地を、角から頂点まで、頂点で水平な円弧にする。
+
+    端と頂点は動かさない。点の数も変えず、各点の x を保ったまま円の上へ移す。
+    """
+    pts = _ring(points)
+    moved = list(pts)
+    for sign in (1.0, -1.0):
+        count = len(moved)
+        if count < 8:
+            return pts
+        peak = max(range(count), key=lambda index: moved[index].y * sign)
+        corner = _arm_corner(moved, peak, sign)
+        if corner is None:
+            continue
+        chain = _chain_through(moved, corner, peak, corner)
+        if chain is None or len(chain) < 4 or len(chain) > count // 2:
+            continue
+        placed = _seat_on_horizontal_arc(moved, chain, sign)
+        if placed is not None:
+            moved = placed
+    return moved
+
+
+def _arm_corner(points: list[Vec2], peak: int, sign: float) -> int | None:
+    """頂点から腕を戻り、最初の角。腕が 50 下がる前に角がなければ腕ではない。"""
+    count = len(points)
+    index = peak
+    for _ in range(count // 2):
+        index = (index - 1) % count
+        corner = points[index]
+        turn = _turn(points[index - 1], corner, points[(index + 1) % count])
+        if abs(turn) > 40.0:
+            return index
+        if (points[peak].y - points[index].y) * sign > 50.0:
+            return None
+    return None
+
+
+def _seat_on_horizontal_arc(
+    points: list[Vec2], chain: list[int], sign: float
+) -> list[Vec2] | None:
+    """鎖の内側を、終点で接線が水平な円の上へ、x を保って移す。"""
+    start, end = points[chain[0]], points[chain[-1]]
+    rise = (end.y - start.y) * sign
+    if rise < 1.0:
+        return None
+    run = end.x - start.x
+    if abs(run) < 1.0:
+        return None
+    drop = end.y - start.y
+    radius = (run * run + drop * drop) / (2.0 * rise)
+    center_y = end.y - sign * radius
+    out = list(points)
+    previous = start.x
+    for index in chain[1:-1]:
+        placed = points[index].x
+        if (placed - previous) * run < -0.5:
+            return None
+        disc = radius * radius - (placed - end.x) ** 2
+        if disc < 0.0:
+            return None
+        out[index] = Vec2(placed, center_y + sign * math.sqrt(disc))
+        previous = placed
+    return out
 
 
 def _two_feet(points: list[Vec2]) -> tuple[int, int] | None:

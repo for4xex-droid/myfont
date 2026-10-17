@@ -9,6 +9,7 @@ from pathops import Path, simplify
 from engine.curve_fit import (
     ContourPath,
     fit_closed_contour,
+    fit_crown_pinned_contour,
     fit_pinned_contour,
     hausdorff_path_to_polyline,
 )
@@ -454,10 +455,37 @@ def _reject(
     return None
 
 
+def _faired_crown(
+    points: list[tuple[float, float]],
+    curve: dict,
+    *,
+    hole: bool,
+    line_tol: float,
+    limit: float,
+    glyph: str,
+) -> ContourPath | None:
+    """天地の極値を節にした当て直し。通常の整形が極値を曲線から外したときだけ使う。"""
+    raw = fit_crown_pinned_contour(
+        points,
+        max_error_upm=float(curve["max_error"]),
+        corner_deg=float(curve["corner_deg"]),
+    )
+    if raw is None:
+        return None
+    path = _post(raw, points, curve, hole=hole, line_tol=line_tol)
+    if _reject(path, points, limit, glyph) is not None:
+        return None
+    faired = fair_contour(path, points)
+    if _reject(faired, points, limit, glyph) is not None:
+        return None
+    return faired
+
+
 def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
     """様式の誤差上限でフィットする。極値を入れ、丸め後に誤差と自己交差を見る。
 
     角と極値を固定したフィットと、従来のフィットを比べ、オンカーブ点が少ない方を採る。
+    整形が極値を外した開いた腕は、天地の極値を節に取り直す。
     """
     curve = style.curve
     limit = float(curve["max_error"]) + 0.75
@@ -495,6 +523,17 @@ def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
             faired = fair_contour(chosen, points)
             if _reject(faired, points, limit, outline.glyph) is None:
                 chosen = faired
+            else:
+                rescued = _faired_crown(
+                    points,
+                    curve,
+                    hole=hole,
+                    line_tol=line_tol,
+                    limit=limit,
+                    glyph=outline.glyph,
+                )
+                if rescued is not None:
+                    chosen = rescued
         origin = min(chosen.on_curve_points(), key=lambda p: (p[1], p[0]))
         fitted.append((origin, chosen))
     fitted.sort(key=lambda item: (item[0][1], item[0][0]))

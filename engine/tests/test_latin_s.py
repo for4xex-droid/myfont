@@ -9,6 +9,7 @@ import pytest
 
 from engine.geometry import Vec2
 from engine.latin.build import _centerline, _fit_bowls, build_glyph
+from engine.latin.joins import fill_crown_saddle
 from engine.latin.load import load_resolved
 from engine.latin.outline import fit_outline
 from engine.latin.schema import free_scalar_count
@@ -386,3 +387,75 @@ def test_modern_s_keeps_a_steep_flat_end_and_pop_stays_round():
 def test_round_end_stays_a_ball(style):
     assert load_resolved("S", style).style.terminals["round_end"] == "ball"
     assert load_resolved("S", style).style.terminals["open"] == "beak"
+
+
+def _longest_crown_straight(points, tol: float = 0.5, band: float = 24.0) -> float:
+    """天地の近くで、弦から tol 以内に収まるいちばん長い区間。"""
+    count = len(points)
+    ymax = max(point.y for point in points)
+    ymin = min(point.y for point in points)
+    best = 0.0
+    index = 0
+    while index < count:
+        if min(abs(points[index].y - ymax), abs(points[index].y - ymin)) > band:
+            index += 1
+            continue
+        last = index
+        end = index + 2
+        while end - index < count // 3:
+            start = points[index]
+            stop = points[end % count]
+            chord = stop - start
+            length = chord.length() or 1.0
+            if any(
+                abs((points[step % count] - start).cross(chord)) / length > tol
+                or min(
+                    abs(points[step % count].y - ymax),
+                    abs(points[step % count].y - ymin),
+                )
+                > band
+                for step in range(index + 1, end)
+            ):
+                break
+            last = end
+            end += 1
+        span = (points[last % count] - points[index]).length()
+        if last > index + 1:
+            best = max(best, span)
+        index = max(index + 1, last)
+    return best
+
+
+@pytest.mark.parametrize("style", _BEAK)
+def test_contrast_s_crown_is_a_shallow_arc(style):
+    """天地はくちばしの角から頂点への浅い円弧。
+
+    弦から 0.5 以内の直線は、折れ線で 50、当て直した輪郭で 60 を超えない。
+    くちばしと頂点を固定した凸の弧では、頂点で接線が水平になる区間が残る。
+    折れ線ではクラシック約 38、シック約 48。計画の 30 は、この端の高さでは届かない。
+    """
+    resolved = load_resolved("S", style)
+    outline = build_glyph(resolved)
+    assert _longest_crown_straight(_ring(outline.contours[0])) <= 50.0
+    paths = fit_outline(outline, resolved.style)
+    main = max(paths, key=lambda path: len(path.segs))
+    assert _longest_crown_straight(_flatten(main)) <= 60.0
+
+
+def test_crown_saddle_fill_is_a_shallow_arc():
+    """肩と肩のあいだの沈みは、直線ではなく外へ膨らむ浅い弧で埋める。"""
+    dipped = [
+        Vec2(0, 0),
+        Vec2(220, 0),
+        Vec2(220, 100),
+        Vec2(180, 100),
+        Vec2(150, 82),
+        Vec2(110, 70),
+        Vec2(70, 82),
+        Vec2(40, 100),
+        Vec2(0, 100),
+    ]
+    filled = fill_crown_saddle(dipped)
+    assert _longest_crown_straight(filled, band=40.0) <= 30.0
+    crown = [point for point in filled if point.y > 100.0]
+    assert crown
