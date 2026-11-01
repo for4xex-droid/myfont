@@ -352,6 +352,76 @@ def ease_outer_cusp(points: list[Vec2], *, turn_deg: float = -100.0, cut: float 
     return eased
 
 
+def pen_envelope(
+    samples: list[tuple[Vec2, Vec2]],
+    widths: list[float],
+    *,
+    stem: float,
+    hairline: float,
+    theta_deg: float,
+) -> tuple[list[Vec2], list[Vec2]]:
+    """楕円ペンで掃いた両側の縁。法線の向きにある、ペンの楕円の支持点に置く。
+
+    法線に半幅だけ押し出すと、太さが急に変わる所で縁が支持点から横にずれ、凸の碗の天地に谷ができる。
+    支持点なら、凸の中心線の外縁は凸のまま。法線方向の太さは widths のまま。
+    """
+    axis = Vec2(math.cos(math.radians(theta_deg)), math.sin(math.radians(theta_deg)))
+    cross = Vec2(-axis.y, axis.x)
+    long_half, short_half = stem / 2.0, hairline / 2.0
+    left: list[Vec2] = []
+    right: list[Vec2] = []
+    for (pos, tangent), half in zip(samples, widths, strict=True):
+        unit = tangent.normalized()
+        normal = Vec2(-unit.y, unit.x)
+        along, across = normal.dot(axis), normal.dot(cross)
+        reach = math.hypot(long_half * along, short_half * across)
+        if reach < 1e-9:
+            left.append(pos + normal * half)
+            right.append(pos - normal * half)
+            continue
+        support = (
+            axis * (long_half * long_half * along) + cross * (short_half * short_half * across)
+        ) * (half / (reach * reach))
+        left.append(pos + support)
+        right.append(pos - support)
+    return left, right
+
+
+def box_ellipse(points: list[Vec2], *, samples: int = 560) -> list[Vec2]:
+    """輪郭の箱に収まる楕円。天地と左右の極は箱のまま残し、向きは元の輪郭に合わせる。"""
+    pts = list(points)
+    if len(pts) >= 2 and (pts[0] - pts[-1]).length() < 1e-6:
+        pts = pts[:-1]
+    if len(pts) < 4 or samples < 8:
+        return list(points)
+    xs = [point.x for point in pts]
+    ys = [point.y for point in pts]
+    center_x = (min(xs) + max(xs)) / 2.0
+    center_y = (min(ys) + max(ys)) / 2.0
+    radius_x = (max(xs) - min(xs)) / 2.0
+    radius_y = (max(ys) - min(ys)) / 2.0
+    if radius_x < 1.0 or radius_y < 1.0:
+        return list(points)
+    area = sum(
+        start.x * end.y - end.x * start.y
+        for start, end in zip(pts, pts[1:] + pts[:1], strict=True)
+    )
+    ring = [
+        Vec2(
+            center_x + radius_x * math.cos(2.0 * math.pi * index / samples),
+            center_y + radius_y * math.sin(2.0 * math.pi * index / samples),
+        )
+        for index in range(samples)
+    ]
+    ellipse_area = sum(
+        start.x * end.y - end.x * start.y
+        for start, end in zip(ring, ring[1:] + ring[:1], strict=True)
+    )
+    if area * ellipse_area < 0.0:
+        ring.reverse()
+    return _clean(ring)
+
+
 def _clean(points: list[Vec2]) -> list[Vec2]:
     """0.01 単位に丸める。生の浮動小数のままだと、重なりの演算が輪郭を落とす。"""
     rounded = [Vec2(round(point.x, 2), round(point.y, 2)) for point in points]

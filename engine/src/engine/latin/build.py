@@ -22,7 +22,12 @@ from engine.join_solver import (
     poly_to_path,
     split_contours,
 )
-from engine.latin.bowls import contrast_polygon, ease_outer_cusp
+from engine.latin.bowls import (
+    box_ellipse,
+    contrast_polygon,
+    ease_outer_cusp,
+    pen_envelope,
+)
 from engine.latin.hobby import Cubic, expand_stroke
 from engine.latin.joins import (
     arc_open_crown,
@@ -468,10 +473,12 @@ def _boxes(
     built: list[tuple[list[tuple[Vec2, Vec2]], list[float]]],
     *,
     level: bool = False,
+    envelope: Resolved | None = None,
 ) -> tuple[_Box, _Box]:
     """中心線と、太さを付けた外形の (xmin, xmax, ymin, ymax)。
 
     level では水平に走る所だけで測る。曲がり始めの膨らみはオーバーシュートとして残る。
+    envelope を渡すと、外形はペンの包絡（`pen_envelope`）で測る。
     """
     if level:
         flat = []
@@ -489,6 +496,13 @@ def _boxes(
     oxs: list[float] = []
     oys: list[float] = []
     for samples, widths in built:
+        if envelope is not None:
+            xs.extend(pos.x for pos, _tangent in samples)
+            ys.extend(pos.y for pos, _tangent in samples)
+            for side in _envelope_sides(samples, widths, envelope):
+                oxs.extend(point.x for point in side)
+                oys.extend(point.y for point in side)
+            continue
         for (pos, tangent), half in zip(samples, widths):
             xs.append(pos.x)
             ys.append(pos.y)
@@ -552,6 +566,7 @@ def _fit_bowls(resolved: Resolved) -> tuple[dict[str, _Frame], float]:
         target_x = None
         # 断面から描く碗の外形は、一番細い幅だけ外へ出る。位置合わせもその幅で測る。
         contrast = resolved.pen.type == "nib" and _bowl_joined(group[0], resolved)
+        envelope = resolved if _hairline_crown(group[0], resolved) else None
         if closed:
             _line, ink = _boxes([_centerline(s, resolved, frame) for s in group])
             ratio = (ink[1] - ink[0]) / (ink[3] - ink[2])
@@ -563,7 +578,9 @@ def _fit_bowls(resolved: Resolved) -> tuple[dict[str, _Frame], float]:
                 built = [
                     (samples, [min(widths)] * len(widths)) for samples, widths in built
                 ]
-            line, ink = _boxes(built, level=_bowl_joined(group[0], resolved))
+            line, ink = _boxes(
+                built, level=_bowl_joined(group[0], resolved), envelope=envelope
+            )
             y_off, y_scale = _refit(
                 frame.y_off, frame.y_scale, line[2], line[3], ink[2], ink[3], target_y
             )
@@ -639,6 +656,9 @@ def _stroke_paths(
     paths: list[Path] = []
     if stroke.closed:
         outer, inner = variable_width_ring_outlines(samples, widths)
+        if _hairline_crown(stroke, resolved):
+            outer = box_ellipse(_envelope_outer(samples, widths, resolved))
+            inner = box_ellipse(inner)
         outer_path = _to_path(outer)
         inner_path = _to_path(inner)
         if count_contours(inner_path):
@@ -1138,6 +1158,41 @@ def _nib_bowl(stroke: Stroke, resolved: Resolved) -> bool:
         and stroke.role == "bowl"
         and _bowl_joined(stroke, resolved)
     )
+
+
+def _hairline_crown(stroke: Stroke, resolved: Resolved) -> bool:
+    """細い方向が水平な、接合のない閉じた碗。天地で穴がレンズになる（シックの O と 0）。"""
+    return (
+        resolved.pen.type == "nib"
+        and resolved.pen.theta_deg == 0.0
+        and stroke.closed
+        and stroke.role == "bowl"
+        and not _bowl_joined(stroke, resolved)
+    )
+
+
+def _envelope_sides(
+    samples: list[tuple[Vec2, Vec2]], widths: list[float], resolved: Resolved
+) -> tuple[list[Vec2], list[Vec2]]:
+    cap = resolved.style.cap_height
+    pen = resolved.pen
+    return pen_envelope(
+        samples,
+        widths,
+        stem=pen.stem * cap,
+        hairline=pen.hairline * cap,
+        theta_deg=pen.theta_deg,
+    )
+
+
+def _envelope_outer(
+    samples: list[tuple[Vec2, Vec2]], widths: list[float], resolved: Resolved
+) -> list[Vec2]:
+    work, halves = list(samples), list(widths)
+    if len(work) >= 2 and (work[0][0] - work[-1][0]).length() < 1e-6:
+        work, halves = work[:-1], halves[:-1]
+    left, right = _envelope_sides(work, halves, resolved)
+    return max(left, right, key=lambda ring: abs(_signed_area(ring)))
 
 
 def _open_nib_arm(resolved: Resolved) -> bool:

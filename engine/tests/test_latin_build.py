@@ -24,6 +24,88 @@ def test_pilot_glyph_matches_expected_contours(glyph, style):
     assert outline.advance > 0
 
 
+def _crown_kink(contour) -> float:
+    """天地の極から 12 UPM 以内の、いちばん大きい折れ。"""
+    pts = list(contour)
+    if len(pts) > 1 and pts[0].x == pts[-1].x and pts[0].y == pts[-1].y:
+        pts = pts[:-1]
+    low = min(point.y for point in pts)
+    high = max(point.y for point in pts)
+    worst = 0.0
+    for turn, point in zip(_turns(pts), pts, strict=True):
+        if min(abs(point.y - low), abs(point.y - high)) <= 12.0:
+            worst = max(worst, abs(turn))
+    return worst
+
+
+@pytest.mark.parametrize("glyph", ("O", "zero"))
+def test_chic_counter_crowns_stay_under_three_degrees(glyph):
+    """シックの O と 0 の穴は、天地のヘアラインと左右の最太から決めた楕円。折れは 3° まで。"""
+    outline = build_glyph(load_resolved(glyph, "chic"))
+    hole = next(contour for contour, hole in zip(outline.contours, outline.holes) if hole)
+    assert _crown_kink(hole) <= 3.0
+
+
+@pytest.mark.parametrize("glyph", ("O", "zero"))
+def test_chic_outer_crowns_have_no_valley(glyph):
+    """外形の天地は中心がいちばん高い（低い）。両脇が出て中央が沈む谷を作らない。"""
+    outline = build_glyph(load_resolved(glyph, "chic"))
+    outer = next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
+    xs = [point.x for point in outer]
+    middle = (min(xs) + max(xs)) / 2.0
+    for upper in (True, False):
+        side = [point for point in outer if (point.y > 350.0) is upper]
+        crown = sorted(
+            (point for point in side if abs(point.x - middle) <= 120.0),
+            key=lambda point: point.x,
+        )
+        heights = [point.y if upper else -point.y for point in crown]
+        peak = max(range(len(crown)), key=lambda index: heights[index])
+        assert abs(crown[peak].x - middle) <= 2.0
+        rising = heights[: peak + 1]
+        falling = heights[peak:]
+        assert all(b >= a - 0.02 for a, b in pairwise(rising))
+        assert all(b <= a + 0.02 for a, b in pairwise(falling))
+
+
+def test_chic_o_axis_walls_stay_on_the_pen():
+    """穴の楕円は、天地をヘアライン、左右を幹の太さに合わせたままにする。"""
+    resolved = load_resolved("O", "chic")
+    cap = resolved.style.cap_height
+    outline = build_glyph(resolved)
+    outer = next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
+    hole = next(contour for contour, hole in zip(outline.contours, outline.holes) if hole)
+    xs = [point.x for point in outer]
+    ys = [point.y for point in outer]
+    origin_x = (min(xs) + max(xs)) / 2.0
+    origin_y = (min(ys) + max(ys)) / 2.0
+
+    def wall(axis_x: float, axis_y: float) -> float:
+        total = 0.0
+        for sign in (1.0, -1.0):
+            direction = (axis_x * sign, axis_y * sign)
+            cuts = []
+            for contour in (outer, hole):
+                ring = list(contour)
+                hits = []
+                for start, end in zip(ring, ring[1:] + ring[:1], strict=False):
+                    edge_x, edge_y = end.x - start.x, end.y - start.y
+                    den = direction[0] * edge_y - direction[1] * edge_x
+                    if abs(den) < 1e-9:
+                        continue
+                    off_x, off_y = start.x - origin_x, start.y - origin_y
+                    distance = (off_x * edge_y - off_y * edge_x) / den
+                    share = (off_x * direction[1] - off_y * direction[0]) / den
+                    if distance > 0.5 and 0.0 <= share <= 1.0:
+                        hits.append(distance)
+                cuts.append(min(hits))
+            total += cuts[0] - cuts[1]
+        return total / 2.0
+
+    assert wall(0.0, 1.0) == pytest.approx(resolved.pen.hairline * cap, abs=0.05)
+    assert wall(1.0, 0.0) == pytest.approx(resolved.pen.stem * cap, abs=0.05)
+
+
 def _turns(contour):
     import math
 

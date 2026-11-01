@@ -109,6 +109,36 @@ def _orient(path: ContourPath, *, hole: bool) -> ContourPath:
     return path
 
 
+_KAPPA = 4.0 * (math.sqrt(2.0) - 1.0) / 3.0
+
+
+def _exact_ellipse(points: list[tuple[float, float]], *, hole: bool) -> ContourPath | None:
+    """軸にそろった楕円なら、極を節にした4本の cubic で書く。当て直しより 1 桁正確。"""
+    if len(points) < 16:
+        return None
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    cx, cy = (min(xs) + max(xs)) / 2.0, (min(ys) + max(ys)) / 2.0
+    rx, ry = (max(xs) - min(xs)) / 2.0, (max(ys) - min(ys)) / 2.0
+    if rx < 1.0 or ry < 1.0:
+        return None
+    for x, y in points:
+        if abs(math.hypot((x - cx) / rx, (y - cy) / ry) - 1.0) * min(rx, ry) > 0.05:
+            return None
+    kx, ky = _KAPPA * rx, _KAPPA * ry
+    bottom = (cx, cy - ry)
+    path = ContourPath(
+        start=bottom,
+        segs=[
+            ("C", cx + kx, cy - ry, cx + rx, cy - ky, cx + rx, cy),
+            ("C", cx + rx, cy + ky, cx + kx, cy + ry, cx, cy + ry),
+            ("C", cx - kx, cy + ry, cx - rx, cy + ky, cx - rx, cy),
+            ("C", cx - rx, cy - ky, cx - kx, cy - ry, bottom[0], bottom[1]),
+        ],
+    )
+    return _orient(_rotate_start(_round(path)), hole=hole)
+
+
 def _lerp(
     a: tuple[float, float], b: tuple[float, float], t: float
 ) -> tuple[float, float]:
@@ -307,16 +337,64 @@ def _flatten_true_lines(
                 return False
         return True
 
+    def end_of(seg: tuple) -> tuple[float, float]:
+        if seg[0] == "L":
+            return (float(seg[1]), float(seg[2]))
+        return (float(seg[5]), float(seg[6]))
+
+    def heading(start: tuple[float, float], seg: tuple, *, at_end: bool) -> float | None:
+        if seg[0] == "L":
+            points = [start, end_of(seg)]
+        else:
+            points = [
+                start,
+                (float(seg[1]), float(seg[2])),
+                (float(seg[3]), float(seg[4])),
+                end_of(seg),
+            ]
+        if at_end:
+            points = points[::-1]
+        for other in points[1:]:
+            dx, dy = other[0] - points[0][0], other[1] - points[0][1]
+            if math.hypot(dx, dy) > 1e-6:
+                angle = math.atan2(dy, dx)
+                return angle + math.pi if at_end else angle
+        return None
+
+    def turn(a: float | None, b: float | None) -> float:
+        if a is None or b is None:
+            return 0.0
+        return abs(math.degrees(math.atan2(math.sin(b - a), math.cos(b - a))))
+
+    def keeps_joins(index: int, start: tuple[float, float], line: tuple) -> bool:
+        """なめらかだった継ぎ目を、直線に替えて角にしない。"""
+        seg = path.segs[index]
+        prev_seg = segs[-1] if segs else path.segs[-1]
+        next_seg = path.segs[(index + 1) % len(path.segs)]
+        incoming = heading(starts[index - 1], prev_seg, at_end=True)
+        outgoing = heading(end_of(seg), next_seg, at_end=False)
+        for before, after in (
+            (
+                turn(incoming, heading(start, seg, at_end=False)),
+                turn(incoming, heading(start, line, at_end=False)),
+            ),
+            (
+                turn(heading(start, seg, at_end=True), outgoing),
+                turn(heading(start, line, at_end=True), outgoing),
+            ),
+        ):
+            if before < 1.0 and after > 1.5:
+                return False
+        return True
+
+    starts = [path.start] + [end_of(seg) for seg in path.segs[:-1]]
     segs: list[tuple] = []
     cur = path.start
-    for seg in path.segs:
-        end = (
-            (float(seg[1]), float(seg[2]))
-            if seg[0] == "L"
-            else (float(seg[5]), float(seg[6]))
-        )
-        if seg[0] == "C" and straight(cur, end):
-            segs.append(("L", end[0], end[1]))
+    for index, seg in enumerate(path.segs):
+        end = end_of(seg)
+        line = ("L", end[0], end[1])
+        if seg[0] == "C" and straight(cur, end) and keeps_joins(index, cur, line):
+            segs.append(line)
         else:
             segs.append(seg)
         cur = end
@@ -494,6 +572,11 @@ def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
     fitted: list[tuple[tuple[float, float], ContourPath]] = []
     for contour, hole in zip(outline.contours, outline.holes):
         points = [(p.x, p.y) for p in contour]
+        ellipse = _exact_ellipse(points, hole=hole)
+        if ellipse is not None and _reject(ellipse, points, limit, outline.glyph) is None:
+            origin = min(ellipse.on_curve_points(), key=lambda p: (p[1], p[0]))
+            fitted.append((origin, ellipse))
+            continue
         primary, _meta = fit_closed_contour(
             points,
             max_error_upm=float(curve["max_error"]),

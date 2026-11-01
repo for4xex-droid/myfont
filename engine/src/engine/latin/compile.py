@@ -33,6 +33,8 @@ def _compile(ufo_dir: Path, dest: Path, kind: str) -> Path:
         output=[kind],
         output_path=str(dest),
         remove_overlaps=True,
+        # 既定の 1/1000 em では、12.6 UPM のヘアラインが 2次曲線への変換で 5% 近く痩せる。
+        conversion_error=0.00025,
     )
     if dest.is_file():
         return dest
