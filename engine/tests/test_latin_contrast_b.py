@@ -514,3 +514,65 @@ def test_other_glyphs_keep_their_outline(glyph, style):
         assert _hausdorff(points, saved["contours"][best_i]) <= 0.05
         assert bool(hole) is saved["holes"][best_i]
         used.add(best_i)
+
+
+def _outer_shoulders(style):
+    """外形の右側で、天地から 60 以内の点と、そこでの曲がり。"""
+    resolved = load_resolved("B", style)
+    pts = _resample(_ring(_outer(build_glyph(resolved))), 3.0)
+    curve = _curvature(pts)
+    ymin = min(point.y for point in pts)
+    ymax = max(point.y for point in pts)
+    stem = _stem_right(resolved)
+    kept = [
+        i
+        for i, point in enumerate(pts)
+        if point.x >= stem + 25.0 and min(point.y - ymin, ymax - point.y) <= 60.0
+    ]
+    return curve, kept
+
+
+@pytest.mark.parametrize("style", _CONTRAST)
+def test_contrast_b_outer_shoulders_do_not_reverse(style):
+    """天地の横画から山へ入る肩で、外形の曲がりを逆向きにしない（段に見える）。"""
+    curve, kept = _outer_shoulders(style)
+    assert kept
+    assert min(curve[i] for i in kept) >= -0.05
+
+
+def test_classic_b_outer_shoulder_curvature_does_not_jump():
+    """肩の外形も、穴と同じく曲率の跳びは 6 まで。"""
+    curve, kept = _outer_shoulders("classic")
+    assert max(abs(curve[(i + 3) % len(curve)] - curve[i]) for i in kept) <= 6.0
+
+
+def test_classic_b_shoulder_is_not_heavier_than_the_stem():
+    """上の碗の右上（穴の中心から 20°–80°）の画は、幹の太さ以下。"""
+    resolved = load_resolved("B", "classic")
+    outline = build_glyph(resolved)
+    stem = resolved.pen.stem * resolved.style.cap_height
+    upper = max(_holes(outline), key=lambda hole: max(point.y for point in hole))
+    hole = _ring(upper)
+    cx = (min(p.x for p in hole) + max(p.x for p in hole)) / 2.0
+    cy = (min(p.y for p in hole) + max(p.y for p in hole)) / 2.0
+
+    def gap(point):
+        best = 1e9
+        for start, end in zip(hole, hole[1:] + hole[:1]):
+            d = end - start
+            length = d.dot(d)
+            t = (
+                0.0
+                if length < 1e-12
+                else max(0.0, min(1.0, (point - start).dot(d) / length))
+            )
+            best = min(best, (point - (start + d * t)).length())
+        return best
+
+    walls = [
+        gap(point)
+        for point in _resample(_ring(_outer(outline)), 3.0)
+        if 20.0 <= math.degrees(math.atan2(point.y - cy, point.x - cx)) <= 80.0
+    ]
+    assert walls
+    assert max(walls) <= stem

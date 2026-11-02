@@ -256,7 +256,10 @@ def _offset_out(
     y_bottom: float,
     y_top: float,
 ) -> list[Vec2]:
-    """穴の点を、進行方向の右へ画の太さだけ動かす。横画の y は外形の端にそろえる。"""
+    """穴の点を、進行方向の右へ画の太さだけ動かす。天地を越す分だけ外形の端で止める。
+
+    水平に近い点を天地へ吸い付けると、穴の角の円弧が平らに伸びて、その先の肩で曲がりが逆になる。
+    """
     headings = []
     for start, end in pairwise(inner):
         delta = end - start
@@ -270,12 +273,10 @@ def _offset_out(
         width = _width_at(turn, w_bottom, w_top, w_low, w_high)
         outward = Vec2(math.sin(heading), -math.cos(heading))
         moved = point + outward * width
-        if abs(turn) < 0.2 or abs(turn - 2.0 * math.pi) < 0.2:
-            moved = Vec2(moved.x, y_bottom)
-        elif abs(turn - math.pi) < 0.2:
-            moved = Vec2(moved.x, y_top)
         # 円弧の外側が天地を越すと、基準線とキャップからはみ出す。
-        moved = Vec2(moved.x, min(y_top, max(y_bottom, moved.y)))
+        # 外形は下の横画から上の横画まで y が下がらない。頭打ちの直後に戻ると段になる。
+        floor = points[-1].y if points else y_bottom
+        moved = Vec2(moved.x, min(y_top, max(floor, moved.y)))
         points.append(moved)
     return points
 
@@ -291,9 +292,9 @@ def _width_at(heading: float, w_bottom: float, w_top: float, w_low: float, w_hig
     右側の下と上で太さが違うとき、短い区間で上げると山の曲がりがそこだけ強くなる。
     真横の手前 35° から、それまでの傾きを保ったまま太い側へ寄せる。
     """
-    if heading <= 0.05:
+    if heading <= 0.0:
         return w_bottom
-    if heading >= math.pi - 0.05:
+    if heading >= math.pi:
         return w_top
     side = math.pi / 2.0
     rise = math.radians(35.0) if abs(w_high - w_low) > 0.5 else 0.0
