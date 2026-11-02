@@ -7,7 +7,7 @@ from itertools import pairwise
 
 import pytest
 
-from engine.latin.build import build_glyph
+from engine.latin.build import _stroke_resolved, build_glyph
 from engine.latin.load import load_resolved
 
 GLYPHS = ("H", "O", "B", "V", "S", "zero")
@@ -69,10 +69,11 @@ def test_chic_outer_crowns_have_no_valley(glyph):
 
 
 def test_chic_o_axis_walls_stay_on_the_pen():
-    """穴の楕円は、天地をヘアライン、左右を幹の太さに合わせたままにする。"""
+    """穴の楕円は、天地をヘアライン、左右を碗のペンの幹の太さに合わせたままにする。"""
     resolved = load_resolved("O", "chic")
     cap = resolved.style.cap_height
     outline = build_glyph(resolved)
+    pen = _stroke_resolved(resolved.skeleton.strokes[0], resolved).pen
     outer = next(contour for contour, hole in zip(outline.contours, outline.holes) if not hole)
     hole = next(contour for contour, hole in zip(outline.contours, outline.holes) if hole)
     xs = [point.x for point in outer]
@@ -102,8 +103,8 @@ def test_chic_o_axis_walls_stay_on_the_pen():
             total += cuts[0] - cuts[1]
         return total / 2.0
 
-    assert wall(0.0, 1.0) == pytest.approx(resolved.pen.hairline * cap, abs=0.05)
-    assert wall(1.0, 0.0) == pytest.approx(resolved.pen.stem * cap, abs=0.05)
+    assert wall(0.0, 1.0) == pytest.approx(pen.hairline * cap, abs=0.05)
+    assert wall(1.0, 0.0) == pytest.approx(pen.stem * cap, abs=0.05)
 
 
 def _turns(contour):

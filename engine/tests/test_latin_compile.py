@@ -14,16 +14,23 @@ from engine.latin.outline import fit_outline
 
 _STYLES = ("modern", "pop", "chic")
 _GLYPHS = ("H", "O")
-_PAIRS = tuple((style, glyph) for style in _STYLES for glyph in _GLYPHS)
+# 2026-10-06 の TTF はクラシックの O が 1.0004、B が 1.25 だった。
+# 二次曲線の許容を 0.25 UPM にしてから、H 0.41、O 0.59、B 0.65。
+_CLASSIC = ("H", "O", "B")
+_PAIRS = tuple((style, glyph) for style in _STYLES for glyph in _GLYPHS) + tuple(
+    ("classic", glyph) for glyph in _CLASSIC
+)
 
 
 @pytest.fixture(scope="module")
 def compiled():
     root = Path(tempfile.mkdtemp())
-    return {
+    built = {
         style: build_style(style, glyphs=_GLYPHS, out_dir=root / style)
         for style in _STYLES
     }
+    built["classic"] = build_style("classic", glyphs=_CLASSIC, out_dir=root / "classic")
+    return built
 
 
 def _design(style: str, glyph: str):
@@ -37,7 +44,7 @@ def test_shipped_outline_stays_on_the_design(compiled, style, glyph, kind):
     _resolved, design = _design(style, glyph)
     worst, mean = outline_gap(design, compiled[style][kind], glyph)
     assert worst <= 1.0
-    assert mean <= 0.3
+    assert 0.0 <= mean <= 0.3
 
 
 @pytest.mark.parametrize("kind", ("otf", "ttf"))

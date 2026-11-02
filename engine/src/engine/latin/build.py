@@ -9,6 +9,7 @@ from itertools import pairwise
 from pathops import Path, PathOp, op, simplify
 
 from engine.geometry import (
+    UPM,
     Vec2,
     limit_half_to_curvature,
     sample_cubic,
@@ -16,6 +17,7 @@ from engine.geometry import (
     variable_width_ring_outlines,
 )
 from engine.join_solver import (
+    HOLE_KEEP_UPM_AREA_RATIO,
     contour_points,
     count_contours,
     pathops_union,
@@ -77,6 +79,86 @@ def _signed_area(points: tuple[Vec2, ...]) -> float:
     return 0.5 * area
 
 
+# 端物の巻きくず（約 2400 まで）より上で、この帯の穴は残す。
+_HOLE_KEEP = HOLE_KEEP_UPM_AREA_RATIO * UPM * UPM
+
+
+def _inside(x: float, y: float, contour: tuple[Vec2, ...]) -> bool:
+    inside = False
+    previous = contour[-1]
+    for point in contour:
+        if (previous.y > y) != (point.y > y) and x < (point.x - previous.x) * (
+            y - previous.y
+        ) / (point.y - previous.y + 1e-15) + previous.x:
+            inside = not inside
+        previous = point
+    return inside
+
+
+def _interior(contour: tuple[Vec2, ...]) -> tuple[float, float]:
+    count = len(contour)
+    cx = sum(point.x for point in contour) / count
+    cy = sum(point.y for point in contour) / count
+    if _inside(cx, cy, contour):
+        return cx, cy
+    sign = 1.0 if _signed_area(contour) >= 0.0 else -1.0
+    for start, end in pairwise(contour + contour[:1]):
+        length = math.hypot(end.x - start.x, end.y - start.y)
+        if length < 1e-12:
+            continue
+        nx = -(end.y - start.y) / length * sign
+        ny = (end.x - start.x) / length * sign
+        mx = (start.x + end.x) / 2.0
+        my = (start.y + end.y) / 2.0
+        for dist in (2.0, 5.0, 10.0, 20.0, 40.0):
+            px, py = mx + nx * dist, my + ny * dist
+            if _inside(px, py, contour):
+                return px, py
+    return cx, cy
+
+
+def _depths(contours: tuple[tuple[Vec2, ...], ...]) -> list[int]:
+    areas = [abs(_signed_area(contour)) for contour in contours]
+    found: list[int] = []
+    for index, contour in enumerate(contours):
+        if len(contour) < 3:
+            found.append(0)
+            continue
+        px, py = _interior(contour)
+        depth = 0
+        for other, area in zip(contours, areas):
+            if other is contour or len(other) < 3 or area <= areas[index] + 1e-6:
+                continue
+            if _inside(px, py, other):
+                depth += 1
+        found.append(depth)
+    return found
+
+
+def _filter_contours(
+    contours: tuple[tuple[Vec2, ...], ...], micro_floor: float
+) -> tuple[tuple[Vec2, ...], ...]:
+    """負輪郭は、包含が奇数で保護床以上のときだけ残す。外形は微小床で落とす。"""
+    if not contours:
+        return contours
+    depths = _depths(contours)
+    largest = max(range(len(contours)), key=lambda i: abs(_signed_area(contours[i])))
+    outer_sign = 1.0 if _signed_area(contours[largest]) >= 0.0 else -1.0
+    kept: list[tuple[Vec2, ...]] = []
+    for contour, depth in zip(contours, depths):
+        if len(contour) < 3:
+            continue
+        area = abs(_signed_area(contour))
+        sign = 1.0 if _signed_area(contour) >= 0.0 else -1.0
+        if sign != outer_sign:
+            if depth % 2 == 1 and area >= _HOLE_KEEP:
+                kept.append(contour)
+            continue
+        if contour is contours[largest] or area >= micro_floor:
+            kept.append(contour)
+    return tuple(kept)
+
+
 def _nudge_apex(stroke: Stroke, resolved: Resolved) -> Stroke:
     """先端をオーバーシュートの分だけ外へ出す。丸い先端は丸の外側がそこに来るよう、真上（真下）へ戻す。"""
     style = resolved.style
@@ -120,6 +202,31 @@ def _bowl_overshoot(stroke: Stroke, resolved: Resolved) -> float:
     if stroke.role != "bowl" or _bowl_joined(stroke, resolved):
         return 0.0
     return resolved.style.overshoot["round"] * resolved.style.cap_height
+
+
+def _stroke_resolved(stroke: Stroke, resolved: Resolved) -> Resolved:
+    """幹に接合しない閉じた碗（O 0）だけ、グループの bowl_ratio で幹の太さを上げる。
+
+    丸は同じ太さの直線より細く見える。ヘアラインは変えないので、nib では太い方向だけ太る。
+    mono は hairline を stem と同じにして作る。幹だけ動かすと、その関係が壊れる。
+    B の碗は幹と横画に挟まれて混むので入れない。
+    クラシックの S は天の位置と穴の膝が検査の際にあり、1% 太らせても膝が 0.011 を超える。
+    """
+    if stroke.role != "bowl" or not stroke.closed or _bowl_joined(stroke, resolved):
+        return resolved
+    ratio = 1.0
+    for name in resolved.skeleton.groups:
+        ratio *= resolved.style.groups.get(name, {}).get("bowl_ratio", 1.0)
+    if ratio == 1.0:
+        return resolved
+    if ratio <= 0.0:
+        raise ValueError(
+            f"{resolved.skeleton.glyph}: bowl_ratio {ratio} must be positive"
+        )
+    stem = resolved.pen.stem * ratio
+    hairline = stem if resolved.pen.type == "mono" else resolved.pen.hairline
+    pen = replace(resolved.pen, stem=stem, hairline=hairline)
+    return replace(resolved, pen=pen)
 
 
 @dataclass(frozen=True)
@@ -566,14 +673,16 @@ def _fit_bowls(resolved: Resolved) -> tuple[dict[str, _Frame], float]:
         target_x = None
         # 断面から描く碗の外形は、一番細い幅だけ外へ出る。位置合わせもその幅で測る。
         contrast = resolved.pen.type == "nib" and _bowl_joined(group[0], resolved)
-        envelope = resolved if _hairline_crown(group[0], resolved) else None
+        drawn = _stroke_resolved(group[0], resolved)
+        envelope = drawn if _hairline_crown(group[0], resolved) else None
         if closed:
+            # 縦横比と左の位置は、丸の補正の前の太さで決める（分離を凍結した計測）。
             _line, ink = _boxes([_centerline(s, resolved, frame) for s in group])
             ratio = (ink[1] - ink[0]) / (ink[3] - ink[2])
             target_x = (ink[0], ink[0] + ratio * (target_y[1] - target_y[0]))
             shrink = max(shrink, ink[1] - target_x[1])
         for _ in range(4):
-            built = [_centerline(s, resolved, frame, hug=not contrast) for s in group]
+            built = [_centerline(s, drawn, frame, hug=not contrast) for s in group]
             if contrast:
                 built = [
                     (samples, [min(widths)] * len(widths)) for samples, widths in built
@@ -1281,7 +1390,10 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     frames, _shrink = _fit_bowls(resolved)
     for stroke in strokes:
         samples[stroke.id], widths[stroke.id] = _centerline(
-            stroke, resolved, frames.get(stroke.id), hug=not _nib_bowl(stroke, resolved)
+            stroke,
+            _stroke_resolved(stroke, resolved),
+            frames.get(stroke.id),
+            hug=not _nib_bowl(stroke, resolved),
         )
     _apply_joins(samples, widths, resolved)
     _extend_bowl_stems(samples, widths, resolved)
@@ -1298,14 +1410,18 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
             )
         else:
             paths.extend(
-                _stroke_paths(stroke, samples[stroke.id], widths[stroke.id], resolved)
+                _stroke_paths(
+                    stroke,
+                    samples[stroke.id],
+                    widths[stroke.id],
+                    _stroke_resolved(stroke, resolved),
+                )
             )
     united = _union_all(paths)
     raw = [
         tuple(Vec2(x, y) for x, y in contour_points(c)) for c in split_contours(united)
     ]
-    floor = resolved.style.micro_area_floor
-    raw = tuple(c for c in raw if len(c) >= 3 and abs(_signed_area(c)) >= floor)
+    raw = _filter_contours(raw, resolved.style.micro_area_floor)
     if not raw:
         raise ValueError(f"{resolved.skeleton.glyph}: empty outline")
     largest = max(range(len(raw)), key=lambda i: abs(_signed_area(raw[i])))

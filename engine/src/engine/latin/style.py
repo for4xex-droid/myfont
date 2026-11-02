@@ -36,7 +36,7 @@ _OVERSHOOT_KEYS = frozenset({"round", "apex"})
 _SIDE_KEYS = frozenset({"base"}) | SIDES
 _VERTICAL_KEYS = frozenset({"ascender", "descender"})
 _CURVE_KEYS = frozenset({"max_error", "corner_deg", "max_anchors_per_contour"})
-_GROUP_KEYS = frozenset({"stem_ratio", "bar_ratio", "hairline_ratio"})
+_GROUP_KEYS = frozenset({"stem_ratio", "bar_ratio", "hairline_ratio", "bowl_ratio"})
 _JOIN_KEYS = frozenset({"crotch_thin"})
 _METRIC_KEYS = frozenset(
     {

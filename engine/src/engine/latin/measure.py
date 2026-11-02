@@ -8,9 +8,19 @@ from pathlib import Path
 
 import freetype
 
+# 1 ピクセルの丸めは、クラシックのセリフ（約 13 ピクセル）で分離の距離を ±0.07 動かす。
+# 字を 1/4 ピクセルずつ縦横にずらした 16 通りの平均で測る。
+_PHASES = 4
+_IDENTITY = freetype.Matrix(0x10000, 0, 0, 0x10000)
 
-def _raster(face: freetype.Face, char: str, ppem: int) -> tuple[list[bytearray], int]:
+
+def _raster(
+    face: freetype.Face, char: str, ppem: int, shift: tuple[float, float] = (0.0, 0.0)
+) -> tuple[list[bytearray], int]:
     face.set_char_size(ppem * 64)
+    face.set_transform(
+        _IDENTITY, freetype.Vector(round(shift[0] * 64), round(shift[1] * 64))
+    )
     face.load_char(char, freetype.FT_LOAD_RENDER | freetype.FT_LOAD_NO_HINTING)
     bitmap = face.glyph.bitmap
     width = bitmap.width
@@ -47,8 +57,26 @@ def _row_at(rows: list[bytearray], top: int, font_y: float, ppem: int) -> bytear
 def measure_otf(path: Path, *, ppem: int = 500) -> dict[str, float | str]:
     """H のステム、O のコントラスト、セリフの出、足元の丸み。単位は em 比。"""
     face = freetype.Face(str(path))
+    shifts = [
+        (i / _PHASES, j / _PHASES) for i in range(_PHASES) for j in range(_PHASES)
+    ]
+    samples = [_measure_once(face, ppem, shift) for shift in shifts]
+    out: dict[str, float | str] = {
+        axis: statistics.fmean(float(sample[axis]) for sample in samples)
+        for axis in samples[0]
+        if axis != "thick_ray_deg"
+    }
+    out["thick_ray_deg"] = statistics.mode(
+        sample["thick_ray_deg"] for sample in samples
+    )
+    return out
+
+
+def _measure_once(
+    face: freetype.Face, ppem: int, shift: tuple[float, float]
+) -> dict[str, float | str]:
     scale = 1000.0 / ppem
-    h_rows, h_top = _raster(face, "H", ppem)
+    h_rows, h_top = _raster(face, "H", ppem, shift)
     stem_samples: list[float] = []
     for y in (150, 250, 520, 620):
         row = _row_at(h_rows, h_top, y, ppem)
@@ -67,7 +95,7 @@ def measure_otf(path: Path, *, ppem: int = 500) -> dict[str, float | str]:
     serif = max(0.0, (foot_width - stem) / 2.0) / 700.0
     taper = max(0.0, 1.0 - foot_width / stem) if stem else 0.0
 
-    o_rows, _o_top = _raster(face, "O", ppem)
+    o_rows, _o_top = _raster(face, "O", ppem, shift)
     ink_cols = [x for row in o_rows for x, value in enumerate(row) if value]
     ink_rows = [i for i, row in enumerate(o_rows) if any(row)]
     o_width = (max(ink_cols) - min(ink_cols) + 1) * scale if ink_cols else 0.0

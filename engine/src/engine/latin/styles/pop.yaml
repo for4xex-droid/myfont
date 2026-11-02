@@ -1,6 +1,6 @@
 style_id: pop_v2
 cap_height: 700
-overshoot: {round: 0.012, apex: 0.008}
+overshoot: {round: 0.025, apex: 0.008}
 pen: {type: mono, stem: 0.22, bar_ratio: 0.92}
 terminals: {foot: round, apex: round, none: none, open: round, round_end: round}
 joins: {crotch_thin: 1.0}
@@ -9,5 +9,6 @@ sidebearing: {base: 0.06, straight: 1.00, near_straight: 0.85, round: 0.50, diag
 vertical: {ascender: 860, descender: -200}
 micro_area_floor: 400
 curve: {max_error: 0.6, corner_deg: 30, max_anchors_per_contour: 12}
-groups: {}
+groups:
+  round: {bowl_ratio: 1.02}
 metrics: {round_frac: 0.55, bar_y: 0.52, apex_taper: 0.85, apex_round: 0.40, upper_bowl: 0.94}

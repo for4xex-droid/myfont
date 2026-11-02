@@ -266,8 +266,11 @@ def outline_gap(
     perimeter = _perimeter(designed)
     if perimeter <= 0.0:
         return worst, float("inf")
-    xor = path_op(_skia_design(design), _skia_font(font, glyph), PathOp.XOR)
-    return worst, abs(xor.area) / perimeter
+    # XOR の結果の area は、ポップの O の TTF で字全体の面積を返した。和から積を引く。
+    planned, shipped = _skia_design(design), _skia_font(font, glyph)
+    union = path_op(planned, shipped, PathOp.UNION)
+    common = path_op(planned, shipped, PathOp.INTERSECTION)
+    return worst, (abs(union.area) - abs(common.area)) / perimeter
 
 
 def _crossings(
