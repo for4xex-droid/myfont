@@ -13,7 +13,7 @@ SIDES = frozenset({"straight", "near_straight", "round", "diagonal", "open"})
 JOIN_TYPES = frozenset({"apex", "apex_cut", "T", "L", "crotch", "bowl_join"})
 GROUPS = frozenset({"straight", "round", "diagonal", "open", "bar"})
 STRUCTURES = frozenset(
-    {"stem_pair", "bowl", "apex_diagonals", "spine", "branch", "stem"}
+    {"stem_pair", "bowl", "apex_diagonals", "spine", "branch", "stem", "diagonal"}
 )
 STYLES = frozenset({"modern", "classic", "chic", "pop"})
 

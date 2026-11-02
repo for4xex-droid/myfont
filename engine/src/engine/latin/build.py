@@ -693,6 +693,17 @@ def _fit_bowls(resolved: Resolved) -> tuple[dict[str, _Frame], float]:
         contrast = resolved.pen.type == "nib" and _bowl_joined(group[0], resolved)
         drawn = _stroke_resolved(group[0], resolved)
         envelope = drawn if _hairline_crown(group[0], resolved) else None
+        ys = [knot.y for stroke in group for knot in stroke.knots]
+        if _bowl_joined(group[0], resolved) and min(ys) > 0.02:
+            # 基線まで届かない接合碗は、届いた範囲を天地へ伸ばさない。
+            # 縦は、天地いっぱいの碗と同じく半幅だけ内側に寄せる。
+            probe, probe_w = _centerline(group[0], drawn, frame)
+            top = max(range(len(probe)), key=lambda i: probe[i][0].y)
+            half = probe_w[top]
+            fitted = _Frame(frame.x_off, frame.x_scale, half, cap - 2.0 * half)
+            for stroke in group:
+                frames[stroke.id] = fitted
+            continue
         if closed:
             # 縦横比と左の位置は、丸の補正の前の太さで決める（分離を凍結した計測）。
             _line, ink = _boxes([_centerline(s, resolved, frame) for s in group])
@@ -808,8 +819,12 @@ def _stroke_paths(
                 ext_widths.append(half)
             boxes.append(_beyond_box(origin, tip, unit, half))
             serifs.extend(_level_serif(origin, unit, half, kind, resolved))
-        poly = variable_width_outline(ext_samples, ext_widths, close=True)
-        poly = _square_lateral_cuts(poly, samples, widths, stroke, resolved)
+        banded = _band_foot_cuts(samples, widths, stroke, resolved)
+        if banded is not None:
+            poly = banded
+        else:
+            poly = variable_width_outline(ext_samples, ext_widths, close=True)
+            poly = _square_lateral_cuts(poly, samples, widths, stroke, resolved)
         path = _to_path(poly)
         for box in boxes:
             path = _difference(path, _to_path(box))
@@ -1137,7 +1152,7 @@ def _square_lateral_cuts(
     cuts: list[tuple[float, bool]] = []
     last = len(samples) - 1
     for index, sign, tag in ((0, -1.0, stroke.ends[0]), (last, 1.0, stroke.ends[1])):
-        if resolved.style.terminals.get(tag) != "flat":
+        if tag != "open" or resolved.style.terminals.get(tag) != "flat":
             continue
         origin, tangent = samples[index]
         unit = tangent * sign
@@ -1163,6 +1178,85 @@ def _square_lateral_cuts(
     return _drop_close(ring)
 
 
+def _band_foot_cuts(
+    samples: list[tuple[Vec2, Vec2]],
+    widths: list[float],
+    stroke: Stroke,
+    resolved: Resolved,
+) -> list[Vec2] | None:
+    """斜めの足は、端を延ばしてから端の y で水平に切る。
+
+    延ばさないと、切り口が画の片側にしか当たらない。箱で切ると角が残る。
+    """
+    if len(samples) < 2:
+        return None
+    cuts: list[tuple[int, float, Vec2]] = []
+    last = len(samples) - 1
+    for index, sign, tag in ((0, -1.0, stroke.ends[0]), (last, 1.0, stroke.ends[1])):
+        if tag != "foot" or resolved.style.terminals.get(tag) != "flat":
+            continue
+        origin, tangent = samples[index]
+        unit = tangent * sign
+        if unit.length() < 1e-9:
+            continue
+        outward = unit.normalized()
+        if abs(outward.y) < 0.5 or abs(outward.x) < 0.05:
+            continue
+        cuts.append((index, origin.y, outward))
+    if not cuts:
+        return None
+    extended = list(samples)
+    extended_w = list(widths)
+    for index, _cut_y, outward in sorted(cuts, reverse=True):
+        half = widths[index]
+        reach = half * abs(outward.x) / abs(outward.y) + 2.0
+        tip = (samples[index][0] + outward * reach, samples[index][1])
+        if index == 0:
+            extended.insert(0, tip)
+            extended_w.insert(0, half)
+        else:
+            extended.append(tip)
+            extended_w.append(half)
+    poly = variable_width_outline(extended, extended_w, close=True)
+    ring = list(poly)
+    if ring and (ring[0] - ring[-1]).length() < 1e-6:
+        ring = ring[:-1]
+    for _index, cut_y, outward in cuts:
+        ring = _clip_horizontal(ring, cut_y, keep_below=outward.y > 0.0)
+    ring = _drop_close(ring)
+    # 碗に付く脚だけ。延ばした端のサンプルが、切ったあとの直線上に残る。
+    if any(
+        item.role == "bowl" for item in resolved.skeleton.strokes
+    ) and _has_diagonal_foot(resolved):
+        ring = _drop_colinear(ring)
+    return ring
+
+
+def _clip_horizontal(poly: list[Vec2], cut_y: float, *, keep_below: bool) -> list[Vec2]:
+    def inside(point: Vec2) -> bool:
+        if keep_below:
+            return point.y <= cut_y + 1e-6
+        return point.y >= cut_y - 1e-6
+
+    def hit(start: Vec2, end: Vec2) -> Vec2:
+        dy = end.y - start.y
+        t = 0.0 if abs(dy) < 1e-9 else (cut_y - start.y) / dy
+        t = max(0.0, min(1.0, t))
+        return Vec2(start.x + (end.x - start.x) * t, cut_y)
+
+    output: list[Vec2] = []
+    for index, cur in enumerate(poly):
+        prev = poly[index - 1]
+        prev_in, cur_in = inside(prev), inside(cur)
+        if cur_in:
+            if not prev_in:
+                output.append(hit(prev, cur))
+            output.append(cur)
+        elif prev_in:
+            output.append(hit(prev, cur))
+    return output
+
+
 def _clip_vertical(poly: list[Vec2], cut_x: float, *, keep_left: bool) -> list[Vec2]:
     def inside(point: Vec2) -> bool:
         if keep_left:
@@ -1186,6 +1280,25 @@ def _clip_vertical(poly: list[Vec2], cut_x: float, *, keep_left: bool) -> list[V
         elif prev_in:
             output.append(hit(prev, cur))
     return output
+
+
+def _drop_colinear(poly: list[Vec2], limit: float = 1.0) -> list[Vec2]:
+    """曲がりが limit 度未満の点を落とす。直線の上のサンプルを節にしない。"""
+    if len(poly) < 4:
+        return poly
+    kept: list[Vec2] = []
+    count = len(poly)
+    for index, point in enumerate(poly):
+        prev, nxt = poly[index - 1], poly[(index + 1) % count]
+        v1x, v1y = point.x - prev.x, point.y - prev.y
+        v2x, v2y = nxt.x - point.x, nxt.y - point.y
+        if math.hypot(v1x, v1y) < 1e-9 or math.hypot(v2x, v2y) < 1e-9:
+            continue
+        turn = abs(math.degrees(math.atan2(v1x * v2y - v1y * v2x, v1x * v2x + v1y * v2y)))
+        if turn < limit:
+            continue
+        kept.append(point)
+    return kept or poly
 
 
 def _drop_close(poly: list[Vec2], gap: float = 0.4) -> list[Vec2]:
@@ -1496,6 +1609,22 @@ def _raise_bars(resolved: Resolved) -> Resolved:
     return replace(resolved, skeleton=replace(resolved.skeleton, strokes=tuple(strokes)))
 
 
+def _has_diagonal_foot(resolved: Resolved) -> bool:
+    """足の節点が斜めに入る。頂点の切り口とは別の脚。"""
+    for stroke in resolved.skeleton.strokes:
+        knots = stroke.knots
+        ends = ((0, stroke.ends[0]), (len(knots) - 1, stroke.ends[1]))
+        for index, tag in ends:
+            if tag != "foot" or len(knots) < 2:
+                continue
+            other = 1 if index == 0 else index - 1
+            dx = knots[index].x - knots[other].x
+            dy = knots[index].y - knots[other].y
+            if abs(dx) > 0.05 and abs(dy) > 0.05:
+                return True
+    return False
+
+
 def _side_amount(style, name: str) -> float:
     return style.sidebearing["base"] * style.cap_height * style.sidebearing[name]
 
@@ -1570,7 +1699,11 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
 
     def _finish(contour: list[Vec2]) -> list[Vec2]:
         polished = list(contour)
-        if _apex_join(resolved) is None:
+        # 碗に付いた斜めの脚は、先端の切り口ではない。谷を削ると脚が欠ける。
+        leg = any(stroke.role == "bowl" for stroke in strokes) and _has_diagonal_foot(
+            resolved
+        )
+        if _apex_join(resolved) is None and not leg:
             polished = trim_apex_stub(bevel_apex_valley(polished))
         # 断面の碗が作る谷は、深い埋め直しをすると肩が太くなる。先に浅く面を取る。
         if contrast:

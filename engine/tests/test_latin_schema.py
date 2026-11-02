@@ -132,3 +132,8 @@ def test_unknown_structure_is_rejected():
 def test_stem_structure_loads():
     """腕のない縦の幹。I がこれ。"""
     assert parse_skeleton(_skeleton(structure="stem")).structure == "stem"
+
+
+def test_diagonal_structure_loads():
+    """幹も頂点もない斜画の字。交差も含む。"""
+    assert parse_skeleton(_skeleton(structure="diagonal")).structure == "diagonal"

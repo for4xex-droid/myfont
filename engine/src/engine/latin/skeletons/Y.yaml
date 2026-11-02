@@ -1,0 +1,22 @@
+glyph: Y
+unicode: 0x0059
+structure: branch
+groups: [diagonal]
+strokes:
+  - id: left
+    knots: [[0.00, 1.00, line], [0.50, 0.50, line]]
+    role: thick
+    ends: {start: foot, end: none}
+  - id: right
+    knots: [[1.00, 1.00, line], [0.50, 0.50, line]]
+    role: thick
+    ends: {start: foot, end: none}
+  - id: stem
+    # 腕の中心線は 0.50 で会う。内縁の交点はそれより上。
+    # 幹の天は交点のすぐ下（0.58）。切り口で谷を潰さない。暫定。
+    knots: [[0.50, 0.58, line], [0.50, 0.00, line]]
+    role: thick
+    ends: {start: none, end: foot}
+joins: []
+sides: {left: diagonal, right: diagonal}
+expect: {contours: 1, holes: 0}

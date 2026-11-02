@@ -1,0 +1,13 @@
+glyph: "/"
+unicode: 0x002F
+structure: diagonal
+groups: [diagonal]
+strokes:
+  - id: slash
+    # 単位幅いっぱい。比例 0.577 で約 60°。暫定。
+    knots: [[0.00, 0.00, line], [1.00, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+joins: []
+sides: {left: diagonal, right: diagonal}
+expect: {contours: 1, holes: 0}

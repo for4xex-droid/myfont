@@ -1,0 +1,30 @@
+glyph: R
+unicode: 0x0052
+structure: bowl
+groups: [round]
+strokes:
+  - id: stem
+    knots: [[0.18, 0.00, line], [0.18, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+  - id: bowl
+    # 下の入りは bar_y 0.52。右の幅は B の上の碗に upper_bowl 0.94 を掛けた位置。暫定。
+    knots:
+      - [0.02, 0.52, smooth, 0]
+      - [0.584, 0.52, smooth, 0]
+      - [0.941, 0.78, smooth, 90]
+      - [0.584, 1.00, smooth, 180]
+      - [0.02, 1.00, smooth, 180]
+    tension: 1.0
+    role: bowl
+    ends: {start: none, end: none}
+  - id: leg
+    # 碗の下の入りから基線へ。端の x は暫定。平切りで、拍車は無い。
+    knots: [[0.18, 0.517, line], [0.86, 0.00, line]]
+    role: thick
+    ends: {start: none, end: foot}
+joins:
+  - {a: bowl, b: stem, type: bowl_join}
+  - {a: leg, b: stem, type: L}
+sides: {left: straight, right: round}
+expect: {contours: 2, holes: 1}

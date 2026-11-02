@@ -1,0 +1,16 @@
+glyph: X
+unicode: 0x0058
+structure: diagonal
+groups: [diagonal]
+strokes:
+  - id: fall
+    knots: [[0.00, 1.00, line], [1.00, 0.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+  - id: rise
+    knots: [[0.00, 0.00, line], [1.00, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+joins: []
+sides: {left: diagonal, right: diagonal}
+expect: {contours: 1, holes: 0}

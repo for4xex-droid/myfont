@@ -1,0 +1,21 @@
+glyph: Z
+unicode: 0x005A
+structure: branch
+groups: [straight]
+strokes:
+  - id: top
+    knots: [[0.00, 1.00, line], [1.00, 1.00, line]]
+    role: arm
+    ends: {start: open, end: open}
+  - id: bottom
+    knots: [[0.00, 0.00, line], [1.00, 0.00, line]]
+    role: arm
+    ends: {start: open, end: open}
+  - id: diagonal
+    # 腕の端より内側で切る。切り口が腕の外へ出ないようにする。暫定。
+    knots: [[0.84, 1.00, line], [0.16, 0.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+joins: []
+sides: {left: straight, right: straight}
+expect: {contours: 1, holes: 0}
