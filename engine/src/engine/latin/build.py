@@ -965,15 +965,21 @@ def _serif_paths(leg: _Leg, resolved: Resolved, cap: float) -> Path:
 
 
 def _bracket_fillet(
-    edge: tuple[Vec2, Vec2], underside: float, reach: float, lo: float, hi: float
+    edge: tuple[Vec2, Vec2],
+    underside: float,
+    reach: float,
+    lo: float,
+    hi: float,
+    *,
+    toward: float = -1.0,
 ) -> list[Vec2]:
-    """下面と脚の縁を、両端で接線がつながる凹の曲線でつなぐ。"""
+    """下面と脚の縁を、両端で接線がつながる凹の曲線でつなぐ。toward は曲線が板から離れる y の向き。"""
     start, end = edge
     if abs(end.y - start.y) < 1e-6:
         return [start, end]
     corner = _at_y(start, end, underside)
     direction = (end - start).normalized()
-    if direction.y > 0.0:
+    if direction.y * toward < 0.0:
         direction = -direction
     along = corner + direction * reach
     outward = -1.0 if corner.x <= (lo + hi) / 2.0 else 1.0
@@ -1043,29 +1049,16 @@ def _level_serif(
     face = origin.y
     back = origin.y - sign * thick * 1.35
     span = cross + overhang
-    # 画の傾きに沿った平行四辺形。水平な矩形だと、片側だけ垂直なくさびになる。
-    top_lo, top_hi = center(face) - span, center(face) + span
-    bot_lo, bot_hi = center(back) - span, center(back) + span
-    polys = [
-        [Vec2(top_lo, face), Vec2(top_hi, face), Vec2(bot_hi, back), Vec2(bot_lo, back)]
-    ]
-    if kind == "serif_hairline":
-        reach = max(thick * 2.5, 8.0)
-    elif kind == "serif_bracketed":
+    # 切り口と同じ水平の板で、両端は垂直。長さは画の厚みの中ほどで測る。
+    middle = center((face + back) / 2.0)
+    lo, hi = middle - span, middle + span
+    polys = [[Vec2(lo, face), Vec2(hi, face), Vec2(hi, back), Vec2(lo, back)]]
+    if kind == "serif_bracketed":
         reach = max(style.metrics.get("bracket", 0.0) * cap, thick)
-    else:
-        reach = 0.0
-    if reach > 0.0:
-        inner = back - sign * reach
-        mid = center(inner)
-        polys.append(
-            [
-                Vec2(bot_lo, back),
-                Vec2(bot_hi, back),
-                Vec2(mid + cross, inner),
-                Vec2(mid - cross, inner),
-            ]
-        )
+        beyond = back - sign * reach
+        for offset in (-cross, cross):
+            edge = (Vec2(center(back) + offset, back), Vec2(center(beyond) + offset, beyond))
+            polys.append(_bracket_fillet(edge, back, reach, lo, hi, toward=-sign))
     return polys
 
 

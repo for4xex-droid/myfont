@@ -367,9 +367,9 @@ def _flatten_true_lines(
         return abs(math.degrees(math.atan2(math.sin(b - a), math.cos(b - a))))
 
     def keeps_joins(index: int, start: tuple[float, float], line: tuple) -> bool:
-        """なめらかだった継ぎ目を、直線に替えて角にしない。"""
+        """なめらかだった継ぎ目を、直線に替えて角にしない。隣は元の区間で見る（直線化が連鎖しない）。"""
         seg = path.segs[index]
-        prev_seg = segs[-1] if segs else path.segs[-1]
+        prev_seg = path.segs[index - 1]
         next_seg = path.segs[(index + 1) % len(path.segs)]
         incoming = heading(starts[index - 1], prev_seg, at_end=True)
         outgoing = heading(end_of(seg), next_seg, at_end=False)

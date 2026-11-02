@@ -34,23 +34,38 @@ def _slab(origin: Vec2, outward: Vec2, length: float, thick: float) -> list[Vec2
     ]
 
 
-def _bracket(origin: Vec2, outward: Vec2, length: float, thick: float, bracket: float, half_width: float) -> list[Vec2]:
-    """セリフの横棒と、幹へ戻る短いブラケット。自己交差しない六角形。"""
+def _bracket(
+    origin: Vec2,
+    outward: Vec2,
+    length: float,
+    thick: float,
+    bracket: float,
+    half_width: float,
+    steps: int = 48,
+) -> list[Vec2]:
+    """セリフの横棒と、板の上面から幹の縁へ、両端で接線がつながる凹の曲線のブラケット。"""
     direction = outward.normalized()
     normal = direction.perpendicular()
     back = origin - direction * (thick * 1.35)
-    front = origin
     half = length / 2.0
-    neck = min(half * 0.55, max(half_width, 1.0))
-    inner = origin - direction * (thick * 1.35 + max(bracket, thick))
-    return [
-        front + normal * half,
-        front - normal * half,
+    stem = min(max(half_width, 1.0), half)
+    reach = max(bracket, thick)
+
+    def fillet(side: float) -> list[Vec2]:
+        corner = back + normal * (side * stem)
+        start = back + normal * (side * min(half, stem + reach))
+        return _quad(start, corner, corner - direction * reach, steps)
+
+    ring = [
+        origin + normal * half,
+        origin - normal * half,
         back - normal * half,
-        inner - normal * neck,
-        inner + normal * neck,
+        *fillet(-1.0),
+        *reversed(fillet(1.0)),
         back + normal * half,
     ]
+    previous = [ring[-1], *ring[:-1]]
+    return [point for point, prev in zip(ring, previous, strict=True) if (point - prev).length() > 1e-6]
 
 
 def _quad(start: Vec2, control: Vec2, end: Vec2, steps: int) -> list[Vec2]:

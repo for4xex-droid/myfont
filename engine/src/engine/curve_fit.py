@@ -516,13 +516,23 @@ def _polyline_extrema(pts: Sequence[Point]) -> list[int]:
     return found
 
 
+def _straight_ends(pts: Sequence[Point], min_length: float = 20.0) -> list[int]:
+    """min_length 以上の辺の両端。曲線から直線へ接線で移る所（ブラケットと幹など）を節にする。"""
+    found: list[int] = []
+    count = len(pts)
+    for index in range(count):
+        if _dist(pts[index], pts[(index + 1) % count]) >= min_length:
+            found.extend((index, (index + 1) % count))
+    return found
+
+
 def fit_pinned_contour(
     points: Sequence[Point],
     *,
     max_error_upm: float,
     corner_deg: float,
 ) -> ContourPath | None:
-    """角と極値を固定し、その区間を誤差以内の三次曲線でつなぐ。
+    """角と極値と長い直線の両端を固定し、その区間を誤差以内の三次曲線でつなぐ。
 
     区間は誤差を超えたときだけ分割する。節点はオンカーブ点で数える。
     """
@@ -532,6 +542,7 @@ def fit_pinned_contour(
     pins = sorted(
         set(detect_corners(pts, angle_deg=corner_deg, min_sep_upm=10.0))
         | set(_polyline_extrema(pts))
+        | set(_straight_ends(pts))
     )
     if len(pins) < 2:
         far = max(range(1, len(pts)), key=lambda index: _dist(pts[index], pts[0]))
@@ -543,10 +554,24 @@ def fit_pinned_contour(
             chain = pts[start_at : end_at + 1]
         else:
             chain = pts[start_at:] + pts[: end_at + 1]
-        segs.extend(_fit_open(chain, max_error=max_error_upm))
+        segs.extend(_fit_open(_densify(chain), max_error=max_error_upm))
     if not segs:
         return None
     return ContourPath(start=pts[pins[0]], segs=segs)
+
+
+def _densify(chain: list[Point], step: float = 4.0) -> list[Point]:
+    """3点以上の区間で、長い辺に step おきの点を足す。点のない辺の上で曲線がたわむのを測れるようにする。"""
+    if len(chain) <= 2:
+        return chain
+    out = [chain[0]]
+    for start, end in zip(chain, chain[1:], strict=False):
+        pieces = int(_dist(start, end) // step)
+        for k in range(1, pieces):
+            t = k / pieces
+            out.append((start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t))
+        out.append(end)
+    return out
 
 
 def fit_crown_pinned_contour(
