@@ -199,9 +199,20 @@ def _bowl_joined(stroke: Stroke, resolved: Resolved) -> bool:
 
 
 def _bowl_overshoot(stroke: Stroke, resolved: Resolved) -> float:
+    """接合した碗は天地を平らなままにする。開いた碗だけ丸のオーバーシュート。"""
     if stroke.role != "bowl" or _bowl_joined(stroke, resolved):
         return 0.0
     return resolved.style.overshoot["round"] * resolved.style.cap_height
+
+
+def _foot_sides(stroke: Stroke) -> set[str]:
+    """足の端が天か地か。その側の外形は基準線に合わせ、オーバーシュートしない。"""
+    found: set[str] = set()
+    for index, tag in ((0, stroke.ends[0]), (-1, stroke.ends[1])):
+        if tag != "foot":
+            continue
+        found.add("top" if stroke.knots[index].y >= 0.5 else "bottom")
+    return found
 
 
 def _stroke_resolved(stroke: Stroke, resolved: Resolved) -> Resolved:
@@ -667,7 +678,14 @@ def _fit_bowls(resolved: Resolved) -> tuple[dict[str, _Frame], float]:
         if not group:
             continue
         overshoot = _bowl_overshoot(group[0], resolved)
-        target_y = (-overshoot, cap + overshoot)
+        hi = cap + overshoot
+        lo = -overshoot
+        for side in _foot_sides(group[0]):
+            if side == "top":
+                hi = cap
+            else:
+                lo = 0.0
+        target_y = (lo, hi)
         frame = _plain_frame(group[0], resolved)
         closed = group[0].closed
         target_x = None
@@ -790,7 +808,9 @@ def _stroke_paths(
                 ext_widths.append(half)
             boxes.append(_beyond_box(origin, tip, unit, half))
             serifs.extend(_level_serif(origin, unit, half, kind, resolved))
-        path = _to_path(variable_width_outline(ext_samples, ext_widths, close=True))
+        poly = variable_width_outline(ext_samples, ext_widths, close=True)
+        poly = _square_lateral_cuts(poly, samples, widths, stroke, resolved)
+        path = _to_path(poly)
         for box in boxes:
             path = _difference(path, _to_path(box))
         paths.append(path)
@@ -1101,18 +1121,102 @@ _CUT_KINDS = ("flat", "apex_sharp", "apex_cut")
 _SERIF_KINDS = ("serif_bracketed", "serif_hairline", "spur")
 
 
+def _square_lateral_cuts(
+    poly: list[Vec2],
+    samples: list[tuple[Vec2, Vec2]],
+    widths: list[float],
+    stroke: Stroke,
+    resolved: Resolved,
+) -> list[Vec2]:
+    """横を向いた碗の平切りは、切り口を垂直にする。
+
+    接線に直角の切り口は斜めの直線になり、軸に乗らない。
+    """
+    if resolved.skeleton.structure != "bowl" or len(samples) < 2 or len(poly) < 4:
+        return poly
+    cuts: list[tuple[float, bool]] = []
+    last = len(samples) - 1
+    for index, sign, tag in ((0, -1.0, stroke.ends[0]), (last, 1.0, stroke.ends[1])):
+        if resolved.style.terminals.get(tag) != "flat":
+            continue
+        origin, tangent = samples[index]
+        unit = tangent * sign
+        if unit.length() < 1e-9:
+            continue
+        outward = unit.normalized()
+        if abs(outward.x) < 0.2:
+            continue
+        normal = tangent.perpendicular().normalized()
+        half = widths[index]
+        ends = ((origin + normal * half).x, (origin - normal * half).x)
+        if outward.x > 0.0:
+            cuts.append((min(ends), True))
+        else:
+            cuts.append((max(ends), False))
+    if not cuts:
+        return poly
+    ring = list(poly)
+    if (ring[0] - ring[-1]).length() < 1e-6:
+        ring = ring[:-1]
+    for cut_x, keep_left in cuts:
+        ring = _clip_vertical(ring, cut_x, keep_left=keep_left)
+    return _drop_close(ring)
+
+
+def _clip_vertical(poly: list[Vec2], cut_x: float, *, keep_left: bool) -> list[Vec2]:
+    def inside(point: Vec2) -> bool:
+        if keep_left:
+            return point.x <= cut_x + 1e-6
+        return point.x >= cut_x - 1e-6
+
+    def hit(start: Vec2, end: Vec2) -> Vec2:
+        dx = end.x - start.x
+        t = 0.0 if abs(dx) < 1e-9 else (cut_x - start.x) / dx
+        t = max(0.0, min(1.0, t))
+        return Vec2(cut_x, start.y + (end.y - start.y) * t)
+
+    output: list[Vec2] = []
+    for index, cur in enumerate(poly):
+        prev = poly[index - 1]
+        prev_in, cur_in = inside(prev), inside(cur)
+        if cur_in:
+            if not prev_in:
+                output.append(hit(prev, cur))
+            output.append(cur)
+        elif prev_in:
+            output.append(hit(prev, cur))
+    return output
+
+
+def _drop_close(poly: list[Vec2], gap: float = 0.4) -> list[Vec2]:
+    if not poly:
+        return poly
+    kept = [poly[0]]
+    for point in poly[1:]:
+        if (point - kept[-1]).length() > gap:
+            kept.append(point)
+    if len(kept) > 2 and (kept[0] - kept[-1]).length() <= gap:
+        kept = kept[:-1]
+    return kept
+
+
 def _diagonal_ends(
     samples: list[tuple[Vec2, Vec2]],
     widths: list[float],
     stroke: Stroke,
     resolved: Resolved,
 ) -> list[tuple[int, str, Vec2, Vec2, float]]:
-    """斜めに入る端。切り口は水平にそろえる。"""
+    """斜めの画と背骨の端は、切り口を水平にそろえる。
+
+    碗の平切りは弧の端のままにする。水平に切り直すと、切り口の前に段ができる。
+    """
     found: list[tuple[int, str, Vec2, Vec2, float]] = []
     last = len(samples) - 1
     for index, sign, tag in ((0, -1.0, stroke.ends[0]), (last, 1.0, stroke.ends[1])):
         kind = resolved.style.terminals[tag]
         if kind not in _CUT_KINDS + _SERIF_KINDS:
+            continue
+        if resolved.skeleton.structure == "bowl" and kind == "flat":
             continue
         origin, tangent = samples[index]
         unit = (tangent * sign).normalized()
@@ -1197,8 +1301,8 @@ def _extend_bowl_stems(
             continue
         for at_start, tag in ((True, stroke.ends[0]), (False, stroke.ends[1])):
             kind = resolved.style.terminals[tag]
+            # 平切りの幹は基準線で止める。丸い碗が先へ出ても、幹は追わない。
             if kind not in (
-                "flat",
                 "round",
                 "serif_bracketed",
                 "serif_hairline",
@@ -1343,6 +1447,36 @@ def _contrast_path(
     return _to_path(polygon)
 
 
+def _seat_arms(resolved: Resolved) -> Resolved:
+    """y が 0 または 1 の腕は、外縁をその基準線に合わせ、中心を半幅だけ内側へ置く。"""
+    strokes = []
+    changed = False
+    for stroke in resolved.skeleton.strokes:
+        if stroke.role != "arm":
+            strokes.append(stroke)
+            continue
+        ys = [knot.y for knot in stroke.knots]
+        if max(ys) - min(ys) > 1e-6:
+            strokes.append(stroke)
+            continue
+        half = half_width(resolved.pen, stroke.role, 0.0)
+        if ys[0] >= 1.0 - 1e-6:
+            seated = 1.0 - half
+        elif ys[0] <= 1e-6:
+            seated = half
+        else:
+            strokes.append(stroke)
+            continue
+        knots = tuple(replace(knot, y=seated) for knot in stroke.knots)
+        strokes.append(replace(stroke, knots=knots))
+        changed = True
+    if not changed:
+        return resolved
+    return replace(
+        resolved, skeleton=replace(resolved.skeleton, strokes=tuple(strokes))
+    )
+
+
 def _raise_bars(resolved: Resolved) -> Resolved:
     """横棒の中心は骨格の y ではなく、様式の metrics.bar_y。"""
     strokes = []
@@ -1383,7 +1517,7 @@ def _seat_on_ink(contours, holes, left: float):
 
 
 def build_glyph(resolved: Resolved) -> GlyphOutline:
-    resolved = _raise_bars(resolved)
+    resolved = _seat_arms(_raise_bars(resolved))
     strokes = resolved.skeleton.strokes
     samples: dict[str, list[tuple[Vec2, Vec2]]] = {}
     widths: dict[str, list[float]] = {}

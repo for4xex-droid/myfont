@@ -1,0 +1,19 @@
+glyph: U
+unicode: 0x0055
+structure: bowl
+groups: [round]
+strokes:
+  - id: bowl
+    # 幹は直線、底は半円。つなぎの接線は幹と同じ向き。
+    knots:
+      - [0.18, 1.00, line]
+      - [0.18, 0.32, smooth, 270]
+      - [0.50, 0.00, smooth, 0]
+      - [0.82, 0.32, smooth, 90]
+      - [0.82, 1.00, line]
+    tension: 1.0
+    role: bowl
+    ends: {start: foot, end: foot}
+joins: []
+sides: {left: straight, right: straight}
+expect: {contours: 1, holes: 0}

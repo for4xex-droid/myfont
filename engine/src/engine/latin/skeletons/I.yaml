@@ -1,0 +1,12 @@
+glyph: I
+unicode: 0x0049
+structure: stem
+groups: [straight]
+strokes:
+  - id: stem
+    knots: [[0.50, 0.00, line], [0.50, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+joins: []
+sides: {left: straight, right: straight}
+expect: {contours: 1, holes: 0}

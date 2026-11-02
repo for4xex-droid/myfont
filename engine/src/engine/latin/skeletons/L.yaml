@@ -1,0 +1,18 @@
+glyph: L
+unicode: 0x004C
+structure: branch
+groups: [straight]
+strokes:
+  - id: stem
+    knots: [[0.10, 0.00, line], [0.10, 1.00, line]]
+    role: thick
+    ends: {start: none, end: foot}
+  - id: arm
+    # 外縁は地。中心は半幅だけ内側。bar_y には寄せない。
+    knots: [[0.10, 0.00, line], [1.00, 0.00, line]]
+    role: arm
+    ends: {start: none, end: open}
+joins:
+  - {a: arm, b: stem, type: L}
+sides: {left: straight, right: open}
+expect: {contours: 1, holes: 0}

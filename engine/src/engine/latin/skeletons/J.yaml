@@ -1,0 +1,19 @@
+glyph: J
+unicode: 0x004A
+structure: bowl
+groups: [round]
+strokes:
+  - id: bowl
+    # 底は基線の半円。枠が縦に伸びるので、単位座標では横長にしておく。
+    # フックをディセンダーへ下ろすかは未決定。端の位置は暫定。
+    knots:
+      - [0.70, 1.00, line]
+      - [0.70, 0.142, smooth, 270]
+      - [0.44, 0.00, smooth, 180]
+      - [0.18, 0.142, smooth, 90]
+    tension: 1.0
+    role: bowl
+    ends: {start: foot, end: round_end}
+joins: []
+sides: {left: open, right: straight}
+expect: {contours: 1, holes: 0}

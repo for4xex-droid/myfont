@@ -108,3 +108,27 @@ def test_variant_sidebearing_is_an_unknown_key():
     raw = _skeleton(variants={"modern": {"sidebearing": {"straight": 0.1}}})
     with pytest.raises(ValueError, match="unknown keys"):
         parse_skeleton(raw)
+
+
+def test_unknown_role_is_rejected():
+    raw = _skeleton()
+    raw["strokes"][0]["role"] = "cross"
+    with pytest.raises(ValueError, match="unknown role"):
+        parse_skeleton(raw)
+
+
+def test_arm_role_loads():
+    """腕は横棒と別に置く。bar_y へ寄せる対象にはしない。"""
+    raw = _skeleton()
+    raw["strokes"][0]["role"] = "arm"
+    assert parse_skeleton(raw).strokes[0].role == "arm"
+
+
+def test_unknown_structure_is_rejected():
+    with pytest.raises(ValueError, match="unknown structure"):
+        parse_skeleton(_skeleton(structure="ladder"))
+
+
+def test_stem_structure_loads():
+    """腕のない縦の幹。I がこれ。"""
+    assert parse_skeleton(_skeleton(structure="stem")).structure == "stem"

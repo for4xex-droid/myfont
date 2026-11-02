@@ -1,0 +1,24 @@
+glyph: D
+unicode: 0x0044
+structure: bowl
+groups: [round]
+strokes:
+  - id: stem
+    knots: [[0.18, 0.00, line], [0.18, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+  - id: bowl
+    # 天地は平ら。肩の長さは暫定。作者が組見本で決める。
+    knots:
+      - [0.02, 1.00, smooth, 0]
+      - [0.62, 1.00, smooth, 0]
+      - [1.00, 0.50, smooth, 270]
+      - [0.62, 0.00, smooth, 180]
+      - [0.02, 0.00, smooth, 180]
+    tension: 1.0
+    role: bowl
+    ends: {start: none, end: none}
+joins:
+  - {a: bowl, b: stem, type: bowl_join}
+sides: {left: straight, right: round}
+expect: {contours: 2, holes: 1}

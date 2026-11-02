@@ -22,21 +22,22 @@ def half_width(
 
     nib は楕円ペン。θ は細い方向（長軸）。接線が θ と平行なとき hairline、
     直交するとき stem。幅は接線角について滑らかで、最細の所に角を作らない。
-    thick / thin / bar / slant_thin はこの式より優先する。run は式のまま。
+    thick / thin / bar / arm / slant_thin はこの式より優先する。run は式のまま。
     slant_thin は幹 × 様式の比。角度でもヘアラインでも決まらない。
+    arm は天と地の腕。太さは bar と同じで、bar_y へは寄せない。
     """
     if role == "slant_thin":
         if slant_ratio is None:
             raise ValueError("slant_thin requires slant_ratio")
         return pen.stem * slant_ratio / 2.0
     if pen.type == "mono":
-        full = pen.stem * (pen.bar_ratio if role == "bar" else 1.0)
+        full = pen.stem * (pen.bar_ratio if role in ("bar", "arm") else 1.0)
         return full / 2.0
     if role == "thick":
         return pen.stem / 2.0
     if role == "thin":
         return pen.hairline / 2.0
-    if role == "bar":
+    if role in ("bar", "arm"):
         return pen.stem * pen.bar_ratio / 2.0
     theta = math.radians(pen.theta_deg)
     along = tangent - theta

@@ -44,6 +44,12 @@ def test_slant_thin_uses_the_stem_ratio_at_every_angle():
     assert half_width(MONO, "slant_thin", 0.4, slant_ratio=0.40) == pytest.approx(0.13 * 0.40 / 2)
 
 
+def test_arm_uses_the_same_width_as_a_bar():
+    """腕は横画。mono でも nib でも bar と同じ太さ。"""
+    assert half_width(MONO, "arm", 0.4) == half_width(MONO, "bar", 0.4)
+    assert half_width(NIB, "arm", 0.3) == half_width(NIB, "bar", 0.3)
+
+
 def test_role_overrides_the_nib_angle():
     along_thin_axis = 0.0
     assert half_width(NIB, "thick", along_thin_axis) == pytest.approx(0.08)

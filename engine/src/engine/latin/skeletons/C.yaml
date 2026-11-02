@@ -1,0 +1,19 @@
+glyph: C
+unicode: 0x0043
+structure: bowl
+groups: [round]
+strokes:
+  - id: bowl
+    # 開きの高さは暫定。接線は円の接線で、端の手前で外へ反らない。
+    knots:
+      - [0.9142, 0.78, smooth, 124.1]
+      - [0.50, 1.00, smooth, 180]
+      - [0.00, 0.50, smooth, 270]
+      - [0.50, 0.00, smooth, 0]
+      - [0.9142, 0.22, smooth, 55.9]
+    tension: 1.0
+    role: bowl
+    ends: {start: open, end: open}
+joins: []
+sides: {left: round, right: open}
+expect: {contours: 1, holes: 0}

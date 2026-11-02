@@ -7,12 +7,14 @@ from dataclasses import dataclass
 from typing import Any
 
 KNOT_TYPES = frozenset({"smooth", "corner", "line"})
-ROLES = frozenset({"thick", "thin", "bar", "bowl", "run", "slant_thin"})
+ROLES = frozenset({"thick", "thin", "bar", "arm", "bowl", "run", "slant_thin"})
 ENDS = frozenset({"foot", "apex", "none", "open", "round_end"})
 SIDES = frozenset({"straight", "near_straight", "round", "diagonal", "open"})
 JOIN_TYPES = frozenset({"apex", "apex_cut", "T", "L", "crotch", "bowl_join"})
 GROUPS = frozenset({"straight", "round", "diagonal", "open", "bar"})
-STRUCTURES = frozenset({"stem_pair", "bowl", "apex_diagonals", "spine", "branch"})
+STRUCTURES = frozenset(
+    {"stem_pair", "bowl", "apex_diagonals", "spine", "branch", "stem"}
+)
 STYLES = frozenset({"modern", "classic", "chic", "pop"})
 
 _TOP_KEYS = frozenset(

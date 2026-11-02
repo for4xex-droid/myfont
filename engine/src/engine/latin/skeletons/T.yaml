@@ -1,0 +1,18 @@
+glyph: T
+unicode: 0x0054
+structure: branch
+groups: [straight]
+strokes:
+  - id: stem
+    knots: [[0.50, 0.00, line], [0.50, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: none}
+  - id: bar
+    # 外縁は天。中心は半幅だけ内側。bar_y には寄せない。
+    knots: [[0.00, 1.00, line], [1.00, 1.00, line]]
+    role: arm
+    ends: {start: open, end: open}
+joins:
+  - {a: bar, b: stem, type: T}
+sides: {left: open, right: open}
+expect: {contours: 1, holes: 0}
