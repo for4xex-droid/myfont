@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from engine.geometry import Vec2, fair_inner_right
 from engine.latin import build
 from engine.latin.build import build_glyph
 from engine.latin.load import load_resolved
@@ -212,6 +213,34 @@ def test_chic_b_counter_side_is_not_straight():
     runs = [_right_straight(hole) for hole in _holes(outline)]
     assert runs
     assert max(runs) <= 40.0
+
+
+def test_pop_b_counter_curvature_does_not_jump_at_the_right():
+    """右の極値で、穴の曲率の跳びは 6 まで。"""
+    outline = build_glyph(load_resolved("B", "pop"))
+    worst = 0.0
+    for hole in _holes(outline):
+        points = _resample(_ring(hole), 3.0)
+        curve = _curvature(points)
+        right = max(point.x for point in points)
+        kept = [i for i, point in enumerate(points) if point.x >= right - 40.0]
+        assert kept
+        worst = max(
+            worst,
+            max(abs(curve[(i + 3) % len(curve)] - curve[i]) for i in kept),
+        )
+    assert worst <= 6.0
+
+
+def test_inner_fairing_skips_the_outer_side_and_the_ends():
+    """中心線より外側、短すぎる側、端が極の側は、置き換えない。"""
+    samples = [(Vec2(float(i), 0.0), Vec2(1.0, 0.0)) for i in range(120)]
+    half = [10.0] * 120
+    outward = [Vec2(200.0 if 40 < i < 80 else 130.0, float(i)) for i in range(120)]
+    assert fair_inner_right(samples, half, outward) == outward
+    assert fair_inner_right(samples[:10], half[:10], outward[:10]) == outward[:10]
+    at_end = [Vec2(500.0 if i == 0 else float(i), float(i)) for i in range(120)]
+    assert fair_inner_right(samples, half, at_end) == at_end
 
 
 def _bars(outline, stem_right):
@@ -531,7 +560,7 @@ def test_contrast_b_shoulders_meet_the_flat(style):
 
 @pytest.mark.parametrize(("glyph", "style"), _UNCHANGED)
 def test_other_glyphs_keep_their_outline(glyph, style):
-    """形は保存した輪郭のまま。2026-10-07、字間を墨基準にしたので x だけ平行移動し、H の横棒は 0.48 から 0.52 へ上げ、シックの右脚を幹の 0.40 にした。2026-10-08、V は外縁と切り口で先端を作り、脚全体を一次に細くし、斜画のセリフを水平な下面と垂直な端に変えた。2026-10-13、クラシックとシックの S を7節点の骨格にし、くちばしを腕の端から内側へ下ろした（クラシックはブラケット 45・出 0.20、シックはつなぎの曲線・出 0.27）。シックは背を幹の太さに保ち、太さを弧の長さで均した（90 UPM）。クラシックも碗の内側の段を消すため 45 UPM で均し、ずれた頂を戻すため頂の節点を 0.49 と 0.51 にした。2026-10-16、B の上の碗を様式の upper_bowl 0.94 で左端を軸に狭め、谷は山の曲線に沿うよう先端だけを丸め、クラシックとシックの天地の段を接線でつないだ。モダンとポップの B だけ差し替えた。2026-10-16、クラシックとシックの S の天地を、くちばしの角から頂点まで、頂点で水平な浅い円弧にした。2026-10-17、シックの O と 0 の穴を、天地のヘアラインと左右の最太に合う楕円にした。外形も箱に収まる楕円にし、天地の谷をなくして丸みを強めた。2026-11-02、クラシックの幹のセリフのブラケットを、面取りの楔から、板の上面と幹の縁に接線でつながる凹の曲線にした。板の長さと厚さは同じ。"""
+    """形は保存した輪郭のまま。2026-10-07、字間を墨基準にしたので x だけ平行移動し、H の横棒は 0.48 から 0.52 へ上げ、シックの右脚を幹の 0.40 にした。2026-10-08、V は外縁と切り口で先端を作り、脚全体を一次に細くし、斜画のセリフを水平な下面と垂直な端に変えた。2026-10-13、クラシックとシックの S を7節点の骨格にし、くちばしを腕の端から内側へ下ろした（クラシックはブラケット 45・出 0.20、シックはつなぎの曲線・出 0.27）。シックは背を幹の太さに保ち、太さを弧の長さで均した（90 UPM）。クラシックも碗の内側の段を消すため 45 UPM で均し、ずれた頂を戻すため頂の節点を 0.49 と 0.51 にした。2026-10-16、B の上の碗を様式の upper_bowl 0.94 で左端を軸に狭め、谷は山の曲線に沿うよう先端だけを丸め、クラシックとシックの天地の段を接線でつないだ。モダンとポップの B だけ差し替えた。2026-10-16、クラシックとシックの S の天地を、くちばしの角から頂点まで、頂点で水平な浅い円弧にした。2026-10-17、シックの O と 0 の穴を、天地のヘアラインと左右の最太に合う楕円にした。外形も箱に収まる楕円にし、天地の谷をなくして丸みを強めた。2026-11-02、クラシックの幹のセリフのブラケットを、面取りの楔から、板の上面と幹の縁に接線でつながる凹の曲線にした。板の長さと厚さは同じ。2026-11-02、ポップ B の穴の右の極で、三次の曲率の山を内周だけ y に対する滑らかな x で置き換えた。外形のずれは 0.01 未満。"""
     saved = json.loads(_FIXTURE.read_text())[f"{style}/{glyph}"]
     outline = build_glyph(load_resolved(glyph, style))
     assert outline.contour_count == len(saved["contours"])

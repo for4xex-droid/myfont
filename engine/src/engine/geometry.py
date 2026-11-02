@@ -11,6 +11,7 @@ from __future__ import annotations
 import math
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
+from itertools import pairwise
 
 UPM = 1000
 
@@ -389,6 +390,147 @@ def _close_ring(pts: Sequence[Vec2]) -> list[Vec2]:
     return out
 
 
+# 右の極の直後で内周の曲率が跳ねる範囲。伸ばすと、置き換える五次が波打つ。
+_FAIR_PAD = 20
+_FAIR_REACH = 60
+_INNER_JUMP = 6.0
+
+
+def _poly_jump(points: Sequence[Vec2]) -> float:
+    """右端の近くで、3 単位おきに測った曲率の跳び。開いた側の両端は結ばない。"""
+    if len(points) < 8:
+        return 0.0
+    stepped = [points[0]]
+    carry = 0.0
+    for start, end in pairwise(points):
+        length = (end - start).length()
+        if length < 1e-9:
+            continue
+        cursor = 3.0 - carry
+        while cursor <= length:
+            stepped.append(start + (end - start) * (cursor / length))
+            cursor += 3.0
+        carry = length - (cursor - 3.0)
+    count = len(stepped)
+    if count < 8:
+        return 0.0
+    curve = [0.0] * count
+    for index in range(2, count - 2):
+        a, b, c = stepped[index - 2], stepped[index], stepped[index + 2]
+        turn = math.atan2(c.y - b.y, c.x - b.x) - math.atan2(b.y - a.y, b.x - a.x)
+        turn = (turn + math.pi) % (2.0 * math.pi) - math.pi
+        curve[index] = math.degrees(turn) / 6.0 * 10.0
+    right = max(point.x for point in stepped)
+    worst = 0.0
+    for index in range(2, count - 5):
+        if stepped[index].x < right - 40.0:
+            continue
+        worst = max(worst, abs(curve[index + 3] - curve[index]))
+    return worst
+
+
+def _local_curvature(points: Sequence[Vec2], index: int) -> float:
+    a, b, c = points[index - 2], points[index], points[index + 2]
+    turn = math.atan2(c.y - b.y, c.x - b.x) - math.atan2(b.y - a.y, b.x - a.x)
+    turn = (turn + math.pi) % (2.0 * math.pi) - math.pi
+    length = (b - a).length() + (c - b).length()
+    if length < 1e-9:
+        return 0.0
+    return abs(math.degrees(turn) / length * 10.0)
+
+
+def _quintic(x0, s0, q0, x1, s1, q1) -> tuple[float, float, float, float, float, float]:
+    """両端の位置・傾き・二階を通す五次。係数は u の 0 次から。"""
+    a0 = x0
+    a1 = s0
+    a2 = q0 / 2.0
+    remain = x1 - a0 - a1 - a2
+    slope = s1 - a1 - 2.0 * a2
+    curve = q1 - 2.0 * a2
+    first = slope - 3.0 * remain
+    second = curve - 6.0 * remain
+    a5 = (second - 6.0 * first) / 2.0
+    a4 = first - 2.0 * a5
+    a3 = remain - a4 - a5
+    return (a0, a1, a2, a3, a4, a5)
+
+
+def fair_inner_right(
+    samples: Sequence[tuple[Vec2, Vec2]],
+    half_widths: Sequence[float],
+    left: list[Vec2],
+) -> list[Vec2]:
+    """右の極で内周が跳ねるとき、その前後を y に対する滑らかな x で置き換える。
+
+    接線を固定した三次は、極の直後に曲率の山を作る。太いペンでは内周だけその山が跳ねる。
+    中心線より外側の側、山が検査の帯（6）以内の側、置き換えると跳びが増える側は動かさない。
+    窓の幅はサンプル数で、区間あたりのサンプル数を変えると山の取り方が変わる。
+    """
+    count = len(left)
+    if count < _FAIR_PAD + _FAIR_REACH + 8 or len(samples) != len(half_widths):
+        return left
+    index = max(range(count), key=lambda i: left[i].x)
+    if index < 4 or index > count - 6:
+        return left
+    center = max(range(len(samples)), key=lambda i: samples[i][0].x)
+    half = half_widths[center]
+    inward = samples[center][0].x - left[index].x
+    if inward < half - 8.0 or inward > half + 8.0:
+        return left
+    jump = _poly_jump(left)
+    if jump <= _INNER_JUMP:
+        return left
+    floor = _local_curvature(left, min(count - 3, index + _FAIR_PAD + _FAIR_REACH))
+    stop = index
+    while stop < count - 6 and _local_curvature(left, stop) > floor + 4.0:
+        stop += 1
+    start = max(3, index - _FAIR_PAD)
+    stop = min(count - 4, stop + _FAIR_PAD)
+    y0, y1 = left[start].y, left[stop].y
+    span = y1 - y0
+    if abs(span) < 1.0 or stop - start < 6:
+        return left
+    sign = 1.0 if span > 0.0 else -1.0
+    if any((left[i + 1].y - left[i].y) * sign <= 0.0 for i in range(start, stop)):
+        return left
+
+    def spaced(i: int) -> bool:
+        return (
+            abs(left[i + 1].y - left[i].y) >= 0.05
+            and abs(left[i].y - left[i - 1].y) >= 0.05
+        )
+
+    if not spaced(start) or not spaced(stop):
+        return left
+
+    def slope(i: int) -> float:
+        return (left[i + 1].x - left[i - 1].x) / (left[i + 1].y - left[i - 1].y)
+
+    def bend(i: int) -> float:
+        forward = (left[i + 1].x - left[i].x) / (left[i + 1].y - left[i].y)
+        back = (left[i].x - left[i - 1].x) / (left[i].y - left[i - 1].y)
+        return (forward - back) / ((left[i + 1].y - left[i - 1].y) / 2.0)
+
+    coef = _quintic(
+        left[start].x,
+        slope(start) * span,
+        bend(start) * span * span,
+        left[stop].x,
+        slope(stop) * span,
+        bend(stop) * span * span,
+    )
+    replaced = list(left)
+    for i in range(start, stop + 1):
+        u = (left[i].y - y0) / span
+        value = 0.0
+        for term in reversed(coef):
+            value = value * u + term
+        replaced[i] = Vec2(value, left[i].y)
+    if _poly_jump(replaced) > jump:
+        return left
+    return replaced
+
+
 def variable_width_outline(
     samples: Sequence[tuple[Vec2, Vec2]],
     half_widths: Sequence[float],
@@ -399,6 +541,7 @@ def variable_width_outline(
     進行方向左側が left、右側が right。
     """
     left, right = _offset_sides(samples, half_widths)
+    left = fair_inner_right(samples, half_widths, left)
 
     # 先端半幅が 0 に近い場合は左右が重なるので先端を1点にまとめる
     tip_hw = half_widths[-1]
