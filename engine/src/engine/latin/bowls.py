@@ -15,6 +15,8 @@ from engine.geometry import Vec2
 _FLAT_PAST_STEM = 42.0
 # 空きが 80 未満の碗だけ、端の縮めを弱める。一様に縮めると横画を離れる曲率が段になる。
 _NARROW_EASE = 1.8
+# 狭い碗の右端に残す傾き。0 だと右辺が直線になり、大きくすると平らな端で曲率が段になる。
+_NARROW_SIDE = 0.9
 
 
 def contrast_polygon(
@@ -156,6 +158,11 @@ def _pen_shape(theta: float, thin: float) -> float:
     return 0.22 + 0.78 * ease * max(pen, 0.35)
 
 
+def _narrow_side(u: float) -> float:
+    """右端に傾きを足す。平らな端（u が 1）の値と傾きは、足す前と同じ。"""
+    return _NARROW_SIDE * (u - 3.0 * u * u + 3.0 * u**3 - u**4)
+
+
 def _pen_bow(
     x_left: float,
     y0: float,
@@ -201,12 +208,16 @@ def _pen_bow(
             ]
         else:
             power = 1.0 + (80.0 - room) / 40.0 * _NARROW_EASE
+            # u ** power は右端で傾きが 0 になり、右辺が直線になる。
+            # 積分が 0 の山を足すと、平らな端の傾きはそのままで、右端に傾きが残る。
             placed = [
                 Vec2(
-                    x_right - room * max(0.0, (x_right - point.x) / span) ** power,
+                    x_right - room * (u**power + _narrow_side(u)),
                     point.y,
                 )
-                for point in placed
+                for u, point in (
+                    (max(0.0, (x_right - point.x) / span), point) for point in placed
+                )
             ]
     points = [Vec2(x_left, y0), Vec2(placed[0].x, y0)]
     points.extend(placed[1:])

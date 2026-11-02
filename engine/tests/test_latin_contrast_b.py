@@ -183,6 +183,37 @@ def test_contrast_b_counter_curvature_does_not_jump(style):
     assert worst <= 6.0
 
 
+def _right_straight(contour, tol: float = 0.5) -> float:
+    """穴の右半分で、弦から tol 以内に収まるいちばん長い区間。"""
+    points = _ring(contour)
+    center = (min(point.x for point in points) + max(point.x for point in points)) / 2.0
+    best = 0.0
+    count = len(points)
+    for start in range(count):
+        if points[start].x < center:
+            continue
+        for end in range(start + 2, count):
+            if points[end].x < center:
+                break
+            chord = points[end] - points[start]
+            length = chord.length()
+            if length < 1e-9 or any(
+                abs((points[step] - points[start]).cross(chord)) / length > tol
+                for step in range(start + 1, end)
+            ):
+                break
+            best = max(best, length)
+    return best
+
+
+def test_chic_b_counter_side_is_not_straight():
+    """太い方向でも、穴の右辺が直線のまま 40 を超えて続かない。"""
+    outline = build_glyph(load_resolved("B", "chic"))
+    runs = [_right_straight(hole) for hole in _holes(outline)]
+    assert runs
+    assert max(runs) <= 40.0
+
+
 def _bars(outline, stem_right):
     """平らな横棒の（下、中央、上）の太さ。セリフで太った所は除く。"""
 
