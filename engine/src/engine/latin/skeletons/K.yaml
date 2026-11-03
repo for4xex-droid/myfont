@@ -1,0 +1,24 @@
+glyph: K
+unicode: 0x004B
+structure: branch
+groups: [straight]
+strokes:
+  - id: stem
+    knots: [[0.16, 0.00, line], [0.16, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: foot}
+  - id: arm
+    # 始まりは幹の中心より左。内縁が幹の右縁で一点に会う。暫定。
+    knots: [[0.125, 0.52, line], [0.96, 1.00, line]]
+    role: thick
+    ends: {start: none, end: foot}
+  - id: leg
+    # 腕からではなく、同じ点から基線の右へ出す。暫定。
+    knots: [[0.125, 0.52, line], [0.90, 0.00, line]]
+    role: thick
+    ends: {start: none, end: foot}
+joins:
+  - {a: arm, b: stem, type: crotch}
+  - {a: leg, b: stem, type: crotch}
+sides: {left: straight, right: diagonal}
+expect: {contours: 1, holes: 0}

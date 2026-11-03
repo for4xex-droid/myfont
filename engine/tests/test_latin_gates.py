@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import inspect
+from dataclasses import replace
+
 import pytest
 from PIL import Image
 
 from engine.geometry import Vec2
 from engine.latin.build import GlyphOutline, build_glyph
 from engine.latin.gate import (
+    _apex_bands,
     ink_area,
     line_gap_area,
     metric_violations,
@@ -17,6 +21,7 @@ from engine.latin.gate import (
     thinnest_run,
 )
 from engine.latin.load import load_resolved
+from engine.latin.schema import Join, Knot, Stroke
 from engine.latin.sheet import render_pilot_sheet, text_origins
 
 GLYPHS = ("H", "O", "B", "V", "S", "zero")
@@ -134,3 +139,39 @@ def test_pilot_sheet_includes_the_spacing_lines(tmp_path):
     image = Image.open(path)
     assert image.width > 500
     assert image.height > 4000
+
+
+def test_apex_band_comes_from_the_skeleton_not_the_glyph_name():
+    """天の尖りは骨格の端か接合から取る。字の名前では足さない。"""
+    assert "W" not in inspect.getsource(_apex_bands)
+    loaded = load_resolved("W", "modern").skeleton
+    bottom = tuple(
+        join
+        for join in loaded.joins
+        if not (join.a == "inner_left" and join.b == "inner_right")
+    )
+    named = replace(loaded, glyph="W", joins=bottom)
+    assert "top" not in _apex_bands(named)
+    peaked = replace(
+        loaded,
+        glyph="synthetic",
+        joins=bottom + (Join("inner_left", "inner_right", "apex"),),
+    )
+    assert _apex_bands(peaked) == {"top", "bottom"}
+    stroke = Stroke(
+        "rise",
+        (
+            Knot(0.2, 0.0, "line"),
+            Knot(0.5, 1.0, "line"),
+        ),
+        False,
+        "thick",
+        ("foot", "apex"),
+        None,
+        None,
+    )
+    topped = replace(loaded, glyph="synthetic", strokes=(stroke,), joins=())
+    assert _apex_bands(topped) == {"top"}
+    v = load_resolved("V", "modern")
+    assert _apex_bands(v.skeleton) == {"bottom"}
+    assert overshoot_violations(build_glyph(v), v) == []

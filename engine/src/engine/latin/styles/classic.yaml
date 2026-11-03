@@ -3,6 +3,7 @@ cap_height: 700
 overshoot: {round: 0.016, apex: 0.020}
 pen: {type: nib, stem: 0.145, bar_ratio: 0.42, hairline: 0.058, theta_deg: 30}
 terminals: {foot: serif_bracketed, apex: apex_cut, none: none, open: beak, round_end: ball}
+# 股の細めは暫定。組見本の MNWK で確かめる。値は 0.82 のまま。
 joins: {crotch_thin: 0.82}
 proportions: {H: 0.78, O: 0.96, B: 0.62, V: 0.82, S: 0.52, "0": 0.88}
 sidebearing: {base: 0.07, straight: 1.00, near_straight: 0.85, round: 0.55, diagonal: 0.18, open: 0.32}

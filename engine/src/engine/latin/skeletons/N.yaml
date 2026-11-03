@@ -1,0 +1,23 @@
+glyph: N
+unicode: 0x004E
+structure: branch
+groups: [straight]
+strokes:
+  - id: left
+    knots: [[0.14, 0.00, line], [0.14, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: apex}
+  - id: right
+    knots: [[0.86, 0.00, line], [0.86, 1.00, line]]
+    role: thick
+    ends: {start: apex, end: foot}
+  - id: diagonal
+    # 左上の頂点から右下の頂点へ。両端が頂点なので太さは一定。暫定。
+    knots: [[0.14, 1.00, line], [0.86, 0.00, line]]
+    role: thick
+    ends: {start: apex, end: apex}
+joins:
+  - {a: left, b: diagonal, type: stem_apex}
+  - {a: right, b: diagonal, type: stem_apex}
+sides: {left: straight, right: straight}
+expect: {contours: 1, holes: 0}

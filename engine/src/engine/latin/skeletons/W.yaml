@@ -1,0 +1,29 @@
+glyph: W
+unicode: 0x0057
+structure: apex_diagonals
+groups: [diagonal]
+strokes:
+  - id: outer_left
+    knots: [[0.02, 1.00, line], [0.26, 0.00, corner]]
+    role: thick
+    ends: {start: foot, end: apex}
+  - id: inner_left
+    # 中央の山はキャップ。下向きの頂点は2つ。山の位置は暫定。
+    knots: [[0.26, 0.00, corner], [0.50, 1.00, line]]
+    role: thick
+    ends: {start: apex, end: foot}
+  - id: inner_right
+    knots: [[0.50, 1.00, line], [0.74, 0.00, corner]]
+    role: thick
+    ends: {start: foot, end: apex}
+  - id: outer_right
+    knots: [[0.74, 0.00, corner], [0.98, 1.00, line]]
+    role: thick
+    ends: {start: apex, end: foot}
+joins:
+  - {a: outer_left, b: inner_left, type: apex}
+  - {a: inner_right, b: outer_right, type: apex}
+  # 中央の山。天の apex なので、平切りがキャップより上に出る。
+  - {a: inner_left, b: inner_right, type: apex}
+sides: {left: diagonal, right: diagonal}
+expect: {contours: 1, holes: 0}

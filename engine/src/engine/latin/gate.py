@@ -10,7 +10,7 @@ from typing import Any
 
 import yaml
 
-from engine.latin.build import GlyphOutline
+from engine.latin.build import GlyphOutline, apex_meeting_y
 
 _TARGETS = Path(__file__).resolve().parent / "targets" / "separation.yaml"
 
@@ -202,6 +202,28 @@ def thinnest_run(outline: GlyphOutline, y: float) -> float:
     return min(right - left for left, right in runs)
 
 
+def _apex_bands(skeleton) -> set[str]:
+    """尖りの端と、尖りの接合が、天にあるか地にあるか。"""
+    bands: set[str] = set()
+
+    def add(y: float) -> None:
+        bands.add("top" if y >= 0.5 else "bottom")
+
+    for stroke in skeleton.strokes:
+        for end, knot in (
+            (stroke.ends[0], stroke.knots[0]),
+            (stroke.ends[1], stroke.knots[-1]),
+        ):
+            if end == "apex":
+                add(knot.y)
+    by_id = {stroke.id: stroke for stroke in skeleton.strokes}
+    for join in skeleton.joins:
+        if join.type not in ("apex", "apex_cut", "stem_apex"):
+            continue
+        add(apex_meeting_y(by_id[join.a], by_id[join.b]))
+    return bands
+
+
 def overshoot_limit(resolved) -> tuple[str, float]:
     """build の付け方に合わせる。接合した碗（B）は平ら、開いた碗は丸、先端は尖り。"""
     cap = resolved.style.cap_height
@@ -223,12 +245,15 @@ def overshoot_violations(outline: GlyphOutline, resolved) -> list[str]:
     below = -ymin
     kind, limit = overshoot_limit(resolved)
     if kind == "apex":
-        deep, shallow = max(above, below), min(above, below)
+        bands = _apex_bands(resolved.skeleton)
         found = []
-        if abs(deep - limit) > _OVERSHOOT_TOL:
-            found.append(f"尖り {deep:.1f} が帯 {limit:.1f} の外")
-        if abs(shallow) > _OVERSHOOT_TOL:
-            found.append(f"尖りの反対側 {shallow:.1f}")
+        expect = (
+            ("上", above, limit if "top" in bands else 0.0),
+            ("下", below, limit if "bottom" in bands else 0.0),
+        )
+        for label, value, want in expect:
+            if abs(value - want) > _OVERSHOOT_TOL:
+                found.append(f"尖りの{label} {value:.1f} が帯 {want:.1f} の外")
         return found
     return [
         f"{kind}の{label} {value:.1f} が帯 {limit:.1f} の外"

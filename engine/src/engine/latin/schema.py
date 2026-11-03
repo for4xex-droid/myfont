@@ -10,7 +10,9 @@ KNOT_TYPES = frozenset({"smooth", "corner", "line"})
 ROLES = frozenset({"thick", "thin", "bar", "arm", "bowl", "run", "slant_thin"})
 ENDS = frozenset({"foot", "apex", "none", "open", "round_end"})
 SIDES = frozenset({"straight", "near_straight", "round", "diagonal", "open"})
-JOIN_TYPES = frozenset({"apex", "apex_cut", "T", "L", "crotch", "bowl_join"})
+JOIN_TYPES = frozenset(
+    {"apex", "apex_cut", "stem_apex", "T", "L", "crotch", "bowl_join"}
+)
 GROUPS = frozenset({"straight", "round", "diagonal", "open", "bar"})
 STRUCTURES = frozenset(
     {"stem_pair", "bowl", "apex_diagonals", "spine", "branch", "stem", "diagonal"}

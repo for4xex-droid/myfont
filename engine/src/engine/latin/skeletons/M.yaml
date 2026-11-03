@@ -1,0 +1,30 @@
+glyph: M
+unicode: 0x004D
+structure: apex_diagonals
+groups: [straight]
+strokes:
+  - id: left
+    # 外縁は垂直。天は斜画の外縁との頂点。暫定。
+    knots: [[0.074, 0.00, line], [0.074, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: apex}
+  - id: right
+    # 左の幹と同じだけ外へ出す。暫定。
+    knots: [[0.926, 0.00, line], [0.926, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: apex}
+  - id: fall
+    # 左右の幹は垂直。中央の谷は基線の頂点。開きは暫定。
+    knots: [[0.08, 1.00, line], [0.50, 0.00, corner]]
+    role: thick
+    ends: {start: apex, end: apex}
+  - id: rise
+    knots: [[0.50, 0.00, corner], [0.92, 1.00, line]]
+    role: thick
+    ends: {start: apex, end: apex}
+joins:
+  - {a: left, b: fall, type: stem_apex}
+  - {a: right, b: rise, type: stem_apex}
+  - {a: fall, b: rise, type: apex}
+sides: {left: straight, right: straight}
+expect: {contours: 1, holes: 0}

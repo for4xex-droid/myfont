@@ -41,7 +41,6 @@ from engine.latin.joins import (
     fillet_bowl_waist,
     retract_end,
     smooth_side_pinches,
-    taper_end,
     trim_apex_stub,
 )
 from engine.latin.load import Resolved
@@ -314,17 +313,9 @@ def _widths(
         widths.append(
             half_width(resolved.pen, stroke.role, angle, slant_ratio=slant) * cap
         )
-    factor = resolved.style.joins["crotch_thin"]
     ends = {stroke.ends[0], stroke.ends[1]}
-    crotch = any(
-        join.type == "crotch" and stroke.id in (join.a, join.b)
-        for join in resolved.skeleton.joins
-    )
-    if crotch and "apex" not in ends:
-        if stroke.ends[0] != "none":
-            taper_end(widths, at_start=True, factor=factor)
-        if stroke.ends[1] != "none":
-            taper_end(widths, at_start=False, factor=factor)
+    if "apex" not in ends:
+        _crotch_taper(samples, widths, stroke, resolved)
     if ends == {"open"} and resolved.style.terminals["open"] == "beak":
         metrics = resolved.style.metrics
         if "spine_weight" in metrics:
@@ -332,6 +323,49 @@ def _widths(
         if "spine_smooth" in metrics:
             widths = _smooth_along(samples, widths, metrics["spine_smooth"] * cap)
     return limit_half_to_curvature(samples, widths)
+
+
+def _crotch_taper(
+    samples: list[tuple[Vec2, Vec2]],
+    widths: list[float],
+    stroke: Stroke,
+    resolved: Resolved,
+) -> None:
+    """股の端を細い端にして、半幅を弧長に対して一次で変える。
+
+    hw(s) = hw0 × (1 − (1 − t) · s / L)。s = 0 が太い端。
+    端が none ならその端が細い。両端を細くするときは、全長を t 倍の一定幅にする。
+    中央で折り返すと縁が折れるので、先細りは片側だけ。接合の a 側だけを細める。
+    """
+    factor = resolved.style.joins["crotch_thin"]
+    if factor == 1.0 or len(widths) < 2:
+        return
+    joined = any(
+        join.type == "crotch" and join.a == stroke.id
+        for join in resolved.skeleton.joins
+    )
+    if not joined:
+        return
+    both_feet = stroke.ends == ("foot", "foot")
+    thin_start = stroke.ends[0] == "none" or both_feet
+    thin_end = stroke.ends[1] == "none" or both_feet
+    if not thin_start and not thin_end:
+        return
+    if thin_start and thin_end:
+        for index in range(len(widths)):
+            widths[index] *= factor
+        return
+    lengths = [0.0]
+    for prev, cur in pairwise(samples):
+        lengths.append(lengths[-1] + (cur[0] - prev[0]).length())
+    total = lengths[-1] or 1.0
+    for index, distance in enumerate(lengths):
+        along = distance / total
+        if thin_start:
+            scale = factor + (1.0 - factor) * along
+        else:
+            scale = 1.0 - (1.0 - factor) * along
+        widths[index] *= scale
 
 
 def _hold_spine(
@@ -768,6 +802,46 @@ def _apply_joins(
         _bury(samples, widths, join.a, join.b)
 
 
+def _clip_behind_vertical_partner(
+    poly: list[Vec2],
+    samples: list[tuple[Vec2, Vec2]],
+    stroke: Stroke,
+    resolved: Resolved,
+) -> list[Vec2]:
+    """股の画が、縦の相手の向こう側へ端を出さない。"""
+    if len(samples) < 2 or len(poly) < 4:
+        return poly
+    by_id = {item.id: item for item in resolved.skeleton.strokes}
+    ring = list(poly)
+    if (ring[0] - ring[-1]).length() < 1e-6:
+        ring = ring[:-1]
+    changed = False
+    cap = resolved.style.cap_height
+    for join in resolved.skeleton.joins:
+        if join.type != "crotch" or stroke.id not in (join.a, join.b):
+            continue
+        partner_id = join.b if join.a == stroke.id else join.a
+        partner = by_id.get(partner_id)
+        if partner is None:
+            continue
+        xs = [knot.x for knot in partner.knots]
+        if max(xs) - min(xs) > 0.02:
+            continue
+        frame = _plain_frame(partner, resolved)
+        center = frame((sum(xs) / len(xs), 0.5))[0]
+        half = half_width(resolved.pen, partner.role, math.pi / 2.0) * cap
+        mid = samples[len(samples) // 2][0]
+        # 幹の向こう側へだけ出さない。手前は重ねて、股の切れ目を埋める。
+        if mid.x >= center:
+            ring = _clip_vertical(ring, center - half, keep_left=False)
+        else:
+            ring = _clip_vertical(ring, center + half, keep_left=True)
+        changed = True
+    if not changed:
+        return poly
+    return _drop_close(ring)
+
+
 def _bury(
     samples: dict[str, list[tuple[Vec2, Vec2]]],
     widths: dict[str, list[float]],
@@ -825,6 +899,7 @@ def _stroke_paths(
         else:
             poly = variable_width_outline(ext_samples, ext_widths, close=True)
             poly = _square_lateral_cuts(poly, samples, widths, stroke, resolved)
+        poly = _clip_behind_vertical_partner(poly, samples, stroke, resolved)
         path = _to_path(poly)
         for box in boxes:
             path = _difference(path, _to_path(box))
@@ -843,11 +918,35 @@ def _metric(resolved: Resolved, key: str) -> float:
     return float(resolved.style.metrics[key])
 
 
+def apex_meeting_y(a: Stroke, b: Stroke) -> float:
+    """二つの画が最も近い端で会う高さ。節点空間。"""
+    pairs = (
+        (a.knots[0], b.knots[0]),
+        (a.knots[0], b.knots[-1]),
+        (a.knots[-1], b.knots[0]),
+        (a.knots[-1], b.knots[-1]),
+    )
+    left, right = min(
+        pairs,
+        key=lambda pair: abs(pair[0].x - pair[1].x) + abs(pair[0].y - pair[1].y),
+    )
+    return (left.y + right.y) / 2.0
+
+
+def _apex_joins(resolved: Resolved) -> list:
+    """下向きの頂点だけ描く。天で会う尖りは帯の判定に使い、ここでは足さない。"""
+    by_id = {stroke.id: stroke for stroke in resolved.skeleton.strokes}
+    return [
+        join
+        for join in resolved.skeleton.joins
+        if join.type in ("apex", "apex_cut")
+        and apex_meeting_y(by_id[join.a], by_id[join.b]) < 0.5
+    ]
+
+
 def _apex_join(resolved: Resolved):
-    for join in resolved.skeleton.joins:
-        if join.type in ("apex", "apex_cut"):
-            return join
-    return None
+    found = _apex_joins(resolved)
+    return found[0] if found else None
 
 
 def _at_y(start: Vec2, end: Vec2, y: float) -> Vec2:
@@ -1625,6 +1724,29 @@ def _has_diagonal_foot(resolved: Resolved) -> bool:
     return False
 
 
+def _flatten_shared_cap(contour: list[Vec2], cap: float) -> list[Vec2]:
+    """頂点を二つ足した字の、天で隣り合う足の段を消す。
+
+    輪郭演算が天の 0.5 UPM 以内に残す段を、キャップへ揃えて落とす。
+    """
+    closed = len(contour) > 1 and (contour[0] - contour[-1]).length() < 1e-6
+    points = list(contour[:-1] if closed else contour)
+    snapped = [
+        Vec2(point.x, cap) if abs(point.y - cap) <= 0.5 else point for point in points
+    ]
+    if not snapped:
+        return list(contour)
+    kept = [snapped[0]]
+    for point in snapped[1:]:
+        if (point - kept[-1]).length() >= 0.5:
+            kept.append(point)
+    if len(kept) > 1 and (kept[0] - kept[-1]).length() < 0.5:
+        kept.pop()
+    if closed and kept:
+        kept.append(kept[0])
+    return kept
+
+
 def _side_amount(style, name: str) -> float:
     return style.sidebearing["base"] * style.cap_height * style.sidebearing[name]
 
@@ -1645,8 +1767,361 @@ def _seat_on_ink(contours, holes, left: float):
     return moved, x1 - x0
 
 
+def _axis_x(stroke: Stroke, resolved: Resolved) -> float:
+    frame = _plain_frame(stroke, resolved)
+    return frame((stroke.knots[0].x, stroke.knots[0].y))[0]
+
+
+def _on_line(origin: tuple[float, float], direction: tuple[float, float], x: float) -> float:
+    return origin[1] + (x - origin[0]) / direction[0] * direction[1]
+
+
+def _clean_ring(points: list[Vec2]) -> list[Vec2]:
+    """辺の上に載った点を輪郭演算でほどき、単純な外周にする。"""
+    cleaned = simplify(_to_path(points), fix_winding=True)
+    rings: list[list[Vec2]] = []
+    for contour in split_contours(cleaned):
+        body = [Vec2(x, y) for x, y in contour_points(contour)]
+        if len(body) > 1 and (body[0] - body[-1]).length() < 1e-4:
+            body = body[:-1]
+        if len(body) >= 3:
+            rings.append(body)
+    ring = max(rings, key=lambda item: abs(_signed_area(item)))
+    # 同じ点を二度通ると、角の数よりオンカーブ点が増える。
+    unique: list[Vec2] = []
+    for point in ring:
+        if any((point - kept).length() < 0.4 for kept in unique):
+            continue
+        unique.append(point)
+    return unique
+
+
+def _constant_gap_direction(
+    start: tuple[float, float],
+    end: tuple[float, float],
+    gap: float,
+    probe_x: float,
+) -> tuple[float, float]:
+    """start を通る直線と、end を通る平行線の距離が gap になる単位方向。
+
+    probe_x では、start 側の線が end 側より上に来る向きを取る。
+    """
+    vx, vy = end[0] - start[0], end[1] - start[1]
+    length = math.hypot(vx, vy)
+    if not 0.0 < gap < length:
+        raise ValueError(f"diagonal gap {gap} does not fit length {length}")
+    ux, uy = vx / length, vy / length
+    alpha = math.asin(gap / length)
+    for sign in (1.0, -1.0):
+        cosine, sine = math.cos(sign * alpha), math.sin(sign * alpha)
+        direction = (cosine * ux - sine * uy, sine * ux + cosine * uy)
+        if _on_line(start, direction, probe_x) > _on_line(end, direction, probe_x):
+            return direction
+    raise ValueError("diagonal edges do not separate")
+
+
+def _dir_hit(
+    origin: tuple[float, float],
+    direction: tuple[float, float],
+    other: tuple[float, float],
+    other_d: tuple[float, float],
+) -> tuple[float, float]:
+    det = direction[0] * other_d[1] - direction[1] * other_d[0]
+    t = ((other[0] - origin[0]) * other_d[1] - (other[1] - origin[1]) * other_d[0]) / det
+    return (origin[0] + direction[0] * t, origin[1] + direction[1] * t)
+
+
+def _font_knot(stroke: Stroke, resolved: Resolved, knot: Knot) -> Vec2:
+    x, y = _plain_frame(stroke, resolved)((knot.x, knot.y))
+    return Vec2(x, y)
+
+
+def _closest_knots(a: Stroke, b: Stroke) -> tuple[Knot, Knot]:
+    pairs = (
+        (a.knots[0], b.knots[0]),
+        (a.knots[0], b.knots[-1]),
+        (a.knots[-1], b.knots[0]),
+        (a.knots[-1], b.knots[-1]),
+    )
+    return min(
+        pairs,
+        key=lambda pair: abs(pair[0].x - pair[1].x) + abs(pair[0].y - pair[1].y),
+    )
+
+
+def _far_knot(diagonal: Stroke, stem: Stroke) -> Knot:
+    meeting, _stem_knot = _closest_knots(diagonal, stem)
+    for knot in (diagonal.knots[0], diagonal.knots[-1]):
+        if knot is not meeting:
+            return knot
+    return diagonal.knots[-1]
+
+
+def _foot_band(stroke: Stroke, resolved: Resolved, high: bool) -> float | None:
+    """足の端の高さ。尖り側は切り口なので None。"""
+    first, last = stroke.knots[0], stroke.knots[-1]
+    if high:
+        knot = last if last.y >= first.y else first
+    else:
+        knot = first if first.y <= last.y else last
+    tag = stroke.ends[0] if knot is first else stroke.ends[-1]
+    if tag != "foot":
+        return None
+    return resolved.style.cap_height if knot.y >= 0.5 else 0.0
+
+
+def _strip_width(stroke: Stroke, resolved: Resolved, full: float) -> float:
+    """両端が頂点の斜画は crotch_thin 倍の一定幅。"""
+    if stroke.ends[0] == "apex" and stroke.ends[1] == "apex":
+        return resolved.style.joins["crotch_thin"] * full
+    return full
+
+
+@dataclass(frozen=True)
+class _StemCorner:
+    stem: Stroke
+    diagonal: Stroke
+    meeting_y: float
+    outer: float
+    inner: float
+    inward: float
+    flat_pt: tuple[float, float]
+    top: bool
+
+
+def _stem_corners(resolved: Resolved) -> list[_StemCorner]:
+    style = resolved.style
+    cap = style.cap_height
+    full = resolved.pen.stem * cap
+    flat = float(style.metrics["apex_flat"]) * full
+    overshoot = style.overshoot["apex"] * cap
+    by_id = {stroke.id: stroke for stroke in resolved.skeleton.strokes}
+    corners = []
+    for join in resolved.skeleton.joins:
+        if join.type != "stem_apex":
+            continue
+        stem, diagonal = by_id[join.a], by_id[join.b]
+        stem_knot, diag_knot = _closest_knots(stem, diagonal)
+        meeting_y = (stem_knot.y + diag_knot.y) / 2.0
+        axis = _axis_x(stem, resolved)
+        inward = 1.0 if _font_knot(diagonal, resolved, _far_knot(diagonal, stem)).x >= axis else -1.0
+        outer = axis - inward * (full / 2.0)
+        top = meeting_y >= 0.5
+        y = cap + overshoot if top else -overshoot
+        corners.append(
+            _StemCorner(
+                stem,
+                diagonal,
+                meeting_y,
+                outer,
+                outer + inward * full,
+                inward,
+                (outer + inward * flat, y),
+                top,
+            )
+        )
+    return corners
+
+
+def _shared_apex_x(resolved: Resolved, diagonals: set[str]) -> float:
+    by_id = {stroke.id: stroke for stroke in resolved.skeleton.strokes}
+    for join in resolved.skeleton.joins:
+        if join.type not in ("apex", "apex_cut"):
+            continue
+        if {join.a, join.b} != diagonals:
+            continue
+        left, right = _closest_knots(by_id[join.a], by_id[join.b])
+        return (
+            _font_knot(by_id[join.a], resolved, left).x
+            + _font_knot(by_id[join.b], resolved, right).x
+        ) / 2.0
+    raise ValueError(f"{resolved.skeleton.glyph}: diagonal apex join missing")
+
+
+def _stem_apex_ring(resolved: Resolved) -> list[Vec2]:
+    """幹と斜画の外頂点。斜画の節点と幹の節点から、一定幅の縁を引く。"""
+    style = resolved.style
+    cap = style.cap_height
+    full = resolved.pen.stem * cap
+    flat = float(style.metrics["apex_flat"]) * full
+    overshoot = style.overshoot["apex"] * cap
+    peak, tip = cap + overshoot, -overshoot
+    corners = _stem_corners(resolved)
+    by_diagonal: dict[str, list[_StemCorner]] = {}
+    for corner in corners:
+        by_diagonal.setdefault(corner.diagonal.id, []).append(corner)
+    if len(by_diagonal) == 1 and len(corners) == 2:
+        return _one_diagonal_ring(corners, resolved, full, peak, tip)
+    if len(by_diagonal) == 2 and len(corners) == 2:
+        return _two_diagonal_ring(corners, resolved, full, flat, peak, tip)
+    raise ValueError(f"{resolved.skeleton.glyph}: unsupported stem_apex layout")
+
+
+def _one_diagonal_ring(
+    corners: list[_StemCorner],
+    resolved: Resolved,
+    full: float,
+    peak: float,
+    tip: float,
+) -> list[Vec2]:
+    """斜画1本が、天の頂点と地の頂点をつなぐ。"""
+    top = next(corner for corner in corners if corner.top)
+    bottom = next(corner for corner in corners if not corner.top)
+    if top.outer > bottom.outer:
+        raise ValueError(f"{resolved.skeleton.glyph}: top stem_apex is not on the left")
+    weight = _strip_width(top.diagonal, resolved, full)
+    direction = _constant_gap_direction(top.flat_pt, bottom.flat_pt, weight, top.inner)
+    low = _foot_band(top.stem, resolved, high=False)
+    high = _foot_band(bottom.stem, resolved, high=True)
+    if low is None or high is None:
+        raise ValueError(f"{resolved.skeleton.glyph}: stem foot missing")
+    crotch_top = _on_line(bottom.flat_pt, direction, top.inner)
+    crotch_bottom = _on_line(top.flat_pt, direction, bottom.inner)
+    return _clean_ring(
+        [
+            Vec2(top.outer, low),
+            Vec2(top.inner, low),
+            Vec2(top.inner, crotch_top),
+            Vec2(*bottom.flat_pt),
+            Vec2(bottom.outer, tip),
+            Vec2(bottom.outer, high),
+            Vec2(bottom.inner, high),
+            Vec2(bottom.inner, crotch_bottom),
+            Vec2(*top.flat_pt),
+            Vec2(top.outer, peak),
+        ]
+    )
+
+
+def _two_diagonal_ring(
+    corners: list[_StemCorner],
+    resolved: Resolved,
+    full: float,
+    flat: float,
+    peak: float,
+    tip: float,
+) -> list[Vec2]:
+    """左右の天は幹との外頂点。谷は2本の斜画の下の頂点。"""
+    left, right = sorted(corners, key=lambda corner: corner.outer)
+    apex_x = _shared_apex_x(resolved, {left.diagonal.id, right.diagonal.id})
+    left_tip = (apex_x - left.inward * flat / 2.0, tip)
+    right_tip = (apex_x - right.inward * flat / 2.0, tip)
+    left_dir = _constant_gap_direction(
+        left.flat_pt, left_tip, _strip_width(left.diagonal, resolved, full), left.inner
+    )
+    right_dir = _constant_gap_direction(
+        right.flat_pt, right_tip, _strip_width(right.diagonal, resolved, full), right.inner
+    )
+    left_low = _foot_band(left.stem, resolved, high=False)
+    right_low = _foot_band(right.stem, resolved, high=False)
+    if left_low is None or right_low is None:
+        raise ValueError(f"{resolved.skeleton.glyph}: stem foot missing")
+    crotch_l = _on_line(left_tip, left_dir, left.inner)
+    crotch_r = _on_line(right_tip, right_dir, right.inner)
+    valley = _dir_hit(left.flat_pt, left_dir, right.flat_pt, right_dir)
+    return _clean_ring(
+        [
+            Vec2(left.outer, left_low),
+            Vec2(left.inner, left_low),
+            Vec2(left.inner, crotch_l),
+            Vec2(*left_tip),
+            Vec2(*right_tip),
+            Vec2(right.inner, crotch_r),
+            Vec2(right.inner, right_low),
+            Vec2(right.outer, right_low),
+            Vec2(right.outer, peak),
+            Vec2(*right.flat_pt),
+            Vec2(*valley),
+            Vec2(*left.flat_pt),
+            Vec2(left.outer, peak),
+        ]
+    )
+
+
+def _stem_apex_outline(resolved: Resolved) -> GlyphOutline | None:
+    if not any(join.type == "stem_apex" for join in resolved.skeleton.joins):
+        return None
+    return _seat_ring(resolved, _stem_apex_ring(resolved))
+
+
+def _seat_ring(resolved: Resolved, ring: list[Vec2]) -> GlyphOutline:
+    style = resolved.style
+    raw = (tuple(ring),)
+    holes = (False,)
+    left = _side_amount(style, resolved.skeleton.sides[0])
+    right = _side_amount(style, resolved.skeleton.sides[1])
+    seated, ink_width = _seat_on_ink(raw, holes, left)
+    return GlyphOutline(
+        resolved.skeleton.glyph, left + ink_width + right, seated, holes, fair=False
+    )
+
+
+def _join_font_x(resolved: Resolved, join) -> float:
+    by_id = {stroke.id: stroke for stroke in resolved.skeleton.strokes}
+    left, right = _closest_knots(by_id[join.a], by_id[join.b])
+    return (
+        _font_knot(by_id[join.a], resolved, left).x
+        + _font_knot(by_id[join.b], resolved, right).x
+    ) / 2.0
+
+
+def _top_apex_joins(resolved: Resolved) -> list:
+    by_id = {stroke.id: stroke for stroke in resolved.skeleton.strokes}
+    return [
+        join
+        for join in resolved.skeleton.joins
+        if join.type in ("apex", "apex_cut")
+        and apex_meeting_y(by_id[join.a], by_id[join.b]) >= 0.5
+    ]
+
+
+def _lift_top_apex(contour, resolved: Resolved):
+    """天の apex 接合に一番近い、キャップ上の平らな縁を、尖りの平切りに上げる。"""
+    targets = [_join_font_x(resolved, join) for join in _top_apex_joins(resolved)]
+    if not targets:
+        return contour
+    style = resolved.style
+    cap = style.cap_height
+    full = resolved.pen.stem * cap
+    flat = float(style.metrics["apex_flat"]) * full
+    peak = cap + style.overshoot["apex"] * cap
+    pts = list(contour)
+    closed = len(pts) > 1 and (pts[0] - pts[-1]).length() < 1e-6
+    if closed:
+        pts = pts[:-1]
+    count = len(pts)
+    spans = []
+    for index in range(count):
+        start, end = pts[index - 1], pts[index]
+        if abs(start.y - cap) > 1.0 or abs(end.y - cap) > 1.0:
+            continue
+        if abs(start.x - end.x) < 20.0:
+            continue
+        spans.append((index - 1, index, (start.x + end.x) / 2.0))
+    if not spans:
+        return contour
+    used: set[tuple[int, int]] = set()
+    for target in targets:
+        left_i, right_i, mid = min(spans, key=lambda item: abs(item[2] - target))
+        left_i %= count
+        right_i %= count
+        if (left_i, right_i) in used:
+            continue
+        used.add((left_i, right_i))
+        if pts[left_i].x > pts[right_i].x:
+            left_i, right_i = right_i, left_i
+        pts[left_i] = Vec2(mid - flat / 2.0, peak)
+        pts[right_i] = Vec2(mid + flat / 2.0, peak)
+    if closed:
+        pts.append(pts[0])
+    return tuple(pts)
+
+
 def build_glyph(resolved: Resolved) -> GlyphOutline:
     resolved = _seat_arms(_raise_bars(resolved))
+    stemmed = _stem_apex_outline(resolved)
+    if stemmed is not None:
+        return stemmed
     strokes = resolved.skeleton.strokes
     samples: dict[str, list[tuple[Vec2, Vec2]]] = {}
     widths: dict[str, list[float]] = {}
@@ -1661,9 +2136,11 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     _apply_joins(samples, widths, resolved)
     _extend_bowl_stems(samples, widths, resolved)
     contrast = any(_nib_bowl(stroke, resolved) for stroke in strokes)
-    apex = _apex_join(resolved)
-    apex_ids = {apex.a, apex.b} if apex is not None else set()
-    paths = _apex_paths(resolved, apex) if apex is not None else []
+    apices = _apex_joins(resolved)
+    apex_ids = {join.a for join in apices} | {join.b for join in apices}
+    paths: list[Path] = []
+    for apex in apices:
+        paths.extend(_apex_paths(resolved, apex))
     for stroke in strokes:
         if stroke.id in apex_ids:
             continue
@@ -1734,6 +2211,17 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
         for contour, hole in zip(raw, holes)
     )
     style = resolved.style
+    if len(apices) >= 2:
+        raw = tuple(
+            tuple(_flatten_shared_cap(list(contour), style.cap_height))
+            if not hole
+            else contour
+            for contour, hole in zip(raw, holes, strict=True)
+        )
+    raw = tuple(
+        _lift_top_apex(contour, resolved) if not hole else contour
+        for contour, hole in zip(raw, holes, strict=True)
+    )
     # 側面は骨格の箱ではなく、できた墨の外側に足す。碗を細くした分は墨の幅に入っている。
     left = _side_amount(style, resolved.skeleton.sides[0])
     right = _side_amount(style, resolved.skeleton.sides[1])
