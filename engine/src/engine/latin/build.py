@@ -1019,6 +1019,58 @@ def _apex_paths(resolved: Resolved, join) -> list[Path]:
     return [ink, *(_serif_paths(leg, resolved, cap) for leg in legs)]
 
 
+def _upright_apex_joins(resolved: Resolved) -> list:
+    """天で会う apex のうち、脚が地の頂点に使われていないもの。
+
+    地の頂点の脚に載る天（W の中央）は、できた平らな天を持ち上げる側に残す。
+    """
+    taken = {join.a for join in _apex_joins(resolved)} | {
+        join.b for join in _apex_joins(resolved)
+    }
+    return [
+        join
+        for join in _top_apex_joins(resolved)
+        if join.a not in taken and join.b not in taken
+    ]
+
+
+def _up_apex_paths(resolved: Resolved, join) -> list[Path]:
+    """天の頂点。V の外縁・平切り・一様な先細りを、足が基線になる向きにする。"""
+    by_id = {stroke.id: stroke for stroke in resolved.skeleton.strokes}
+    left = by_id[join.a]
+    right = by_id[join.b]
+    frame = _plain_frame(left, resolved)
+    cap = resolved.style.cap_height
+    tip_y = cap + resolved.style.overshoot["apex"] * cap
+    stem = resolved.style.pen.stem * cap
+    taper = _metric(resolved, "apex_taper")
+
+    def foot_of(stroke: Stroke) -> Vec2:
+        knot = stroke.knots[0] if stroke.ends[0] != "apex" else stroke.knots[-1]
+        x, y = frame((knot.x, knot.y))
+        return Vec2(x, y)
+
+    def apex_x(stroke: Stroke) -> float:
+        knot = stroke.knots[-1] if stroke.ends[1] == "apex" else stroke.knots[0]
+        return frame((knot.x, knot.y))[0]
+
+    axis = (apex_x(left) + apex_x(right)) / 2.0
+    if resolved.style.terminals["apex"] == "round":
+        raise ValueError(f"{resolved.skeleton.glyph}: upward round apex is not built")
+    flat = _metric(resolved, "apex_flat") * stem
+    ends = (Vec2(axis - flat / 2.0, tip_y), Vec2(axis + flat / 2.0, tip_y))
+    legs = [
+        _straight_leg(left, resolved, foot_of(left), ends[0], -1.0, taper, 0.0),
+        _straight_leg(right, resolved, foot_of(right), ends[1], 1.0, taper, 0.0),
+    ]
+    covered = []
+    for leg, far in ((legs[0], ends[1]), (legs[1], ends[0])):
+        top, tip, inner, inner_top = leg.quad
+        covered.append(_to_path([top, tip, far, inner, inner_top]))
+    ink = _intersect(_union_all(covered), _to_path(_flat_envelope(legs, 0.0)))
+    return [ink]
+
+
 @dataclass(frozen=True)
 class _Leg:
     stroke: Stroke
@@ -1037,7 +1089,7 @@ def _straight_leg(
     outer_tip: Vec2,
     outward_x: float,
     taper: float,
-    cap: float,
+    cut_y: float,
 ) -> _Leg:
     direction = (outer_tip - foot).normalized()
     width = _leg_width(stroke, resolved, direction)
@@ -1047,15 +1099,15 @@ def _straight_leg(
     inward = -_outward(outer_tip - outer_foot, -outward_x)
     inner_foot = outer_foot + inward * width
     inner_tip = outer_tip + inward * (width * taper)
-    outer_top = _at_y(outer_foot, outer_tip, cap)
-    inner_top = _at_y(inner_foot, inner_tip, cap)
+    outer_top = _at_y(outer_foot, outer_tip, cut_y)
+    inner_top = _at_y(inner_foot, inner_tip, cut_y)
     quad = [outer_top, outer_tip, inner_tip, inner_top]
     return _Leg(stroke, quad, outer_top, inner_top, outer_line, width, outward_x)
 
 
-def _flat_envelope(legs: list[_Leg], cap: float) -> list[Vec2]:
+def _flat_envelope(legs: list[_Leg], foot_y: float) -> list[Vec2]:
     left, right = legs
-    return [left.outer_top, left.quad[1], right.quad[1], right.outer_top, Vec2(right.outer_top.x, cap), Vec2(left.outer_top.x, cap)]
+    return [left.outer_top, left.quad[1], right.quad[1], right.outer_top, Vec2(right.outer_top.x, foot_y), Vec2(left.outer_top.x, foot_y)]
 
 
 def _intersect(outer: Path, inner: Path) -> Path:
@@ -2137,10 +2189,14 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
     _extend_bowl_stems(samples, widths, resolved)
     contrast = any(_nib_bowl(stroke, resolved) for stroke in strokes)
     apices = _apex_joins(resolved)
+    upright = _upright_apex_joins(resolved)
     apex_ids = {join.a for join in apices} | {join.b for join in apices}
+    apex_ids |= {join.a for join in upright} | {join.b for join in upright}
     paths: list[Path] = []
     for apex in apices:
         paths.extend(_apex_paths(resolved, apex))
+    for apex in upright:
+        paths.extend(_up_apex_paths(resolved, apex))
     for stroke in strokes:
         if stroke.id in apex_ids:
             continue
@@ -2180,7 +2236,7 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
         leg = any(stroke.role == "bowl" for stroke in strokes) and _has_diagonal_foot(
             resolved
         )
-        if _apex_join(resolved) is None and not leg:
+        if _apex_join(resolved) is None and not upright and not leg:
             polished = trim_apex_stub(bevel_apex_valley(polished))
         # 断面の碗が作る谷は、深い埋め直しをすると肩が太くなる。先に浅く面を取る。
         if contrast:
