@@ -7,7 +7,8 @@ terminals: {foot: flat, apex: apex_sharp, none: none, open: flat, round_end: fla
 joins: {crotch_thin: 0.90}
 # I L T E F C D J U P R Z X Y / と K M N W は暫定。作者が組見本で決める。
 # I は幹1本なので、この値は墨の幅を変えない。/ は単位幅いっぱいで約 60°。
-proportions: {H: 0.74, O: 1.00, B: 0.68, V: 0.78, S: 0.56, "0": 0.92, I: 0.30, L: 0.62, T: 0.72, E: 0.58, F: 0.52, C: 0.94, D: 0.76, J: 0.52, U: 0.78, P: 0.68, R: 0.74, Z: 0.68, X: 0.76, Y: 0.72, "/": 0.577, K: 0.72, M: 0.92, N: 0.76, W: 1.08}
+# A の幅は V と同じ暫定。G の幅は C と同じ。横棒の高さと長さは G の骨格に書く。
+proportions: {H: 0.74, O: 1.00, B: 0.68, V: 0.78, S: 0.56, "0": 0.92, I: 0.30, L: 0.62, T: 0.72, E: 0.58, F: 0.52, C: 0.94, D: 0.76, J: 0.52, U: 0.78, P: 0.68, R: 0.74, Z: 0.68, X: 0.76, Y: 0.72, "/": 0.577, K: 0.72, M: 0.92, N: 0.76, W: 1.08, A: 0.78, G: 0.94}
 sidebearing: {base: 0.08, straight: 1.00, near_straight: 0.85, round: 0.55, diagonal: 0.20, open: 0.35}
 vertical: {ascender: 820, descender: -180}
 micro_area_floor: 400

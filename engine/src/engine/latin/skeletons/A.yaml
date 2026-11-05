@@ -1,0 +1,23 @@
+glyph: A
+unicode: 0x0041
+structure: apex_diagonals
+groups: [diagonal]
+strokes:
+  - id: left
+    knots: [[0.08, 0.00, line], [0.50, 1.00, line]]
+    role: thick
+    ends: {start: foot, end: apex}
+  - id: right
+    knots: [[0.50, 1.00, line], [0.92, 0.00, line]]
+    role: thick
+    ends: {start: apex, end: foot}
+  - id: cross
+    # 中心はキャップの 0.22。bar にしないので、外縁を天や地に寄せない。
+    # 脚の中心より少し外側まで伸ばし、墨の中で会わせる。
+    knots: [[0.1324, 0.22, line], [0.8676, 0.22, line]]
+    role: arm
+    ends: {start: none, end: none}
+joins:
+  - {a: left, b: right, type: apex}
+sides: {left: diagonal, right: diagonal}
+expect: {contours: 2, holes: 1}

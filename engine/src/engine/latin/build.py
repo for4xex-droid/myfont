@@ -1316,16 +1316,22 @@ def _square_lateral_cuts(
         half = widths[index]
         ends = ((origin + normal * half).x, (origin - normal * half).x)
         if outward.x > 0.0:
-            cuts.append((min(ends), True))
+            cuts.append((min(ends), True, origin.y))
         else:
-            cuts.append((max(ends), False))
+            cuts.append((max(ends), False, origin.y))
     if not cuts:
         return poly
     ring = list(poly)
     if (ring[0] - ring[-1]).length() < 1e-6:
         ring = ring[:-1]
-    for cut_x, keep_left in cuts:
-        ring = _clip_vertical(ring, cut_x, keep_left=keep_left)
+    for cut_x, keep_left, origin_y in cuts:
+        band = _bulge_band(ring, cut_x, keep_left=keep_left, origin_y=origin_y)
+        if band is None:
+            ring = _clip_vertical(ring, cut_x, keep_left=keep_left)
+        else:
+            ring = _clip_vertical(
+                ring, cut_x, keep_left=keep_left, y0=band[0], y1=band[1]
+            )
     return _drop_close(ring)
 
 
@@ -1408,8 +1414,57 @@ def _clip_horizontal(poly: list[Vec2], cut_y: float, *, keep_below: bool) -> lis
     return output
 
 
-def _clip_vertical(poly: list[Vec2], cut_x: float, *, keep_left: bool) -> list[Vec2]:
+def _bulge_band(
+    poly: list[Vec2], cut_x: float, *, keep_left: bool, origin_y: float
+) -> tuple[float, float] | None:
+    """切り口をはみ出す連なりのうち、端に近いものの y 範囲。
+
+    碗の反対側まで続く弧は別の連なりなので、開いた端の平切りはそちらを削らない。
+    """
+
+    def past(point: Vec2) -> bool:
+        if keep_left:
+            return point.x > cut_x + 0.05
+        return point.x < cut_x - 0.05
+
+    count = len(poly)
+    flags = [past(point) for point in poly]
+    if not any(flags) or all(flags):
+        return None
+    start = next(index for index, flag in enumerate(flags) if not flag)
+    runs: list[list[int]] = []
+    index = 0
+    while index < count:
+        at = (start + index) % count
+        if not flags[at]:
+            index += 1
+            continue
+        end = index
+        while end < count and flags[(start + end) % count]:
+            end += 1
+        runs.append([(start + step) % count for step in range(index, end)])
+        index = end
+    if len(runs) < 2:
+        return None
+    chosen = min(
+        runs,
+        key=lambda indices: abs(sum(poly[i].y for i in indices) / len(indices) - origin_y),
+    )
+    ys = [poly[i].y for i in chosen]
+    return min(ys) - 2.0, max(ys) + 2.0
+
+
+def _clip_vertical(
+    poly: list[Vec2],
+    cut_x: float,
+    *,
+    keep_left: bool,
+    y0: float | None = None,
+    y1: float | None = None,
+) -> list[Vec2]:
     def inside(point: Vec2) -> bool:
+        if y0 is not None and y1 is not None and not y0 <= point.y <= y1:
+            return True
         if keep_left:
             return point.x <= cut_x + 1e-6
         return point.x >= cut_x - 1e-6
@@ -2169,6 +2224,97 @@ def _lift_top_apex(contour, resolved: Resolved):
     return tuple(pts)
 
 
+def _bar_tail(resolved: Resolved) -> Stroke | None:
+    """開いた碗の終点が、基準線でない高さで内へ向かう横棒になっている。
+
+    幹へ戻る碗（B D P R）は接合を持つので、ここには入らない。
+    """
+    joined = {join.a for join in resolved.skeleton.joins} | {
+        join.b for join in resolved.skeleton.joins
+    }
+    for stroke in resolved.skeleton.strokes:
+        knots = stroke.knots
+        if stroke.role != "bowl" or stroke.closed or len(knots) < 3:
+            continue
+        if stroke.id in joined or "open" not in stroke.ends:
+            continue
+        end, before = knots[-1], knots[-2]
+        if abs(end.y - before.y) > 1e-4 or end.x >= before.x - 1e-4:
+            continue
+        if end.y <= 1e-4 or end.y >= 1.0 - 1e-4:
+            continue
+        return stroke
+    return None
+
+
+def _outer_parallel(frame: _Frame, theta: float, half: float, seat: float) -> Vec2:
+    fx = frame.x_off + (0.5 + 0.5 * math.cos(theta)) * frame.x_scale
+    fy = frame.y_off + (0.5 + 0.5 * math.sin(theta)) * frame.y_scale
+    tx = -math.sin(theta) * frame.x_scale
+    ty = math.cos(theta) * frame.y_scale
+    length = math.hypot(tx, ty)
+    ox, oy = ty / length, -tx / length
+    center_x = frame.x_off + 0.5 * frame.x_scale
+    center_y = frame.y_off + 0.5 * frame.y_scale
+    if ox * (fx - center_x) + oy * (fy - center_y) < 0.0:
+        ox, oy = -ox, -oy
+    return Vec2(fx + ox * half + seat, fy + oy * half)
+
+
+def _meet_bar_on_circle(
+    contour: list[Vec2], frame: _Frame, half: float, cap: float
+) -> list[Vec2]:
+    """横棒の上面と円の外縁が、面取りではなく一つの外角で会う。"""
+    ring = list(contour)
+    closed = len(ring) > 1 and (ring[0] - ring[-1]).length() < 1e-6
+    if closed:
+        ring = ring[:-1]
+    top_y = None
+    flat_at = None
+    for index, (start, end) in enumerate(zip(ring, ring[1:] + ring[:1], strict=True)):
+        if end.x >= start.x - 40.0 or abs(end.y - start.y) > 0.6:
+            continue
+        if start.y < cap * 0.5:
+            continue
+        top_y = (start.y + end.y) / 2.0
+        flat_at = index
+        break
+    if top_y is None or flat_at is None:
+        return list(contour)
+    equator = frame.y_off + 0.5 * frame.y_scale
+    near = [point.x for point in ring if abs(point.y - equator) < 40.0]
+    if not near:
+        return list(contour)
+    seat = max(near) - (frame.x_off + frame.x_scale + half)
+    low, high = 0.0, 0.8
+    for _ in range(24):
+        mid = (low + high) / 2.0
+        if _outer_parallel(frame, mid, half, seat).y < top_y:
+            low = mid
+        else:
+            high = mid
+    on_circle = [
+        index
+        for index, point in enumerate(ring)
+        if point.y < top_y - 20.0 and point.x > max(near) - 2.0
+    ]
+    if not on_circle:
+        return list(contour)
+    leave = max(on_circle)
+    samples: list[Vec2] = []
+    theta = 0.0
+    while theta < high:
+        point = _outer_parallel(frame, theta, half, seat)
+        if point.y > ring[leave].y:
+            samples.append(point)
+        theta += 0.02
+    samples.append(_outer_parallel(frame, high, half, seat))
+    merged = ring[: leave + 1] + samples + ring[flat_at + 1 :]
+    if closed and merged:
+        merged.append(merged[0])
+    return merged
+
+
 def build_glyph(resolved: Resolved) -> GlyphOutline:
     resolved = _seat_arms(_raise_bars(resolved))
     stemmed = _stem_apex_outline(resolved)
@@ -2278,6 +2424,15 @@ def build_glyph(resolved: Resolved) -> GlyphOutline:
         _lift_top_apex(contour, resolved) if not hole else contour
         for contour, hole in zip(raw, holes, strict=True)
     )
+    tail = _bar_tail(resolved)
+    if tail is not None and tail.id in frames:
+        half = half_width(resolved.pen, "thick", 0.0) * style.cap_height
+        raw = tuple(
+            tuple(_meet_bar_on_circle(list(contour), frames[tail.id], half, style.cap_height))
+            if not hole
+            else contour
+            for contour, hole in zip(raw, holes, strict=True)
+        )
     # 側面は骨格の箱ではなく、できた墨の外側に足す。碗を細くした分は墨の幅に入っている。
     left = _side_amount(style, resolved.skeleton.sides[0])
     right = _side_amount(style, resolved.skeleton.sides[1])

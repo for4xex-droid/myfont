@@ -333,6 +333,7 @@ def _fit_open(
     max_error: float,
     depth: int = 0,
     max_depth: int = 14,
+    reparam_iters: int = 3,
 ) -> list[tuple]:
     """開折れ線 → cubic/line セグメント列（開始点は呼び出し側）。"""
     if len(pts) < 2:
@@ -347,10 +348,14 @@ def _fit_open(
         if mid_err <= max_error * 0.5:
             return [("L", b[0], b[1])]
 
-    cubic = _fit_cubic(pts)
+    cubic = _fit_cubic(pts, reparam_iters=reparam_iters)
     if cubic is None:
         return [("L", pts[1][0], pts[1][1])] + _fit_open(
-            pts[1:], max_error=max_error, depth=depth + 1, max_depth=max_depth
+            pts[1:],
+            max_error=max_error,
+            depth=depth + 1,
+            max_depth=max_depth,
+            reparam_iters=reparam_iters,
         )
 
     err, idx = _max_error_cubic(pts, cubic)
@@ -361,10 +366,18 @@ def _fit_open(
         return [("C", p1[0], p1[1], p2[0], p2[1], p3[0], p3[1])]
 
     left = _fit_open(
-        pts[: idx + 1], max_error=max_error, depth=depth + 1, max_depth=max_depth
+        pts[: idx + 1],
+        max_error=max_error,
+        depth=depth + 1,
+        max_depth=max_depth,
+        reparam_iters=reparam_iters,
     )
     right = _fit_open(
-        pts[idx:], max_error=max_error, depth=depth + 1, max_depth=max_depth
+        pts[idx:],
+        max_error=max_error,
+        depth=depth + 1,
+        max_depth=max_depth,
+        reparam_iters=reparam_iters,
     )
     return left + right
 
@@ -531,6 +544,7 @@ def fit_pinned_contour(
     *,
     max_error_upm: float,
     corner_deg: float,
+    reparam_iters: int = 3,
 ) -> ContourPath | None:
     """角と極値と長い直線の両端を固定し、その区間を誤差以内の三次曲線でつなぐ。
 
@@ -554,7 +568,13 @@ def fit_pinned_contour(
             chain = pts[start_at : end_at + 1]
         else:
             chain = pts[start_at:] + pts[: end_at + 1]
-        segs.extend(_fit_open(_densify(chain), max_error=max_error_upm))
+        segs.extend(
+            _fit_open(
+                _densify(chain),
+                max_error=max_error_upm,
+                reparam_iters=reparam_iters,
+            )
+        )
     if not segs:
         return None
     return ContourPath(start=pts[pins[0]], segs=segs)

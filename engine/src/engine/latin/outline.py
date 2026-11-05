@@ -8,6 +8,8 @@ from pathops import Path, simplify
 
 from engine.curve_fit import (
     ContourPath,
+    _polyline_extrema,
+    detect_corners,
     fit_closed_contour,
     fit_crown_pinned_contour,
     fit_pinned_contour,
@@ -559,6 +561,15 @@ def _faired_crown(
     return faired
 
 
+def _anchor_budget(points: list[tuple[float, float]], corner_deg: float, cap: int) -> int:
+    ring = points
+    if len(ring) > 1 and ring[0] == ring[-1]:
+        ring = ring[:-1]
+    pins = set(detect_corners(ring, angle_deg=corner_deg, min_sep_upm=10.0))
+    pins.update(_polyline_extrema(ring))
+    return max(cap, len(pins))
+
+
 def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
     """様式の誤差上限でフィットする。極値を入れ、丸め後に誤差と自己交差を見る。
 
@@ -602,6 +613,23 @@ def fit_outline(outline: GlyphOutline, style: Style) -> tuple[ContourPath, ...]:
                 chosen = path
         if chosen is None:
             raise ValueError(reason)
+        budget = _anchor_budget(points, float(curve["corner_deg"]), int(curve["max_anchors_per_contour"]))
+        if len(chosen.on_curve_points()) > budget:
+            tight = fit_pinned_contour(
+                points,
+                max_error_upm=float(curve["max_error"]),
+                corner_deg=float(curve["corner_deg"]),
+                reparam_iters=12,
+            )
+            if tight is not None:
+                refit = _post(tight, points, curve, hole=hole, line_tol=line_tol)
+                error = hausdorff_path_to_polyline(refit, points)
+                if (
+                    error <= float(curve["max_error"])
+                    and len(refit.on_curve_points()) <= budget
+                    and _reject(refit, points, limit, outline.glyph) is None
+                ):
+                    chosen = refit
         if outline.fair:
             faired = fair_contour(chosen, points)
             if _reject(faired, points, limit, outline.glyph) is None:
